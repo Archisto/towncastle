@@ -1,0 +1,7 @@
+Towncastle/Library/
+Towncastle/Temp/
+Towncastle/.vs/
+*.csproj
+*.sln
+*.suo
+/Builds/

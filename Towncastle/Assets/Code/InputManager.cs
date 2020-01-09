@@ -1,0 +1,134 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+/// <summary>
+/// Manages user input.
+/// </summary>
+public class InputManager : MonoBehaviour
+{
+    private ObjectPlacer objPlacer;
+    private PlayerController player;
+
+    private SingleInputHandler resetKey;
+    private SingleInputHandler testKey;
+    private SingleInputHandler[] numberKeys;
+
+    /// <summary>
+    /// Start is called before the first frame update.
+    /// </summary>
+    private void Start()
+    {
+        objPlacer = FindObjectOfType<ObjectPlacer>();
+        player = GameManager.Instance.Player;
+
+        resetKey = new SingleInputHandler(KeyCode.R);
+        testKey = new SingleInputHandler(KeyCode.E);
+
+        numberKeys = new SingleInputHandler[] {
+            new SingleInputHandler(KeyCode.Alpha0),
+            new SingleInputHandler(KeyCode.Alpha1),
+            new SingleInputHandler(KeyCode.Alpha2),
+            new SingleInputHandler(KeyCode.Alpha3),
+            new SingleInputHandler(KeyCode.Alpha4),
+            new SingleInputHandler(KeyCode.Alpha5),
+            new SingleInputHandler(KeyCode.Alpha6),
+            new SingleInputHandler(KeyCode.Alpha7),
+            new SingleInputHandler(KeyCode.Alpha8),
+            new SingleInputHandler(KeyCode.Alpha9)
+        };
+    }
+
+    /// <summary>
+    /// Update is called once per frame.
+    /// </summary>
+    private void Update()
+    {
+        HandleInput();
+
+        if (player != null)
+            HandlePlayerMovement();
+
+        HandleDebugInput();
+    }
+
+    /// <summary>
+    /// Handles user input.
+    /// </summary>
+    private void HandleInput()
+    {
+        resetKey.Update();
+
+        if (resetKey.JustPressedDown)
+        {
+            GameManager.Instance.ResetGame();
+        }
+
+        HandleNumberKeyInput();
+    }
+
+    private void HandleNumberKeyInput()
+    {
+        for (int i = 0; i < numberKeys.Length; i++)
+        {
+            numberKeys[i].Update();
+            if (numberKeys[i].JustPressedDown)
+            {
+                objPlacer.SetCoord(i);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Handles player movement user input.
+    /// </summary>
+    private void HandlePlayerMovement()
+    {
+        Vector3 direction = Vector3.zero;
+
+        if (Input.GetKey(KeyCode.W))
+        {
+            direction.z += 1;
+        }
+        if (Input.GetKey(KeyCode.S))
+        {
+            direction.z -= 1;
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            direction.x -= 1;
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            direction.x += 1;
+        }
+
+        if (direction != Vector3.zero)
+        {
+            player.Move(direction);
+        }
+    }
+
+    /// <summary>
+    /// Handles user input for debugging.
+    /// </summary>
+    private void HandleDebugInput()
+    {
+        testKey.Update();
+
+        if (testKey.Released)
+        {
+            Debug.Log("TestKey: Released");
+        }
+
+        if (testKey.JustPressedDown)
+        {
+            Debug.Log("TestKey: Just pressed down");
+            objPlacer.ChangeObject();
+        }
+        else if (testKey.PressedDown)
+        {
+            Debug.Log("TestKey: Pressed down");
+        }
+    }
+}
