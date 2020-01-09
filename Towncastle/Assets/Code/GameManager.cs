@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Towncastle.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -35,18 +36,22 @@ public class GameManager : MonoBehaviour
 
     private Vector3 playerStartPos;
 
+    public UIManager UI { get; private set; }
+
     public HexGrid Grid { get; private set; }
 
     public PlayerController Player { get; private set; }
 
     public float ElapsedTime { get; private set; }
 
+    public bool PlayReady { get { return !GamePaused && !GameOver; } }
+
     public bool GameOver { get; private set; }
 
     public bool GamePaused { get; private set; }
 
     /// <summary>
-    /// Awake is called when the scene loads.
+    /// Awake is called when the script instance is being loaded.
     /// </summary>
     private void Awake()
     {
@@ -67,6 +72,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Initializing GameManager...");
 
+        UI = FindObjectOfType<UIManager>();
         Grid = FindObjectOfType<HexGrid>();
         Player = FindObjectOfType<PlayerController>();
         shooter = FindObjectOfType<Shooter>();

@@ -21,18 +21,38 @@ public class ObjectPlacer : MonoBehaviour
         coord = new Vector2Int(-1, -1);
     }
 
-    public void SetCoord(int i)
+    public void SetCoord(int i, bool removeObj)
     {
         if (coord.x < 0)
         {
             coord.x = i;
-            Debug.Log("X: " + i);
         }
         else if (coord.y < 0)
         {
             coord.y = i;
-            Debug.Log("Y: " + i);
-            AddObjectToGridCell(coord);
+
+            if (!grid.CellExists(coord.x, coord.y))
+            {
+                Debug.LogError("Cell doesn't exist: " + coord);
+            }
+            else
+            {
+                bool cellAvailable = grid.CellIsAvailable(coord);
+
+                if (!removeObj && cellAvailable)
+                {
+                    AddObjectToGridCell(coord);
+                }
+                else if (removeObj && !cellAvailable)
+                {
+                    grid.EditCell(coord, null);
+                }
+                else
+                {
+                    Debug.LogWarning("Cell unavailable: " + coord);
+                }
+            }
+
             coord = new Vector2Int(-1, -1);
         }
     }
@@ -45,16 +65,16 @@ public class ObjectPlacer : MonoBehaviour
         {
             if (!obj.activeSelf)
             {
-                Vector3 newPosition = grid.GetCellCenterWorld(cell);
+                Vector3 newPosition = grid.GetCellCenterWorld(cell, defaultYAxis: false);
                 if (newPosition.x >= 0)
                 {
                     obj.transform.position = newPosition;
                     obj.SetActive(true);
-                    Debug.Log("Cell: " + cell);
+                    grid.EditCell(cell, obj);
                 }
                 else
                 {
-                    Debug.Log("Unreachable Cell: " + cell);
+                    Debug.LogWarning("Unreachable cell: " + cell);
                 }
 
                 return;

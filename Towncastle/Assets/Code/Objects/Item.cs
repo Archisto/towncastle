@@ -29,7 +29,7 @@ public class Item : LevelObject
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (isCollected || isDestroyed)
+        if (isCollected || IsDestroyed)
             return;
 
         Debug.Log("HIT: " + collision.gameObject.name);

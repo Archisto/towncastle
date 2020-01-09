@@ -7,7 +7,7 @@ public class LevelObject : MonoBehaviour
     [SerializeField]
     private bool showGizmos;
 
-    protected bool isDestroyed;
+    public bool IsDestroyed { get; protected set; }
 
     /// <summary>
     /// Start is called before the first frame update.
@@ -22,7 +22,7 @@ public class LevelObject : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        if (!isDestroyed)
+        if (!IsDestroyed)
         {
             UpdateObject();
         }
@@ -43,7 +43,7 @@ public class LevelObject : MonoBehaviour
     /// </summary>
     public virtual void DestroyObject()
     {
-        isDestroyed = true;
+        IsDestroyed = true;
     }
 
     /// <summary>
@@ -51,7 +51,7 @@ public class LevelObject : MonoBehaviour
     /// </summary>
     public virtual void ResetObject()
     {
-        isDestroyed = false;
+        IsDestroyed = false;
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public class LevelObject : MonoBehaviour
     /// </summary>
     protected virtual void DrawGizmos()
     {
-        if (!isDestroyed)
+        if (!IsDestroyed)
         {
             Gizmos.color = Color.green;
         }

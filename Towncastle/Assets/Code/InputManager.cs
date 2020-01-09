@@ -11,8 +11,11 @@ public class InputManager : MonoBehaviour
     private PlayerController player;
 
     private SingleInputHandler resetKey;
-    private SingleInputHandler testKey;
+
+    private SingleInputHandler removeKey;
     private SingleInputHandler[] numberKeys;
+
+    private SingleInputHandler testKey;
 
     /// <summary>
     /// Start is called before the first frame update.
@@ -23,7 +26,8 @@ public class InputManager : MonoBehaviour
         player = GameManager.Instance.Player;
 
         resetKey = new SingleInputHandler(KeyCode.R);
-        testKey = new SingleInputHandler(KeyCode.E);
+
+        removeKey = new SingleInputHandler(KeyCode.X);
 
         numberKeys = new SingleInputHandler[] {
             new SingleInputHandler(KeyCode.Alpha0),
@@ -37,6 +41,8 @@ public class InputManager : MonoBehaviour
             new SingleInputHandler(KeyCode.Alpha8),
             new SingleInputHandler(KeyCode.Alpha9)
         };
+
+        testKey = new SingleInputHandler(KeyCode.E);
     }
 
     /// <summary>
@@ -64,17 +70,19 @@ public class InputManager : MonoBehaviour
             GameManager.Instance.ResetGame();
         }
 
-        HandleNumberKeyInput();
+        HandleObjPlacingInput();
     }
 
-    private void HandleNumberKeyInput()
+    private void HandleObjPlacingInput()
     {
+        removeKey.Update();
+
         for (int i = 0; i < numberKeys.Length; i++)
         {
             numberKeys[i].Update();
             if (numberKeys[i].JustPressedDown)
             {
-                objPlacer.SetCoord(i);
+                objPlacer.SetCoord(i, removeKey.PressedDown);
             }
         }
     }

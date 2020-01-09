@@ -9,7 +9,7 @@ public class ProgressBar : MonoBehaviour
     private Image fillImg;
 
     [SerializeField]
-    private HelperMethods.Direction barDirection = HelperMethods.Direction.Right;
+    private Utils.Direction barDirection = Utils.Direction.Right;
 
     [SerializeField]
     private float maxFillSize = -200f;
@@ -47,19 +47,19 @@ public class ProgressBar : MonoBehaviour
 
             switch (barDirection)
             {
-                case HelperMethods.Direction.Up:
+                case Utils.Direction.Up:
                     fillImg.rectTransform.offsetMax = new Vector2(fillImg.rectTransform.offsetMax.x, -1 * hpRatio * maxFillSize);
                     break;
 
-                case HelperMethods.Direction.Down:
+                case Utils.Direction.Down:
                     fillImg.rectTransform.offsetMin = new Vector2(fillImg.rectTransform.offsetMin.x, hpRatio * maxFillSize);
                     break;
 
-                case HelperMethods.Direction.Left:
+                case Utils.Direction.Left:
                     fillImg.rectTransform.offsetMin = new Vector2(hpRatio * maxFillSize, fillImg.rectTransform.offsetMin.y);
                     break;
 
-                case HelperMethods.Direction.Right:
+                case Utils.Direction.Right:
                     fillImg.rectTransform.offsetMax = new Vector2(-1 * hpRatio * maxFillSize, fillImg.rectTransform.offsetMax.y);
                     break;
             }

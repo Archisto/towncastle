@@ -6,6 +6,9 @@ public class SingleInputHandler
 {
     public KeyCode key;
 
+    // TODO: Double press
+    //private float doublePressTime = 0.5f;
+
     private bool wasPressedDown;
 
     public bool Released { get; private set; }
@@ -20,6 +23,12 @@ public class SingleInputHandler
 
     public bool JustPressedDown { get; private set; }
 
+    //public bool DoublePressed { get; private set; }
+
+    /// <summary>
+    /// Creates the SingleInputHandler.
+    /// </summary>
+    /// <param name="keyCode">The key code</param>
     public SingleInputHandler(KeyCode keyCode)
     {
         key = keyCode;

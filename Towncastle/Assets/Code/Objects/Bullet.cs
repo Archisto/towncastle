@@ -18,7 +18,7 @@ public class Bullet : MonoBehaviour
 
     private bool initDone;
     private bool isMoving;
-    private HelperMethods.Direction cardinalDir = HelperMethods.Direction.Up;
+    private Utils.Direction cardinalDir = Utils.Direction.Up;
 
     private bool UnlimitedLifeTime { get { return lifeTime <= 0; } }
 
@@ -47,9 +47,9 @@ public class Bullet : MonoBehaviour
             lifeTimer.Start();
     }
 
-    public void Shoot(HelperMethods.Direction dir)
+    public void Shoot(Utils.Direction dir)
     {
-        Shoot(transform.position, HelperMethods.VectorFromDirection(dir));
+        Shoot(transform.position, Utils.VectorFromDirection(dir));
     }
 
     public void Shoot()
@@ -66,14 +66,14 @@ public class Bullet : MonoBehaviour
     {
         switch (cardinalDir)
         {
-            case HelperMethods.Direction.Up:
-                cardinalDir = HelperMethods.Direction.Down;
+            case Utils.Direction.Up:
+                cardinalDir = Utils.Direction.Down;
                 break;
-            case HelperMethods.Direction.Down:
-                cardinalDir = HelperMethods.Direction.Up;
+            case Utils.Direction.Down:
+                cardinalDir = Utils.Direction.Up;
                 break;
             default:
-                cardinalDir = HelperMethods.Direction.Up;
+                cardinalDir = Utils.Direction.Up;
                 break;
         }
 
