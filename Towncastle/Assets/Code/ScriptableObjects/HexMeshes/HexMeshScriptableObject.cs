@@ -6,5 +6,6 @@ public class HexMeshScriptableObject : ScriptableObject
     public Mesh mesh;
     public bool imported = true;
     public HexObject.StructureType structureType = HexObject.StructureType.Object;
+    public float defaultPositionY = 0;
     public float defaultRotationY = 90;
 }

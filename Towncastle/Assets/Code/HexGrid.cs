@@ -59,16 +59,10 @@ public class HexGrid : MonoBehaviour
 
     private void InitFilledCells()
     {
-        //filledCells = new bool[gridSizeY][]; // Supports only symmetrical arrays (x size == y size)
         cellContents = new List<GameObject[]>();
         for (int i = 0; i < GridSizeY; i++)
         {
             cellContents.Add(new GameObject[GridSizeX]);
-
-            //for (int j = 0; j < filledCells[1].Length; j++)
-            //{
-            //    filledCells[i][j] = false;
-            //}
         }
     }
 
@@ -233,6 +227,17 @@ public class HexGrid : MonoBehaviour
         {
             Debug.LogError("Invalid coordinates: (" + x + ", " + y + ")");
             return null;
+        }
+    }
+
+    public void ResetGrid()
+    {
+        for (int y = 0; y < GridSizeY; y++)
+        {
+            for (int x = 0; x < GridSizeX; x++)
+            {
+                cellContents[y][x] = null;
+            }
         }
     }
 

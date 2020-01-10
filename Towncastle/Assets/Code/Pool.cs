@@ -112,6 +112,11 @@ public class Pool<T>
         component.gameObject.SetActive(false);
     }
 
+    public List<T> GetAllObjects()
+    {
+        return _pool;
+    }
+
     /// <summary>
     /// Fetches an object form the pool.
     /// </summary>

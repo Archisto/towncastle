@@ -32,7 +32,7 @@ public class GameManager : MonoBehaviour
 
     private Shooter shooter;
     private TimeCounter counter;
-    private LevelObject[] levelObjects;
+    private List<LevelObject> levelObjects;
 
     private Vector3 playerStartPos;
 
@@ -80,12 +80,38 @@ public class GameManager : MonoBehaviour
         Player = FindObjectOfType<PlayerController>();
         shooter = FindObjectOfType<Shooter>();
         counter = FindObjectOfType<TimeCounter>();
-        levelObjects = FindObjectsOfType<LevelObject>();
+
+        InitLevelObjects();
 
         if (Player != null)
             playerStartPos = Player.transform.position;
 
         Debug.Log("GameManager initialized.");
+    }
+
+    private void InitLevelObjects()
+    {
+        levelObjects = new List<LevelObject>();
+        LevelObject[] loArray = FindObjectsOfType<LevelObject>();
+        foreach (LevelObject lo in loArray)
+        {
+            AddLevelObjectToList(lo);
+        }
+    }
+
+    public void AddLevelObjectsToList<T>(List<T> objs)
+        where T : LevelObject
+    {
+        foreach (LevelObject lo in objs)
+        {
+            AddLevelObjectToList(lo);
+        }
+    }
+
+    public void AddLevelObjectToList<T>(T obj)
+        where T : LevelObject
+    {
+        levelObjects.Add(obj);
     }
 
     /// <summary>
@@ -122,6 +148,19 @@ public class GameManager : MonoBehaviour
         GameOver = false;
         ElapsedTime = 0f;
 
+        if (levelObjects != null)
+        {
+            foreach (LevelObject lo in levelObjects)
+            {
+                lo.ResetObject();
+            }
+        }
+
+        if (Grid != null)
+        {
+            Grid.ResetGrid();
+        }
+
         if (Player != null)
         {
             Player.transform.position = playerStartPos;
@@ -133,13 +172,5 @@ public class GameManager : MonoBehaviour
 
         if (counter != null)
             counter.ResetCounter();
-
-        if (levelObjects != null)
-        {
-            foreach (LevelObject lo in levelObjects)
-            {
-                lo.ResetObject();
-            }
-        }
     }
 }

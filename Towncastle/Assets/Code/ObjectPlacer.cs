@@ -42,7 +42,10 @@ public class ObjectPlacer : MonoBehaviour
         coord = new Vector2Int(-1, -1);
 
         if (hexObjPrefab != null)
+        {
             pool = new Pool<HexObject>(hexObjPrefab, hexObjPoolSize, false);
+            GameManager.Instance.AddLevelObjectsToList(pool.GetAllObjects());
+        }
 
         if (hexMeshes != null)
             Debug.Log("Selected item: " + hexMeshes[currentHexMesh].name);
@@ -118,6 +121,7 @@ public class ObjectPlacer : MonoBehaviour
             Vector3 newPosition = grid.GetCellCenterWorld(cell, defaultYAxis: false);
             if (newPosition.x >= 0)
             {
+                newPosition.y = newObj.HexMesh.defaultPositionY;
                 newObj.transform.position = newPosition;
                 SetRotationForObject(newObj.gameObject);
                 newObj.gameObject.SetActive(true);
@@ -188,6 +192,9 @@ public class ObjectPlacer : MonoBehaviour
 
     public string GetPlacementInfo()
     {
+        if (hexMeshes == null || hexMeshes.Length == 0)
+            return "No hex meshes!";
+        
         return string.Format("Selected item: {0} ({1})\nRotation: {2} degrees",
             hexMeshes[currentHexMesh].name, hexMeshes[currentHexMesh].structureType, objRotation);
     }
