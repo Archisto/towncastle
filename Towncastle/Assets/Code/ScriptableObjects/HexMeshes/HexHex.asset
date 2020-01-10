@@ -15,3 +15,4 @@ MonoBehaviour:
   mesh: {fileID: -7158247418717641203, guid: 92f88e66719df9248adeb291a244689c, type: 3}
   imported: 1
   structureType: 6
+  defaultRotationY: 0

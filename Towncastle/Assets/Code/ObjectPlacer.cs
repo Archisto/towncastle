@@ -23,7 +23,7 @@ public class ObjectPlacer : MonoBehaviour
     private Pool<HexObject> pool;
 
     private int currentHexMesh = 0;
-    private float objRotation = 90;
+    private float objRotation = 0;
 
     private enum PlacingMode
     {
@@ -143,8 +143,6 @@ public class ObjectPlacer : MonoBehaviour
             currentHexMesh++;
             if (currentHexMesh >= hexMeshes.Length)
                 currentHexMesh = 0;
-
-            Debug.Log("Selected item: " + hexMeshes[currentHexMesh].name);
         }
     }
 
@@ -159,8 +157,6 @@ public class ObjectPlacer : MonoBehaviour
             objRotation -= 360;
         else if (objRotation < 0)
             objRotation += 360;
-
-        Debug.Log("Rotation: " + objRotation + " degrees");
     }
 
     public void ChangeRotationForNextObject(float rotation)
@@ -176,8 +172,6 @@ public class ObjectPlacer : MonoBehaviour
             while (objRotation < 0)
                 objRotation += 360;
         }
-
-        Debug.Log("Rotation: " + objRotation + " degrees");
     }
 
     public void SetRotationForObject(GameObject obj)
@@ -185,10 +179,16 @@ public class ObjectPlacer : MonoBehaviour
         Vector3 newRotation = obj.transform.rotation.eulerAngles;
 
         if (hexMeshes[currentHexMesh].imported)
-            newRotation.z = objRotation;
+            newRotation.z = objRotation + hexMeshes[currentHexMesh].defaultRotationY;
         else
-            newRotation.y = objRotation;
+            newRotation.y = objRotation + hexMeshes[currentHexMesh].defaultRotationY;
 
         obj.transform.rotation = Quaternion.Euler(newRotation);
+    }
+
+    public string GetPlacementInfo()
+    {
+        return string.Format("Selected item: {0} ({1})\nRotation: {2} degrees",
+            hexMeshes[currentHexMesh].name, hexMeshes[currentHexMesh].structureType, objRotation);
     }
 }
