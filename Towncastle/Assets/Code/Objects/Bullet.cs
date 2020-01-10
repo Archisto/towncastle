@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+#pragma warning disable 0649
+
     [SerializeField]
     private int damage = 1;
 
@@ -12,6 +14,8 @@ public class Bullet : MonoBehaviour
 
     [SerializeField]
     private float lifeTime = 1f;
+
+#pragma warning restore 0649
 
     private Timer lifeTimer;
     private Vector3 direction;

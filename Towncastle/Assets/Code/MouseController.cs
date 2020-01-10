@@ -6,9 +6,13 @@ public class MouseController : MonoBehaviour
 {
     public float mouseWorldY = 1f;
 
+#pragma warning disable 0649
+
     // Testing
     [SerializeField]
     private GameObject testObj;
+
+ #pragma warning restore 0649
 
     public Vector3 Position { get; private set; }
 

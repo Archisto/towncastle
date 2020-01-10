@@ -4,8 +4,12 @@ using UnityEngine;
 
 public class LevelObject : MonoBehaviour
 {
+#pragma warning disable 0649
+
     [SerializeField]
     private bool showGizmos;
+
+#pragma warning restore 0649
 
     public bool IsDestroyed { get; protected set; }
 

@@ -7,8 +7,12 @@ using UnityEngine;
 /// </summary>
 public class ScreenSpaceObject : MonoBehaviour
 {
+#pragma warning disable 0649
+
     [SerializeField]
     private Vector2 screenSpacePos;
+
+#pragma warning restore 0649
 
     /// <summary>
     /// Update is called once per frame.

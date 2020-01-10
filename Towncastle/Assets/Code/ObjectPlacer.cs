@@ -4,11 +4,20 @@ using UnityEngine;
 
 public class ObjectPlacer : MonoBehaviour
 {
-    public GameObject[] testObjs;
-    public GameObject[] testObjs2;
+#pragma warning disable 0649
+
+    [SerializeField]
+    private HexObject hexObjPrefab;
+
+    [SerializeField]
+    private int hexObjPoolSize = 20;
+
+#pragma warning restore 0649
 
     private HexGrid grid;
     private Vector2Int coord;
+
+    private Pool<HexObject> pool;
 
     private bool useObject1 = true;
 
@@ -27,6 +36,9 @@ public class ObjectPlacer : MonoBehaviour
     {
         grid = GameManager.Instance.Grid;
         coord = new Vector2Int(-1, -1);
+
+        if (hexObjPrefab != null)
+            pool = new Pool<HexObject>(hexObjPrefab, hexObjPoolSize, false);
     }
 
     public void TryPlaceObject(Vector3 mousePosition, bool removeObj)
@@ -90,26 +102,27 @@ public class ObjectPlacer : MonoBehaviour
 
     private void AddObjectToGridCell(Vector2Int cell)
     {
-        GameObject[] objs = (useObject1 ? testObjs : testObjs2);
+        HexObject newObj = pool.GetPooledObject(false);
 
-        foreach (GameObject obj in objs)
+        if (newObj != null)
         {
-            if (!obj.activeSelf)
+            Vector3 newPosition = grid.GetCellCenterWorld(cell, defaultYAxis: false);
+            if (newPosition.x >= 0)
             {
-                Vector3 newPosition = grid.GetCellCenterWorld(cell, defaultYAxis: false);
-                if (newPosition.x >= 0)
-                {
-                    obj.transform.position = newPosition;
-                    obj.SetActive(true);
-                    grid.EditCell(cell, obj);
-                }
-                else
-                {
-                    Debug.LogWarning("Unreachable cell: " + cell);
-                }
-
-                return;
+                newObj.transform.position = newPosition;
+                newObj.gameObject.SetActive(true);
+                grid.EditCell(cell, newObj.gameObject);
             }
+            else
+            {
+                Debug.LogWarning("Unreachable cell: " + cell);
+            }
+
+            return;
+        }
+        else
+        {
+            Debug.LogWarning("No more objects to add");
         }
     }
 

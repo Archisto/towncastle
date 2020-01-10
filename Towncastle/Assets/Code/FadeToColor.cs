@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class FadeToColor : MonoBehaviour
 {
+#pragma warning disable 0649
+
     [SerializeField]
     private Color _color;
 
@@ -17,6 +19,8 @@ public class FadeToColor : MonoBehaviour
 
     [SerializeField]
     private float _fadeInTime = 1;
+    
+ #pragma warning restore 0649
 
     private Image _screenCoverImage;
     private bool _fadeOut;

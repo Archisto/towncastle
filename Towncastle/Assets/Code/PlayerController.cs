@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+#pragma warning disable 0649
+
     [SerializeField]
     private int maxHitpoints = 10;
 
@@ -15,6 +17,8 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private Material hurtMaterial;
+
+#pragma warning restore 0649
 
     private MeshRenderer rend;
 

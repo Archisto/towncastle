@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class ProgressBar : MonoBehaviour
 {
+#pragma warning disable 0649
+
     [SerializeField]
     private Image fillImg;
 
@@ -13,6 +15,8 @@ public class ProgressBar : MonoBehaviour
 
     [SerializeField]
     private float maxFillSize = -200f;
+
+#pragma warning restore 0649
 
     PlayerController player;
 
