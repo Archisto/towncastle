@@ -10,6 +10,9 @@ public class ObjectPlacer : MonoBehaviour
     private HexObject hexObjPrefab;
 
     [SerializeField]
+    private HexMeshScriptableObject[] hexMeshes;
+
+    [SerializeField]
     private int hexObjPoolSize = 20;
 
 #pragma warning restore 0649
@@ -19,7 +22,8 @@ public class ObjectPlacer : MonoBehaviour
 
     private Pool<HexObject> pool;
 
-    private bool useObject1 = true;
+    private int currentHexMesh = 0;
+    private float objRotation = 90;
 
     private enum PlacingMode
     {
@@ -39,6 +43,9 @@ public class ObjectPlacer : MonoBehaviour
 
         if (hexObjPrefab != null)
             pool = new Pool<HexObject>(hexObjPrefab, hexObjPoolSize, false);
+
+        if (hexMeshes != null)
+            Debug.Log("Selected item: " + hexMeshes[currentHexMesh].name);
     }
 
     public void TryPlaceObject(Vector3 mousePosition, bool removeObj)
@@ -106,10 +113,13 @@ public class ObjectPlacer : MonoBehaviour
 
         if (newObj != null)
         {
+            newObj.ChangeHexMesh(hexMeshes[currentHexMesh]);
+
             Vector3 newPosition = grid.GetCellCenterWorld(cell, defaultYAxis: false);
             if (newPosition.x >= 0)
             {
                 newObj.transform.position = newPosition;
+                SetRotationForObject(newObj.gameObject);
                 newObj.gameObject.SetActive(true);
                 grid.EditCell(cell, newObj.gameObject);
             }
@@ -128,6 +138,57 @@ public class ObjectPlacer : MonoBehaviour
 
     public void ChangeObject()
     {
-        useObject1 = !useObject1;
+        if (hexMeshes != null && hexMeshes.Length > 1)
+        {
+            currentHexMesh++;
+            if (currentHexMesh >= hexMeshes.Length)
+                currentHexMesh = 0;
+
+            Debug.Log("Selected item: " + hexMeshes[currentHexMesh].name);
+        }
+    }
+
+    public void ChangeRotationForNextObject(Utils.Direction direction)
+    {
+        float degrees = 360 / 6;
+        if (direction == Utils.Direction.Left)
+            degrees = -1 * degrees;
+
+        objRotation += degrees;
+        if (objRotation >= 360)
+            objRotation -= 360;
+        else if (objRotation < 0)
+            objRotation += 360;
+
+        Debug.Log("Rotation: " + objRotation + " degrees");
+    }
+
+    public void ChangeRotationForNextObject(float rotation)
+    {
+        objRotation = rotation;
+        if (objRotation >= 360)
+        {
+            while (objRotation >= 360)
+                objRotation -= 360;
+        }
+        else if (objRotation < 0)
+        {
+            while (objRotation < 0)
+                objRotation += 360;
+        }
+
+        Debug.Log("Rotation: " + objRotation + " degrees");
+    }
+
+    public void SetRotationForObject(GameObject obj)
+    {
+        Vector3 newRotation = obj.transform.rotation.eulerAngles;
+
+        if (hexMeshes[currentHexMesh].imported)
+            newRotation.z = objRotation;
+        else
+            newRotation.y = objRotation;
+
+        obj.transform.rotation = Quaternion.Euler(newRotation);
     }
 }

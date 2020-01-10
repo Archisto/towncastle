@@ -131,11 +131,11 @@ public class HexGrid : MonoBehaviour
         if (obj == null && cellContents[coordinates.y][coordinates.x] != null)
         {
             cellContents[coordinates.y][coordinates.x].SetActive(false);
-            Debug.Log("Cell " + coordinates + " is now empty");
+            //Debug.Log("Cell " + coordinates + " is now empty");
         }
         else if (obj != null)
         {
-            Debug.Log("Cell " + coordinates + ": " + obj.name);
+            //Debug.Log("Cell " + coordinates + ": " + obj.name);
         }
 
         cellContents[coordinates.y][coordinates.x] = obj;

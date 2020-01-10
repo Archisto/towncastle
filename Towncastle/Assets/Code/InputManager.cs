@@ -11,12 +11,11 @@ public class InputManager : MonoBehaviour
     private ObjectPlacer objPlacer;
     private PlayerController player;
 
+    private SingleInputHandler changeObjKey;
     private SingleInputHandler resetKey;
 
-    private SingleInputHandler removeKey;
     private SingleInputHandler[] numberKeys;
 
-    private SingleInputHandler testKey;
 
     /// <summary>
     /// Start is called before the first frame update.
@@ -27,9 +26,8 @@ public class InputManager : MonoBehaviour
         objPlacer = FindObjectOfType<ObjectPlacer>();
         player = GameManager.Instance.Player;
 
+        changeObjKey = new SingleInputHandler(KeyCode.E);
         resetKey = new SingleInputHandler(KeyCode.R);
-
-        removeKey = new SingleInputHandler(KeyCode.X);
 
         numberKeys = new SingleInputHandler[] {
             new SingleInputHandler(KeyCode.Alpha0),
@@ -43,8 +41,6 @@ public class InputManager : MonoBehaviour
             new SingleInputHandler(KeyCode.Alpha8),
             new SingleInputHandler(KeyCode.Alpha9)
         };
-
-        testKey = new SingleInputHandler(KeyCode.E);
     }
 
     /// <summary>
@@ -65,11 +61,28 @@ public class InputManager : MonoBehaviour
     /// </summary>
     private void HandleInput()
     {
-        resetKey.Update();
+        changeObjKey.Update();
+        if (changeObjKey.JustPressedDown)
+        {
+            objPlacer.ChangeObject();
+        }
 
+        resetKey.Update();
         if (resetKey.JustPressedDown)
         {
             GameManager.Instance.ResetGame();
+        }
+
+        numberKeys[1].Update();
+        if (numberKeys[1].JustPressedDown)
+        {
+            objPlacer.ChangeRotationForNextObject(Utils.Direction.Left);
+        }
+
+        numberKeys[2].Update();
+        if (numberKeys[2].JustPressedDown)
+        {
+            objPlacer.ChangeRotationForNextObject(Utils.Direction.Right);
         }
 
         HandleObjPlacingInput();
@@ -131,21 +144,6 @@ public class InputManager : MonoBehaviour
     /// </summary>
     private void HandleDebugInput()
     {
-        testKey.Update();
-
-        if (testKey.Released)
-        {
-            Debug.Log("TestKey: Released");
-        }
-
-        if (testKey.JustPressedDown)
-        {
-            Debug.Log("TestKey: Just pressed down");
-            objPlacer.ChangeObject();
-        }
-        else if (testKey.PressedDown)
-        {
-            Debug.Log("TestKey: Pressed down");
-        }
+        
     }
 }

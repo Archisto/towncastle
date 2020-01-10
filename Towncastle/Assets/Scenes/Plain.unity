@@ -5343,7 +5343,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hexObjPrefab: {fileID: 3962224509512467013, guid: 6f25910d3213bf04ca653441081d1464,
     type: 3}
-  hexObjPoolSize: 3
+  hexMeshes:
+  - {fileID: 11400000, guid: 379072f27482c0646963b65651a674a7, type: 2}
+  - {fileID: 11400000, guid: 2a60ed74517f2524b888fca82b23c680, type: 2}
+  - {fileID: 11400000, guid: c0d43659151176845a41c1dd982aeec0, type: 2}
+  hexObjPoolSize: 36
 --- !u!1 &2137075155
 GameObject:
   m_ObjectHideFlags: 0
