@@ -23,13 +23,11 @@ public class HexGrid : MonoBehaviour
     [SerializeField]
     private Color gridColor = Color.black;
 
-    [SerializeField]
-    private Transform testTf;
-
 #pragma warning restore 0649
 
     private float cellGapZ;
 
+    private MouseController mouse;
     private List<GameObject[]> cellContents;
 
     public int GridSizeX { get { return gridSizeX; } }
@@ -49,6 +47,7 @@ public class HexGrid : MonoBehaviour
     /// </summary>
     void Start()
     {
+        mouse = GameManager.Instance.Mouse;
         UpdateCellGapZ();
         InitFilledCells();
     }
@@ -246,7 +245,7 @@ public class HexGrid : MonoBehaviour
             {
                 Vector2Int coordinates = new Vector2Int(x, y);
 
-                if (testTf != null && GetCellFromWorldPos(testTf.position) == coordinates)
+                if (mouse != null && GetCellFromWorldPos(mouse.Position) == coordinates)
                 {
                     Gizmos.color = Color.yellow;
                 }

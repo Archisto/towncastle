@@ -12,6 +12,14 @@ public class ObjectPlacer : MonoBehaviour
 
     private bool useObject1 = true;
 
+    private enum PlacingMode
+    {
+        Stack,
+        Insert,
+        Attach,
+        Remove
+    }
+
     /// <summary>
     /// Start is called before the first frame update.
     /// </summary>
@@ -19,6 +27,29 @@ public class ObjectPlacer : MonoBehaviour
     {
         grid = GameManager.Instance.Grid;
         coord = new Vector2Int(-1, -1);
+    }
+
+    public void TryPlaceObject(Vector3 mousePosition, bool removeObj)
+    {
+        Vector2Int cell = grid.GetCellFromWorldPos(mousePosition);
+
+        if (grid.CellExists(cell.x, cell.y))
+        {
+            bool cellAvailable = grid.CellIsAvailable(cell);
+
+            if (!removeObj && cellAvailable)
+            {
+                AddObjectToGridCell(cell);
+            }
+            else if (removeObj && !cellAvailable)
+            {
+                grid.EditCell(cell, null);
+            }
+            else
+            {
+                Debug.LogWarning("Cannot perform action to cell: " + cell);
+            }
+        }
     }
 
     public void SetCoord(int i, bool removeObj)

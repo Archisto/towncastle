@@ -38,6 +38,8 @@ public class GameManager : MonoBehaviour
 
     public UIManager UI { get; private set; }
 
+    public MouseController Mouse { get; private set; }
+
     public HexGrid Grid { get; private set; }
 
     public PlayerController Player { get; private set; }
@@ -73,6 +75,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Initializing GameManager...");
 
         UI = FindObjectOfType<UIManager>();
+        Mouse = FindObjectOfType<MouseController>();
         Grid = FindObjectOfType<HexGrid>();
         Player = FindObjectOfType<PlayerController>();
         shooter = FindObjectOfType<Shooter>();

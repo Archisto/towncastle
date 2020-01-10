@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public class InputManager : MonoBehaviour
 {
+    private MouseController mouse;
     private ObjectPlacer objPlacer;
     private PlayerController player;
 
@@ -22,6 +23,7 @@ public class InputManager : MonoBehaviour
     /// </summary>
     private void Start()
     {
+        mouse = GameManager.Instance.Mouse;
         objPlacer = FindObjectOfType<ObjectPlacer>();
         player = GameManager.Instance.Player;
 
@@ -75,16 +77,23 @@ public class InputManager : MonoBehaviour
 
     private void HandleObjPlacingInput()
     {
-        removeKey.Update();
-
-        for (int i = 0; i < numberKeys.Length; i++)
+        bool add = mouse.LeftButtonReleased;
+        bool remove = mouse.RightButtonReleased;
+        if (add || remove)
         {
-            numberKeys[i].Update();
-            if (numberKeys[i].JustPressedDown)
-            {
-                objPlacer.SetCoord(i, removeKey.PressedDown);
-            }
+            objPlacer.TryPlaceObject(mouse.Position, remove);
         }
+
+        //removeKey.Update();
+
+        //for (int i = 0; i < numberKeys.Length; i++)
+        //{
+        //    numberKeys[i].Update();
+        //    if (numberKeys[i].JustPressedDown)
+        //    {
+        //        objPlacer.SetCoord(i, removeKey.PressedDown);
+        //    }
+        //}
     }
 
     /// <summary>

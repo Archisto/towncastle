@@ -19,6 +19,20 @@ public static class Utils
     }
 
     /// <summary>
+    /// Hexagon side directions.
+    /// </summary>
+    public enum HexDirection
+    {
+        Left,
+        Right,
+        UpLeft,
+        UpRight,
+        DownLeft,
+        DownRight,
+        None
+    }
+
+    /// <summary>
     /// Axis.
     /// </summary>
     public enum Axis

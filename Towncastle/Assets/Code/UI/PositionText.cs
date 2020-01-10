@@ -28,10 +28,15 @@ public class PositionText : MonoBehaviour
     {
         if (!GameManager.Instance.GameOver)
         {
+            /*
             Vector2Int coord = grid.GetCellFromWorldPos(go.transform.position);
             Value = grid.GetCellCenterWorld(coord, defaultYAxis: false);
             text.text = "CellPos: " + Value + "\nGrid: " + grid.GetCellFromWorldPos(Value);
             //text.text = seconds + "." + secondHundreths + " s";
+            */
+
+            Value = Input.mousePosition;
+            text.text = "MousePos: " + Value;
         }
     }
 
