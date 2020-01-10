@@ -37,6 +37,8 @@ public class HexGrid : MonoBehaviour
 
     public int GridSizeY { get { return gridSizeY; } }
 
+    public float CellHeight { get { return cellHeight; } }
+
     /// <summary>
     /// OnValidate is called when the script is loaded or a value is changed. (Editor only)
     /// </summary>

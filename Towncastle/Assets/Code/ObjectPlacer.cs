@@ -61,7 +61,7 @@ public class ObjectPlacer : MonoBehaviour
 
             if (!removeObj && cellAvailable)
             {
-                AddObjectToGridCell(cell);
+                AddObjectToGridCell(cell, 1);
             }
             else if (removeObj && !cellAvailable)
             {
@@ -69,7 +69,10 @@ public class ObjectPlacer : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("Cannot perform action to cell: " + cell);
+                //Debug.LogWarning("Cannot perform action to cell: " + cell);
+
+                // Testing heightLevel
+                AddObjectToGridCell(cell, 2);
             }
         }
     }
@@ -94,7 +97,7 @@ public class ObjectPlacer : MonoBehaviour
 
                 if (!removeObj && cellAvailable)
                 {
-                    AddObjectToGridCell(coord);
+                    AddObjectToGridCell(coord, 1);
                 }
                 else if (removeObj && !cellAvailable)
                 {
@@ -110,7 +113,7 @@ public class ObjectPlacer : MonoBehaviour
         }
     }
 
-    private void AddObjectToGridCell(Vector2Int cell)
+    private void AddObjectToGridCell(Vector2Int cell, int heightLevel)
     {
         HexObject newObj = pool.GetPooledObject(false);
 
@@ -121,7 +124,9 @@ public class ObjectPlacer : MonoBehaviour
             Vector3 newPosition = grid.GetCellCenterWorld(cell, defaultYAxis: false);
             if (newPosition.x >= 0)
             {
-                newPosition.y = newObj.HexMesh.defaultPositionY;
+                // TODO: Ask available heightLevel from grid
+
+                newPosition.y = newObj.HexMesh.defaultPositionY + (heightLevel - 1) * grid.CellHeight;
                 newObj.transform.position = newPosition;
                 SetRotationForObject(newObj.gameObject);
                 newObj.gameObject.SetActive(true);
