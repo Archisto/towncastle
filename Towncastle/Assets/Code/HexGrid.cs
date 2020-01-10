@@ -18,6 +18,9 @@ public class HexGrid : MonoBehaviour
     private float cellSize = 1f;
 
     [SerializeField]
+    private float cellHeight = 2f;
+
+    [SerializeField]
     private List<HexBase> hexBases;
 
     [SerializeField]

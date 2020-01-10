@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c2c12c3f29d7d34a86252a7392a9ecd, type: 3}
-  m_Name: HexCube
+  m_Name: Hex
   m_EditorClassIdentifier: 
-  mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
-  imported: 0
-  structureType: 1
-  defaultRotationY: 90
+  mesh: {fileID: -7158247418717641203, guid: 92f88e66719df9248adeb291a244689c, type: 3}
+  imported: 1
+  structureType: 6
+  defaultPositionY: 0
+  defaultRotationY: 0

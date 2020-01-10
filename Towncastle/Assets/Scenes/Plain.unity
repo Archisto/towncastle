@@ -6237,13 +6237,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1193763609}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalRotation: {x: 0.55972135, y: -0.2504763, z: 0.0651835, w: 0.78722596}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 66.051, y: -52.351, z: -25.972002}
 --- !u!1 &1213231806
 GameObject:
   m_ObjectHideFlags: 0
@@ -10702,6 +10702,7 @@ MonoBehaviour:
   gridSizeX: 8
   gridSizeY: 10
   cellSize: 1.92
+  cellHeight: 2.032
   hexBases:
   - {fileID: 956507747}
   - {fileID: 1215285481}
@@ -10802,6 +10803,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a9c35b96da646b247acd52a3f52d1f60, type: 2}
   - {fileID: 11400000, guid: 2a60ed74517f2524b888fca82b23c680, type: 2}
   - {fileID: 11400000, guid: c0d43659151176845a41c1dd982aeec0, type: 2}
+  - {fileID: 11400000, guid: 7e82f42facf5bd74ab1d24881e6e5764, type: 2}
+  - {fileID: 11400000, guid: cd1b5f7b3dea88b4583590b036c7cdf4, type: 2}
   hexObjPoolSize: 36
 --- !u!1 &2132356912
 GameObject:
