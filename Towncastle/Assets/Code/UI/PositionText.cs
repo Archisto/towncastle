@@ -9,6 +9,7 @@ public class PositionText : MonoBehaviour
 
     private Text text;
     private HexGrid grid;
+    private ObjectPlacer objPlacer;
 
     public Vector3 Value { get; private set; }
 
@@ -19,6 +20,7 @@ public class PositionText : MonoBehaviour
     {
         text = GetComponent<Text>();
         grid = FindObjectOfType<HexGrid>();
+        objPlacer = FindObjectOfType<ObjectPlacer>();
     }
 
     /// <summary>
@@ -35,8 +37,12 @@ public class PositionText : MonoBehaviour
             //text.text = seconds + "." + secondHundreths + " s";
             */
 
+            /*
             Value = Input.mousePosition;
             text.text = "MousePos: " + Value;
+            */
+
+            text.text = objPlacer.GetPlacementInfo();
         }
     }
 

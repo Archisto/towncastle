@@ -15,6 +15,9 @@ public class ObjectPlacer : MonoBehaviour
     [SerializeField]
     private int hexObjPoolSize = 20;
 
+    [SerializeField]
+    private Utils.HexDirection defaultHexDirection = Utils.HexDirection.Right;
+
 #pragma warning restore 0649
 
     private HexGrid grid;
@@ -33,6 +36,8 @@ public class ObjectPlacer : MonoBehaviour
         Remove
     }
 
+    public Utils.HexDirection ObjectDirection { get; private set; }
+
     /// <summary>
     /// Start is called before the first frame update.
     /// </summary>
@@ -40,6 +45,7 @@ public class ObjectPlacer : MonoBehaviour
     {
         grid = GameManager.Instance.Grid;
         coord = new Vector2Int(-1, -1);
+        ObjectDirection = defaultHexDirection;
 
         if (hexObjPrefab != null)
         {
@@ -67,12 +73,16 @@ public class ObjectPlacer : MonoBehaviour
             {
                 grid.EditCell(cell, null);
             }
-            else
+            else if (!removeObj && !cellAvailable)
             {
-                //Debug.LogWarning("Cannot perform action to cell: " + cell);
-
                 // Testing heightLevel
                 AddObjectToGridCell(cell, 2);
+            }
+            else
+            {
+                // TODO: Make it possible to remove [heightLevel > 1] objects
+
+                Debug.LogWarning("Cannot perform action to cell: " + cell);
             }
         }
     }
@@ -157,15 +167,35 @@ public class ObjectPlacer : MonoBehaviour
 
     public void ChangeRotationForNextObject(Utils.Direction direction)
     {
-        float degrees = 360 / 6;
-        if (direction == Utils.Direction.Left)
-            degrees = -1 * degrees;
+        bool left = direction == Utils.Direction.Left;
+        switch (ObjectDirection)
+        {
+            case Utils.HexDirection.Left:
+                ObjectDirection = (left ? Utils.HexDirection.DownLeft : Utils.HexDirection.UpLeft);
+                break;
+            case Utils.HexDirection.Right:
+                ObjectDirection = (left ? Utils.HexDirection.UpRight : Utils.HexDirection.DownRight);
+                break;
+            case Utils.HexDirection.UpLeft:
+                ObjectDirection = (left ? Utils.HexDirection.Left : Utils.HexDirection.UpRight);
+                break;
+            case Utils.HexDirection.UpRight:
+                ObjectDirection = (left ? Utils.HexDirection.UpLeft : Utils.HexDirection.Right);
+                break;
+            case Utils.HexDirection.DownLeft:
+                ObjectDirection = (left ? Utils.HexDirection.DownRight : Utils.HexDirection.Left);
+                break;
+            case Utils.HexDirection.DownRight:
+                ObjectDirection = (left ? Utils.HexDirection.Right : Utils.HexDirection.DownLeft);
+                break;
+        }
 
-        objRotation += degrees;
-        if (objRotation >= 360)
-            objRotation -= 360;
-        else if (objRotation < 0)
-            objRotation += 360;
+        objRotation = Utils.AngleFromHexDirection(ObjectDirection);
+    }
+
+    public void ChangeRotationForNextObject(Utils.HexDirection direction)
+    {
+        objRotation = Utils.AngleFromHexDirection(direction);
     }
 
     public void ChangeRotationForNextObject(float rotation)
@@ -187,10 +217,14 @@ public class ObjectPlacer : MonoBehaviour
     {
         Vector3 newRotation = obj.transform.rotation.eulerAngles;
 
+        float rotY = objRotation +
+                     hexMeshes[currentHexMesh].defaultRotationY +
+                     Utils.AngleFromHexDirectionToAnother(defaultHexDirection, hexMeshes[currentHexMesh].defaultDirection);
+
         if (hexMeshes[currentHexMesh].imported)
-            newRotation.z = objRotation + hexMeshes[currentHexMesh].defaultRotationY;
+            newRotation.z = rotY;
         else
-            newRotation.y = objRotation + hexMeshes[currentHexMesh].defaultRotationY;
+            newRotation.y = rotY;
 
         obj.transform.rotation = Quaternion.Euler(newRotation);
     }
@@ -200,7 +234,7 @@ public class ObjectPlacer : MonoBehaviour
         if (hexMeshes == null || hexMeshes.Length == 0)
             return "No hex meshes!";
         
-        return string.Format("Selected item: {0} ({1})\nRotation: {2} degrees",
-            hexMeshes[currentHexMesh].name, hexMeshes[currentHexMesh].structureType, objRotation);
+        return string.Format("Selected item: {0} ({1})\nDirection: {2}",
+            hexMeshes[currentHexMesh].name, hexMeshes[currentHexMesh].structureType, ObjectDirection);
     }
 }

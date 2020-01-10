@@ -33,7 +33,9 @@ public class ProgressBar : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        if (player.MaxHitpoints <= 0)
+        // TODO: Abstract parent class
+
+        if (player == null || player.MaxHitpoints <= 0)
             return;
 
         float hpRatio = (float) player.Hitpoints / player.MaxHitpoints;

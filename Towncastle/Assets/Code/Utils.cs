@@ -83,4 +83,30 @@ public static class Utils
                 return Vector3.zero;
         }
     }
+
+    public static float AngleFromHexDirection(HexDirection direction)
+    {
+        switch (direction)
+        {
+            case HexDirection.Left:
+                return 180;
+            case HexDirection.Right:
+                return 0;
+            case HexDirection.UpLeft:
+                return -120;
+            case HexDirection.UpRight:
+                return -60;
+            case HexDirection.DownLeft:
+                return 120;
+            case HexDirection.DownRight:
+                return 60;
+            default:
+                return 0;
+        }
+    }
+
+    public static float AngleFromHexDirectionToAnother(HexDirection direction1, HexDirection direction2)
+    {
+        return AngleFromHexDirection(direction1) - AngleFromHexDirection(direction2);
+    }
 }
