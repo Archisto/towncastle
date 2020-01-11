@@ -34,9 +34,18 @@ public class HexObject : LevelObject, IGridObject
         }
     }
 
+    protected override void InitObject()
+    {
+        base.InitObject();
+
+        //if (!HexMesh.imported)
+        //    childObj.transform.rotation = Quaternion.Euler(0, 0, 0);
+    }
+
     public void ChangeHexMesh(HexMeshScriptableObject hexMesh)
     {
         // TODO: Change hitbox also
+        // TODO: Weird rotations, with child object especially
 
         HexMesh = hexMesh;
 
@@ -48,8 +57,8 @@ public class HexObject : LevelObject, IGridObject
 
         meshFilter.mesh = hexMesh.mesh;
 
-        float xAxis = HexMesh.imported ? -90 : 0;
-        childObj.transform.rotation = Quaternion.Euler(xAxis, 0, 0);
+        //float xAxis = HexMesh.imported ? -90 : 0;
+        //childObj.transform.rotation = Quaternion.Euler(xAxis, 0, 0);
     }
 
     public override void ResetObject()

@@ -227,7 +227,11 @@ public class ObjectPlacer : MonoBehaviour
 
     public void SetRotationForObject(GameObject obj)
     {
+        // TODO: Fix rotation being wrong after removing and replacing an object
+
         Vector3 newRotation = obj.transform.rotation.eulerAngles;
+
+        Debug.Log("objRotation: " + objRotation);
 
         float rotY = objRotation +
                      hexMeshes[currentHexMesh].defaultRotationY +
