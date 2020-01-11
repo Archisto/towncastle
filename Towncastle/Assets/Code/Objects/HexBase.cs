@@ -2,9 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HexBase : MonoBehaviour
+public class HexBase : MonoBehaviour, IGridObject
 {
-    public Vector2Int Coordinates;// { get; set; }
+#pragma warning disable 0649
 
-    public float Y { get { return transform.position.y; } }
+    [SerializeField]
+    private Vector2Int coordinates;
+
+    [SerializeField]
+    public bool frozen;
+
+#pragma warning restore 0649
+
+    public Vector2Int Coordinates { get => coordinates; set => coordinates = value; }
+
+    public float Y { get => transform.position.y; }
+
+    public HexGrid HexGrid { get; set; }
+
+    public void ShapeTerrain()
+    {
+        if (frozen)
+            return;
+
+        Vector3 newPosition = transform.position;
+        newPosition.y = HexGrid.GetYWhereHitAbove(newPosition);
+        transform.position = newPosition;
+    }
 }

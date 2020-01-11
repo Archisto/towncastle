@@ -61,10 +61,8 @@ public class ObjectPlacer : MonoBehaviour
             Debug.Log("Selected item: " + hexMeshes[currentHexMesh].name);
     }
 
-    public void TryPlaceObject(Vector3 mousePosition, bool removeObj)
+    public void TryPlaceObject(Vector2Int cell, bool removeObj)
     {
-        Vector2Int cell = grid.GetCellFromWorldPos(mousePosition);
-
         if (grid.CellExists(cell.x, cell.y))
         {
             bool cellAvailable = grid.CellIsAvailable(cell);
@@ -89,6 +87,12 @@ public class ObjectPlacer : MonoBehaviour
                 Debug.LogWarning("Cannot perform action to cell: " + cell);
             }
         }
+    }
+
+    public void TryPlaceObject(Vector3 position, bool removeObj)
+    {
+        Vector2Int cell = grid.GetCellFromWorldPos(position);
+        TryPlaceObject(cell, removeObj);
     }
 
     public void SetCoord(int i, bool removeObj)
@@ -140,7 +144,9 @@ public class ObjectPlacer : MonoBehaviour
             {
                 // TODO: Ask available heightLevel from grid
 
-                newPosition.y = newObj.HexMesh.defaultPositionY + (heightLevel - 1) * grid.CellHeight;
+                newObj.Coordinates = cell;
+                newPosition.y +=
+                    newObj.HexMesh.defaultPositionY + (heightLevel - 1) * grid.CellHeight;
                 newObj.transform.position = newPosition;
                 SetRotationForObject(newObj.gameObject);
                 newObj.gameObject.SetActive(true);
@@ -228,10 +234,7 @@ public class ObjectPlacer : MonoBehaviour
                      Utils.AngleFromHexDirectionToAnother
                         (Utils.HexDirection.Right, hexMeshes[currentHexMesh].mainDirection); // Right is the world main direction
 
-        if (hexMeshes[currentHexMesh].imported)
-            newRotation.z = rotY;
-        else
-            newRotation.y = rotY;
+        newRotation.y = rotY;
 
         obj.transform.rotation = Quaternion.Euler(newRotation);
     }

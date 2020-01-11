@@ -102,7 +102,14 @@ public class InputManager : MonoBehaviour
         bool remove = mouse.RightButtonReleased;
         if (add || remove)
         {
-            objPlacer.TryPlaceObject(mouse.Position, remove);
+            if (mouse.SelectingCoordinates)
+            {
+                objPlacer.TryPlaceObject(mouse.Coordinates, remove);
+            }
+            //else
+            //{
+            //    objPlacer.TryPlaceObject(mouse.Position, remove);
+            //}
         }
 
         //removeKey.Update();

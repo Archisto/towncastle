@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
+using UnityEditor;
 
 namespace Towncastle.Editor
 {
-    [UnityEditor.CustomEditor(typeof(ObjectPlacer))]
+    [CustomEditor(typeof(ObjectPlacer))]
     public class ObjectPlacerEditor : UnityEditor.Editor
     {
         private ObjectPlacer targetObjectPlacer;

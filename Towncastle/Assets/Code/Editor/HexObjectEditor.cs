@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
+using UnityEditor;
 
 namespace Towncastle.Editor
 {
-    [UnityEditor.CustomEditor(typeof(HexObject))]
+    [CustomEditor(typeof(HexObject))]
     public class HexObjectEditor : UnityEditor.Editor
     {
         private HexObject targetHexObject;

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class HexGrid : MonoBehaviour
 {
-    public HexBase hexBase;
+    public HexBase hexBasePrefab;
 
 #pragma warning disable 0649
 
@@ -24,6 +24,9 @@ public class HexGrid : MonoBehaviour
     private List<HexBase> hexBases;
 
     [SerializeField]
+    public List<HexBase> terrainShapingHexBases;
+
+    [SerializeField]
     private Color gridColor = Color.black;
 
 #pragma warning restore 0649
@@ -38,6 +41,8 @@ public class HexGrid : MonoBehaviour
     public int GridSizeY { get { return gridSizeY; } }
 
     public float CellHeight { get { return cellHeight; } }
+
+    public float HexBaseCount { get { return hexBases.Count; } }
 
     /// <summary>
     /// OnValidate is called when the script is loaded or a value is changed. (Editor only)
@@ -54,7 +59,7 @@ public class HexGrid : MonoBehaviour
     {
         mouse = GameManager.Instance.Mouse;
         UpdateCellGapZ();
-        InitFilledCells();
+        InitCellContentList();
     }
 
     private void UpdateCellGapZ()
@@ -62,7 +67,7 @@ public class HexGrid : MonoBehaviour
         cellGapZ = Mathf.Sqrt(Mathf.Pow(cellSize, 2) - Mathf.Pow(cellSize / 2, 2));
     }
 
-    private void InitFilledCells()
+    private void InitCellContentList()
     {
         cellContents = new List<GameObject[]>();
         for (int i = 0; i < GridSizeY; i++)
@@ -73,10 +78,8 @@ public class HexGrid : MonoBehaviour
 
     public void PopulateHexBases()
     {
-        if (hexBase == null)
-        {
+        if (hexBasePrefab == null)
             return;
-        }
 
         hexBases = new List<HexBase>();
 
@@ -84,20 +87,58 @@ public class HexGrid : MonoBehaviour
         {
             for (int x = 0; x < GridSizeX; x++)
             {
-                HexBase newHexBase = Instantiate(hexBase, transform);
-                newHexBase.transform.position = GetCellCenterWorld(x, y, defaultYAxis: true);
+                HexBase newHexBase = Instantiate(hexBasePrefab, transform);
+                newHexBase.HexGrid = this;
+                Vector3 newPosition = GetCellCenterWorld(x, y, defaultYAxis: true);
+
+                // Rises until hits something (use a terrain shaper)
+                newPosition.y = GetYWhereHitAbove(newPosition);
+
+                newHexBase.transform.position = newPosition;
                 newHexBase.Coordinates = new Vector2Int(x, y);
+                newHexBase.name = string.Format("HexBase ({0}, {1})", x, y);
                 hexBases.Add(newHexBase);
             }
         }
     }
 
+    public void ShapeTerrainWithSelectedHexBases()
+    {
+        if (terrainShapingHexBases == null)
+            return;
+
+        // All hex bases in terrainShapingHexBases list rise
+        // until they hit something (use a terrain shaper)
+
+        Vector3 newPosition;
+        foreach (HexBase hexBase in terrainShapingHexBases)
+        {
+            if (hexBase.frozen)
+                continue;
+
+            newPosition = hexBase.transform.position;
+            newPosition.y = GetYWhereHitAbove(newPosition);
+            hexBase.transform.position = newPosition;
+        }
+    }
+
+    public float GetYWhereHitAbove(Vector3 origin)
+    {
+        float maxDistance = 20f;
+
+        RaycastHit hit;
+        if (Physics.Raycast(origin, Vector3.up, out hit, maxDistance))
+        {
+            return hit.point.y;
+        }
+
+        return origin.y;
+    }
+
     public void DestroyHexBases()
     {
         if (hexBases == null)
-        {
             return;
-        }
 
         for (int i = hexBases.Count - 1; i >= 0; i--)
         {
@@ -105,6 +146,7 @@ public class HexGrid : MonoBehaviour
         }
 
         hexBases.Clear();
+        terrainShapingHexBases.Clear();
     }
 
     public bool CellExists(int x, int y)
@@ -248,24 +290,26 @@ public class HexGrid : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = gridColor;
-
         for (int y = 0; y < GridSizeY; y++)
         {
             for (int x = 0; x < GridSizeX; x++)
             {
+                Gizmos.color = gridColor;
+
                 Vector2Int coordinates = new Vector2Int(x, y);
 
-                if (mouse != null && GetCellFromWorldPos(mouse.Position) == coordinates)
+                if (mouse != null)
                 {
-                    Gizmos.color = Color.yellow;
-                }
-                else
-                {
-                    Gizmos.color = gridColor;
+                    if (mouse.SelectingCoordinates && mouse.Coordinates == coordinates)
+                    {
+                        Gizmos.color = Color.blue;
+                    }
+                    //else if (!mouse.SelectingCoordinates && GetCellFromWorldPos(mouse.Position) == coordinates)
+                    //{
+                    //    Gizmos.color = Color.yellow;
+                    //}
                 }
 
-                //Gizmos.DrawSphere(GetCellCenterWorld(coordinates), 0.3f);
                 Gizmos.DrawWireSphere(GetCellCenterWorld(coordinates, defaultYAxis: false), cellSize / 2);
             }
         }

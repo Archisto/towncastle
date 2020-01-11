@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HexObject : LevelObject
+public class HexObject : LevelObject, IGridObject
 {
-    private MeshFilter meshFilter;
-    //private ObjectPlacer objPlacer;
-
     public enum StructureType
     {
         Floor,
@@ -18,6 +15,11 @@ public class HexObject : LevelObject
         Object,
         Undefined
     }
+
+    public Vector2Int Coordinates { get; set; }
+
+    private GameObject childObj;
+    private MeshFilter meshFilter; // In child object, not the object with the script
 
     public HexMeshScriptableObject HexMesh { get; private set; }
 
@@ -32,22 +34,20 @@ public class HexObject : LevelObject
         }
     }
 
-    //public void Init(ObjectPlacer objPlacer)
-    //{
-    //    this.objPlacer = objPlacer;
-    //}
-
     public void ChangeHexMesh(HexMeshScriptableObject hexMesh)
     {
         HexMesh = hexMesh;
 
+        if (childObj == null)
+            childObj = transform.GetChild(0).gameObject;
+
         if (meshFilter == null)
-            meshFilter = GetComponent<MeshFilter>();
+            meshFilter = childObj.GetComponent<MeshFilter>();
 
         meshFilter.mesh = hexMesh.mesh;
 
         float xAxis = HexMesh.imported ? -90 : 0;
-        transform.rotation = Quaternion.Euler(xAxis, 0, 0);
+        childObj.transform.rotation = Quaternion.Euler(xAxis, 0, 0);
     }
 
     public override void ResetObject()
