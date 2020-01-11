@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8700096909968475455
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8700096909968475454}
+  - component: {fileID: 8700096909968475453}
+  - component: {fileID: 8700096909968475452}
+  m_Layer: 0
+  m_Name: HexGrid
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8700096909968475454
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8700096909968475455}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8700096909968475453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8700096909968475455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27027f370ba0e004b9e649d63c1a5f54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hexBasePrefab: {fileID: 7675227451486952203, guid: 003a6906d5282de409ff93366b8870cf,
+    type: 3}
+  gridSizeX: 8
+  gridSizeY: 10
+  cellSize: 1.92
+  cellHeight: 2.032
+  hexBases: []
+  terrainShapingHexBases: []
+  gridColor: {r: 0.735849, g: 0.114542544, b: 0.114542544, a: 0.3019608}
+--- !u!114 &8700096909968475452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8700096909968475455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 346e0bde785738243ae5386859e6caf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hexObjPrefab: {fileID: 8644007892669904045, guid: 6f25910d3213bf04ca653441081d1464,
+    type: 3}
+  hexMeshes:
+  - {fileID: 11400000, guid: a9c35b96da646b247acd52a3f52d1f60, type: 2}
+  - {fileID: 11400000, guid: 2a60ed74517f2524b888fca82b23c680, type: 2}
+  - {fileID: 11400000, guid: c0d43659151176845a41c1dd982aeec0, type: 2}
+  - {fileID: 11400000, guid: 7e82f42facf5bd74ab1d24881e6e5764, type: 2}
+  - {fileID: 11400000, guid: cd1b5f7b3dea88b4583590b036c7cdf4, type: 2}
+  - {fileID: 11400000, guid: 6c74bb3eb5d10b24c96243fc3ced2822, type: 2}
+  hexObjPoolSize: 36
+  defaultHexDirection: 1

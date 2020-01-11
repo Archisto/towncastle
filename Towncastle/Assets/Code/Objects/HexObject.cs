@@ -19,7 +19,7 @@ public class HexObject : LevelObject, IGridObject
     public Vector2Int Coordinates { get; set; }
 
     private GameObject childObj;
-    private MeshFilter meshFilter; // In child object, not the object with the script
+    private MeshFilter meshFilter; // This is in the child object, not the object with the script
 
     public HexMeshScriptableObject HexMesh { get; private set; }
 
@@ -36,6 +36,8 @@ public class HexObject : LevelObject, IGridObject
 
     public void ChangeHexMesh(HexMeshScriptableObject hexMesh)
     {
+        // TODO: Change hitbox also
+
         HexMesh = hexMesh;
 
         if (childObj == null)

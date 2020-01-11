@@ -58,6 +58,7 @@ public class HexGrid : MonoBehaviour
     void Start()
     {
         mouse = GameManager.Instance.Mouse;
+        InitHexBases();
         UpdateCellGapZ();
         InitCellContentList();
     }
@@ -73,6 +74,26 @@ public class HexGrid : MonoBehaviour
         for (int i = 0; i < GridSizeY; i++)
         {
             cellContents.Add(new GameObject[GridSizeX]);
+        }
+    }
+
+    /// <summary>
+    /// Finds all hex bases in the hex grid's children
+    /// in the case that hex base object references are lost
+    /// (making the hex grid a prefab causes this).
+    /// </summary>
+    public void InitHexBases()
+    {
+        if (hexBases == null)
+            hexBases = new List<HexBase>();
+
+        if (hexBases.Count == 0)
+        {
+            HexBase[] hbArray = GetComponentsInChildren<HexBase>();
+            foreach (HexBase hb in hbArray)
+            {
+                hexBases.Add(hb);
+            }
         }
     }
 

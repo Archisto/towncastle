@@ -20,6 +20,7 @@ namespace Towncastle.Editor
             EditorGUI.BeginDisabledGroup(targetHexGrid.hexBasePrefab == null);
             ShapeTerrainButton();
             PopulateHexBasesButton();
+            ReacquireHexBasesButton();
             DestroyHexBasesButton();
             EditorGUI.EndDisabledGroup();
         }
@@ -46,6 +47,18 @@ namespace Towncastle.Editor
             if (GUILayout.Button("Populate Cells With Hex Bases"))
             {
                 targetHexGrid.PopulateHexBases();
+            }
+
+            EditorGUI.EndDisabledGroup();
+        }
+
+        private void ReacquireHexBasesButton()
+        {
+            EditorGUI.BeginDisabledGroup(targetHexGrid.HexBaseCount > 0);
+
+            if (GUILayout.Button("Reacquire Lost Hex Bases"))
+            {
+                targetHexGrid.InitHexBases();
             }
 
             EditorGUI.EndDisabledGroup();
