@@ -27,6 +27,7 @@ public class ObjectPlacer : MonoBehaviour
 
     private int currentHexMesh = 0;
     private float objRotation = 0;
+    private float defaultDirectionRotationOffset;
 
     private enum PlacingMode
     {
@@ -46,6 +47,9 @@ public class ObjectPlacer : MonoBehaviour
         grid = GameManager.Instance.Grid;
         coord = new Vector2Int(-1, -1);
         ObjectDirection = defaultHexDirection;
+        defaultDirectionRotationOffset =
+            Utils.AngleFromHexDirectionToAnother(defaultHexDirection, Utils.HexDirection.Right);
+        SetRotationForNextObject(ObjectDirection);
 
         if (hexObjPrefab != null)
         {
@@ -155,13 +159,15 @@ public class ObjectPlacer : MonoBehaviour
         }
     }
 
-    public void ChangeObject()
+    public void ChangeObject(bool next)
     {
         if (hexMeshes != null && hexMeshes.Length > 1)
         {
-            currentHexMesh++;
+            currentHexMesh += next ? 1 : -1;
             if (currentHexMesh >= hexMeshes.Length)
                 currentHexMesh = 0;
+            else if (currentHexMesh < 0)
+                currentHexMesh = hexMeshes.Length - 1;
         }
     }
 
@@ -193,7 +199,7 @@ public class ObjectPlacer : MonoBehaviour
         objRotation = Utils.AngleFromHexDirection(ObjectDirection);
     }
 
-    public void ChangeRotationForNextObject(Utils.HexDirection direction)
+    public void SetRotationForNextObject(Utils.HexDirection direction)
     {
         objRotation = Utils.AngleFromHexDirection(direction);
     }
@@ -219,7 +225,8 @@ public class ObjectPlacer : MonoBehaviour
 
         float rotY = objRotation +
                      hexMeshes[currentHexMesh].defaultRotationY +
-                     Utils.AngleFromHexDirectionToAnother(defaultHexDirection, hexMeshes[currentHexMesh].defaultDirection);
+                     Utils.AngleFromHexDirectionToAnother
+                        (Utils.HexDirection.Right, hexMeshes[currentHexMesh].mainDirection); // Right is the world main direction
 
         if (hexMeshes[currentHexMesh].imported)
             newRotation.z = rotY;
@@ -237,4 +244,10 @@ public class ObjectPlacer : MonoBehaviour
         return string.Format("Selected item: {0} ({1})\nDirection: {2}",
             hexMeshes[currentHexMesh].name, hexMeshes[currentHexMesh].structureType, ObjectDirection);
     }
+
+    //private void OnDrawGizmos()
+    //{
+    //    Gizmos.color = Color.green;
+    //    Gizmos.DrawLine(Vector3.zero, new Vector3(Mathf.Cos(defaultDirectionRotationOffset), 0, Mathf.Sin(defaultDirectionRotationOffset)));
+    //}
 }

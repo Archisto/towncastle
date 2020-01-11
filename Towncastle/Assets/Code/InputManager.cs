@@ -11,7 +11,8 @@ public class InputManager : MonoBehaviour
     private ObjectPlacer objPlacer;
     private PlayerController player;
 
-    private SingleInputHandler changeObjKey;
+    private SingleInputHandler changeObjKey1;
+    private SingleInputHandler changeObjKey2;
     private SingleInputHandler resetKey;
 
     private SingleInputHandler[] numberKeys;
@@ -26,7 +27,8 @@ public class InputManager : MonoBehaviour
         objPlacer = FindObjectOfType<ObjectPlacer>();
         player = GameManager.Instance.Player;
 
-        changeObjKey = new SingleInputHandler(KeyCode.E);
+        changeObjKey1 = new SingleInputHandler(KeyCode.Q);
+        changeObjKey2 = new SingleInputHandler(KeyCode.E);
         resetKey = new SingleInputHandler(KeyCode.R);
 
         numberKeys = new SingleInputHandler[] {
@@ -61,10 +63,16 @@ public class InputManager : MonoBehaviour
     /// </summary>
     private void HandleInput()
     {
-        changeObjKey.Update();
-        if (changeObjKey.JustPressedDown)
+        changeObjKey1.Update();
+        if (changeObjKey1.JustPressedDown)
         {
-            objPlacer.ChangeObject();
+            objPlacer.ChangeObject(false);
+        }
+
+        changeObjKey2.Update();
+        if (changeObjKey2.JustPressedDown)
+        {
+            objPlacer.ChangeObject(true);
         }
 
         resetKey.Update();

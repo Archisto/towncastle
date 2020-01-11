@@ -10609,8 +10609,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7e82f42facf5bd74ab1d24881e6e5764, type: 2}
   - {fileID: 11400000, guid: cd1b5f7b3dea88b4583590b036c7cdf4, type: 2}
   - {fileID: 11400000, guid: 6c74bb3eb5d10b24c96243fc3ced2822, type: 2}
+  - {fileID: 11400000, guid: 60dfe4b7f3d52164eaefa8679723c815, type: 2}
   hexObjPoolSize: 36
-  defaultHexDirection: 1
+  defaultHexDirection: 2
 --- !u!1 &2111622100
 GameObject:
   m_ObjectHideFlags: 0
