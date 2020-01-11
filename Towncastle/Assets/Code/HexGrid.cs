@@ -175,6 +175,11 @@ public class HexGrid : MonoBehaviour
         return !(x < 0 || x >= GridSizeX || y < 0 || y >= GridSizeY);
     }
 
+    public bool CellExists(Vector2Int coordinates)
+    {
+        return CellExists(coordinates.x, coordinates.y);
+    }
+
     public bool CellIsAvailable(int x, int y)
     {
         if (!CellExists(x, y))

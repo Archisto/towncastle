@@ -65,7 +65,6 @@ public class ObjectPlacer : MonoBehaviour
 
         if (hexMeshes != null)
         {
-            Debug.Log("Selected item: " + hexMeshes[currentHexMesh].name);
             InitPreviewObject();
         }
     }
@@ -77,12 +76,48 @@ public class ObjectPlacer : MonoBehaviour
 
         PreviewObj.gameObject.name = PreviewObjectString;
         PreviewObj.SetHexMesh(hexMeshes[currentHexMesh]);
-        PreviewObj.SetMaterial(previewObjMaterial);
+        PreviewObj.SetMaterial(previewObjMaterial, true);
         SetRotationForObject(PreviewObj.gameObject);
         PreviewObj.gameObject.layer = 0; // Default layer
 
         // TODO: Proper support for objects following the mouse cursor
-        GameManager.Instance.Mouse.testObj = PreviewObj.gameObject;
+        //GameManager.Instance.Mouse.testObj = PreviewObj.gameObject;
+    }
+
+    /// <summary>
+    /// Update is called once per frame.
+    /// </summary>
+    private void Update()
+    {
+        UpdatePreviewObject();
+    }
+
+    /// <summary>
+    /// Updates the preview object.
+    /// </summary>
+    private void UpdatePreviewObject()
+    {
+        Vector2Int previewCell = GameManager.Instance.Mouse.Coordinates;
+
+        if (PreviewObj == null || !grid.CellExists(previewCell))
+            return;
+
+        if (PreviewObj.Coordinates != previewCell)
+        {
+            //Debug.Log("Previewing: " + previewCell);
+            RepositionPreviewObject(previewCell);
+        }
+    }
+
+    private void RepositionPreviewObject(Vector2Int previewCell)
+    {
+        // TODO: Better height level
+
+        int heightLevel = 1;
+        if (!grid.CellIsAvailable(previewCell))
+            heightLevel = 2;
+
+        PlaceObject(PreviewObj, previewCell, heightLevel, false);
     }
 
     public void ChangeObject(bool next)
@@ -98,6 +133,7 @@ public class ObjectPlacer : MonoBehaviour
             if (PreviewObj != null)
             {
                 PreviewObj.SetHexMesh(hexMeshes[currentHexMesh]);
+                RepositionPreviewObject(PreviewObj.Coordinates);
                 SetRotationForObject(PreviewObj.gameObject);
             }
         }
@@ -105,7 +141,9 @@ public class ObjectPlacer : MonoBehaviour
 
     public void TryPlaceObject(Vector2Int cell, bool removeObj)
     {
-        if (grid.CellExists(cell.x, cell.y))
+        // TODO: Just use whatever position the preview object has?
+
+        if (grid.CellExists(cell))
         {
             bool cellAvailable = grid.CellIsAvailable(cell);
 
@@ -116,6 +154,7 @@ public class ObjectPlacer : MonoBehaviour
             else if (removeObj && !cellAvailable)
             {
                 grid.EditCell(cell, null);
+                RepositionPreviewObject(cell);
             }
             else if (!removeObj && !cellAvailable)
             {
@@ -144,30 +183,31 @@ public class ObjectPlacer : MonoBehaviour
         if (newObj != null)
         {
             newObj.SetHexMesh(hexMeshes[currentHexMesh]);
-
-            Vector3 newPosition = grid.GetCellCenterWorld(cell, defaultYAxis: false);
-            if (newPosition.x >= 0)
-            {
-                // TODO: Ask available heightLevel from grid
-
-                newObj.Coordinates = cell;
-                newPosition.y +=
-                    newObj.HexMesh.defaultPositionY + (heightLevel - 1) * grid.CellHeight;
-                newObj.transform.position = newPosition;
-                SetRotationForObject(newObj.gameObject);
-                newObj.gameObject.SetActive(true);
-                grid.EditCell(cell, newObj.gameObject);
-            }
-            else
-            {
-                Debug.LogWarning("Unreachable cell: " + cell);
-            }
+            PlaceObject(newObj, cell, heightLevel, true);
 
             return;
         }
         else
         {
             Debug.LogWarning("No more objects to add");
+        }
+    }
+
+    private void PlaceObject(HexObject hexObj, Vector2Int cell, int heightLevel, bool addToGrid)
+    {
+        hexObj.Coordinates = cell;
+
+        Vector3 newPosition = grid.GetCellCenterWorld(cell, defaultYAxis: false);
+        newPosition.y +=
+            hexObj.HexMesh.defaultPositionY + (heightLevel - 1) * grid.CellHeight;
+        hexObj.transform.position = newPosition;
+
+        if (addToGrid)
+        {
+            SetRotationForObject(hexObj.gameObject);
+            hexObj.gameObject.SetActive(true);
+            grid.EditCell(cell, hexObj.gameObject);
+            RepositionPreviewObject(cell);
         }
     }
 
@@ -222,11 +262,7 @@ public class ObjectPlacer : MonoBehaviour
 
     public void SetRotationForObject(GameObject obj)
     {
-        // TODO: Fix rotation being wrong after REMOVING and REPLACING an object
-
         Vector3 newRotation = obj.transform.rotation.eulerAngles;
-
-        //Debug.Log("objRotation: " + objRotation);
 
         float rotY = objRotation +
                      hexMeshes[currentHexMesh].defaultRotationY +

@@ -61,9 +61,13 @@ public class HexObject : LevelObject, IGridObject
         //childObj.transform.rotation = Quaternion.Euler(xAxis, 0, 0);
     }
 
-    public void SetMaterial(Material material)
+    public void SetMaterial(Material material, bool disableShadows)
     {
-        childObj.GetComponent<MeshRenderer>().material = material;
+        MeshRenderer meshRend = childObj.GetComponent<MeshRenderer>();
+        meshRend.material = material;
+
+        if (disableShadows)
+            meshRend.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
     }
 
     public override void ResetObject()
