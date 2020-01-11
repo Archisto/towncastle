@@ -16,12 +16,12 @@ public class HexObject : LevelObject, IGridObject
         Undefined
     }
 
-    public Vector2Int Coordinates { get; set; }
-
     private GameObject childObj;
     private MeshFilter meshFilter; // This is in the child object, not the object with the script
 
     public HexMeshScriptableObject HexMesh { get; private set; }
+
+    public Vector2Int Coordinates { get; set; }
 
     public StructureType Type
     {
@@ -42,7 +42,7 @@ public class HexObject : LevelObject, IGridObject
         //    childObj.transform.rotation = Quaternion.Euler(0, 0, 0);
     }
 
-    public void ChangeHexMesh(HexMeshScriptableObject hexMesh)
+    public void SetHexMesh(HexMeshScriptableObject hexMesh)
     {
         // TODO: Change hitbox also
         // TODO: Weird rotations, with child object especially
@@ -59,6 +59,11 @@ public class HexObject : LevelObject, IGridObject
 
         //float xAxis = HexMesh.imported ? -90 : 0;
         //childObj.transform.rotation = Quaternion.Euler(xAxis, 0, 0);
+    }
+
+    public void SetMaterial(Material material)
+    {
+        childObj.GetComponent<MeshRenderer>().material = material;
     }
 
     public override void ResetObject()

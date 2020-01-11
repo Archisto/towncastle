@@ -11948,6 +11948,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hexObjPrefab: {fileID: 8644007892669904045, guid: 6f25910d3213bf04ca653441081d1464,
     type: 3}
+  previewObjMaterial: {fileID: 2100000, guid: 55c8c18d9ff0c0046ab88a31bd310a68, type: 2}
   hexMeshes:
   - {fileID: 11400000, guid: a9c35b96da646b247acd52a3f52d1f60, type: 2}
   - {fileID: 11400000, guid: 2a60ed74517f2524b888fca82b23c680, type: 2}

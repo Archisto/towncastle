@@ -4,10 +4,23 @@ using UnityEngine;
 
 public class ObjectPlacer : MonoBehaviour
 {
+    private const string PreviewObjectString = "PreviewObject";
+
+    private enum PlacingMode
+    {
+        Stack,
+        Insert,
+        Attach,
+        Remove
+    }
+
 #pragma warning disable 0649
 
     [SerializeField]
     private HexObject hexObjPrefab;
+
+    [SerializeField]
+    private Material previewObjMaterial;
 
     [SerializeField]
     private HexMeshScriptableObject[] hexMeshes;
@@ -16,7 +29,7 @@ public class ObjectPlacer : MonoBehaviour
     private int hexObjPoolSize = 20;
 
     [SerializeField]
-    private Utils.HexDirection defaultHexDirection = Utils.HexDirection.Right;
+    private Utils.HexDirection initialHexDirection = Utils.HexDirection.Right;
 
 #pragma warning restore 0649
 
@@ -27,17 +40,10 @@ public class ObjectPlacer : MonoBehaviour
 
     private int currentHexMesh = 0;
     private float objRotation = 0;
-    private float defaultDirectionRotationOffset;
-
-    private enum PlacingMode
-    {
-        Stack,
-        Insert,
-        Attach,
-        Remove
-    }
 
     public Utils.HexDirection ObjectDirection { get; private set; }
+
+    public HexObject PreviewObj { get; private set; }
 
     /// <summary>
     /// Start is called before the first frame update.
@@ -46,19 +52,55 @@ public class ObjectPlacer : MonoBehaviour
     {
         grid = GameManager.Instance.Grid;
         coord = new Vector2Int(-1, -1);
-        ObjectDirection = defaultHexDirection;
-        defaultDirectionRotationOffset =
-            Utils.AngleFromHexDirectionToAnother(defaultHexDirection, Utils.HexDirection.Right);
+        ObjectDirection = initialHexDirection;
+        objRotation = Utils.AngleFromHexDirection(ObjectDirection);
         SetRotationForNextObject(ObjectDirection);
 
         if (hexObjPrefab != null)
         {
             pool = new Pool<HexObject>(hexObjPrefab, hexObjPoolSize, false);
             GameManager.Instance.AddLevelObjectsToList(pool.GetAllObjects());
+            PreviewObj = pool.GetPooledObject(true);
         }
 
         if (hexMeshes != null)
+        {
             Debug.Log("Selected item: " + hexMeshes[currentHexMesh].name);
+            InitPreviewObject();
+        }
+    }
+
+    private void InitPreviewObject()
+    {
+        if (PreviewObj == null)
+            return;
+
+        PreviewObj.gameObject.name = PreviewObjectString;
+        PreviewObj.SetHexMesh(hexMeshes[currentHexMesh]);
+        PreviewObj.SetMaterial(previewObjMaterial);
+        SetRotationForObject(PreviewObj.gameObject);
+        PreviewObj.gameObject.layer = 0; // Default layer
+
+        // TODO: Proper support for objects following the mouse cursor
+        GameManager.Instance.Mouse.testObj = PreviewObj.gameObject;
+    }
+
+    public void ChangeObject(bool next)
+    {
+        if (hexMeshes != null && hexMeshes.Length > 1)
+        {
+            currentHexMesh += next ? 1 : -1;
+            if (currentHexMesh >= hexMeshes.Length)
+                currentHexMesh = 0;
+            else if (currentHexMesh < 0)
+                currentHexMesh = hexMeshes.Length - 1;
+
+            if (PreviewObj != null)
+            {
+                PreviewObj.SetHexMesh(hexMeshes[currentHexMesh]);
+                SetRotationForObject(PreviewObj.gameObject);
+            }
+        }
     }
 
     public void TryPlaceObject(Vector2Int cell, bool removeObj)
@@ -95,49 +137,13 @@ public class ObjectPlacer : MonoBehaviour
         TryPlaceObject(cell, removeObj);
     }
 
-    public void SetCoord(int i, bool removeObj)
-    {
-        if (coord.x < 0)
-        {
-            coord.x = i;
-        }
-        else if (coord.y < 0)
-        {
-            coord.y = i;
-
-            if (!grid.CellExists(coord.x, coord.y))
-            {
-                Debug.LogError("Cell doesn't exist: " + coord);
-            }
-            else
-            {
-                bool cellAvailable = grid.CellIsAvailable(coord);
-
-                if (!removeObj && cellAvailable)
-                {
-                    AddObjectToGridCell(coord, 1);
-                }
-                else if (removeObj && !cellAvailable)
-                {
-                    grid.EditCell(coord, null);
-                }
-                else
-                {
-                    Debug.LogWarning("Cell unavailable: " + coord);
-                }
-            }
-
-            coord = new Vector2Int(-1, -1);
-        }
-    }
-
     private void AddObjectToGridCell(Vector2Int cell, int heightLevel)
     {
         HexObject newObj = pool.GetPooledObject(false);
 
         if (newObj != null)
         {
-            newObj.ChangeHexMesh(hexMeshes[currentHexMesh]);
+            newObj.SetHexMesh(hexMeshes[currentHexMesh]);
 
             Vector3 newPosition = grid.GetCellCenterWorld(cell, defaultYAxis: false);
             if (newPosition.x >= 0)
@@ -162,18 +168,6 @@ public class ObjectPlacer : MonoBehaviour
         else
         {
             Debug.LogWarning("No more objects to add");
-        }
-    }
-
-    public void ChangeObject(bool next)
-    {
-        if (hexMeshes != null && hexMeshes.Length > 1)
-        {
-            currentHexMesh += next ? 1 : -1;
-            if (currentHexMesh >= hexMeshes.Length)
-                currentHexMesh = 0;
-            else if (currentHexMesh < 0)
-                currentHexMesh = hexMeshes.Length - 1;
         }
     }
 
@@ -203,6 +197,7 @@ public class ObjectPlacer : MonoBehaviour
         }
 
         objRotation = Utils.AngleFromHexDirection(ObjectDirection);
+        SetRotationForObject(PreviewObj.gameObject);
     }
 
     public void SetRotationForNextObject(Utils.HexDirection direction)
@@ -227,11 +222,11 @@ public class ObjectPlacer : MonoBehaviour
 
     public void SetRotationForObject(GameObject obj)
     {
-        // TODO: Fix rotation being wrong after removing and replacing an object
+        // TODO: Fix rotation being wrong after REMOVING and REPLACING an object
 
         Vector3 newRotation = obj.transform.rotation.eulerAngles;
 
-        Debug.Log("objRotation: " + objRotation);
+        //Debug.Log("objRotation: " + objRotation);
 
         float rotY = objRotation +
                      hexMeshes[currentHexMesh].defaultRotationY +
@@ -239,7 +234,6 @@ public class ObjectPlacer : MonoBehaviour
                         (Utils.HexDirection.Right, hexMeshes[currentHexMesh].mainDirection); // Right is the world main direction
 
         newRotation.y = rotY;
-
         obj.transform.rotation = Quaternion.Euler(newRotation);
     }
 
@@ -250,6 +244,14 @@ public class ObjectPlacer : MonoBehaviour
         
         return string.Format("Selected item: {0} ({1})\nDirection: {2}",
             hexMeshes[currentHexMesh].name, hexMeshes[currentHexMesh].structureType, ObjectDirection);
+    }
+
+    public void ResetPlacer()
+    {
+        if (PreviewObj != null)
+        {
+            PreviewObj.gameObject.SetActive(true);
+        }
     }
 
     //private void OnDrawGizmos()

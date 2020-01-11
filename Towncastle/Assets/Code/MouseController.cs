@@ -13,7 +13,7 @@ public class MouseController : MonoBehaviour
 
     // Testing
     [SerializeField]
-    private GameObject testObj;
+    public GameObject testObj;
 
  #pragma warning restore 0649
 
@@ -43,10 +43,14 @@ public class MouseController : MonoBehaviour
         UpdatePosition();
         CheckInput();
 
-        // Testing
+        // Testing / Object Preview
         if (testObj)
         {
-            testObj.transform.position = Position;
+            if (SelectingCoordinates)
+                testObj.transform.position = Position;
+            //else
+            //    testObj.transform.position =
+            //        new Vector3(Position.x, testObj.transform.position.y, Position.z);
         }
     }
 

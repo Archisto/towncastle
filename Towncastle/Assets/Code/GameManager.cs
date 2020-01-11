@@ -42,6 +42,8 @@ public class GameManager : MonoBehaviour
 
     public HexGrid Grid { get; private set; }
 
+    public ObjectPlacer ObjectPlacer { get; private set; }
+
     public PlayerController Player { get; private set; }
 
     public float ElapsedTime { get; private set; }
@@ -77,6 +79,7 @@ public class GameManager : MonoBehaviour
         UI = FindObjectOfType<UIManager>();
         Mouse = FindObjectOfType<MouseController>();
         Grid = FindObjectOfType<HexGrid>();
+        ObjectPlacer = FindObjectOfType<ObjectPlacer>();
         Player = FindObjectOfType<PlayerController>();
         shooter = FindObjectOfType<Shooter>();
         counter = FindObjectOfType<TimeCounter>();
@@ -159,6 +162,7 @@ public class GameManager : MonoBehaviour
         if (Grid != null)
         {
             Grid.ResetGrid();
+            ObjectPlacer.ResetPlacer();
         }
 
         if (Player != null)
