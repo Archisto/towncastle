@@ -76,6 +76,7 @@ public class MouseController : MonoBehaviour
         }
         else
         {
+            SelectingCoordinates = false;
             Position = camPos;
         }
     }
