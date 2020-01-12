@@ -123,13 +123,14 @@ public class HexGrid : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// All hex bases in terrainShapingHexBases list rise
+    /// until they hit something (use a terrain shaper).
+    /// </summary>
     public void ShapeTerrainWithSelectedHexBases()
     {
         if (terrainShapingHexBases == null)
             return;
-
-        // All hex bases in terrainShapingHexBases list rise
-        // until they hit something (use a terrain shaper)
 
         Vector3 newPosition;
         foreach (HexBase hexBase in terrainShapingHexBases)
@@ -156,7 +157,29 @@ public class HexGrid : MonoBehaviour
         return origin.y;
     }
 
-    public void DestroyHexBases()
+    /// <summary>
+    /// All hex bases in terrainShapingHexBases are destroyed.
+    /// </summary>
+    public void DestroySelectedHexBases()
+    {
+        if (terrainShapingHexBases == null)
+            return;
+
+        foreach (HexBase hexBase in terrainShapingHexBases)
+        {
+            if (hexBase.frozen)
+                continue;
+
+            // The hex base will be null but still occupy the space in the list
+            // NO -> hexBases.Remove(hexBase);
+
+            DestroyImmediate(hexBase.gameObject);
+        }
+
+        terrainShapingHexBases.Clear();
+    }
+
+    public void DestroyAllHexBases()
     {
         if (hexBases == null)
             return;
@@ -218,7 +241,10 @@ public class HexGrid : MonoBehaviour
         float yAxis = 0;
         if (!defaultYAxis && hexBases != null && hexBases.Count > 0)
         {
-            yAxis = GetHexBaseInHex(x, y).Y;
+            HexBase hexBase = GetHexBaseInHex(x, y);
+
+            if (hexBase != null)
+                yAxis = hexBase.Y;
         }
 
         Vector3 result = transform.position + new Vector3(x * cellSize, yAxis, y * cellGapZ);
@@ -298,7 +324,7 @@ public class HexGrid : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Invalid coordinates: (" + x + ", " + y + ")");
+            //Debug.LogError("Invalid coordinates: (" + x + ", " + y + ")");
             return null;
         }
     }

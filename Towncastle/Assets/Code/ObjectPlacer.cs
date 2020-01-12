@@ -6,6 +6,14 @@ public class ObjectPlacer : MonoBehaviour
 {
     private const string PreviewObjectString = "PreviewObject";
 
+    private enum EditMode
+    {
+        Edit,
+        Clear,
+        Hide,
+        Isolate
+    }
+
     private enum PlacingMode
     {
         Stack,
@@ -141,7 +149,7 @@ public class ObjectPlacer : MonoBehaviour
 
     public void TryPlaceObject(Vector2Int cell, bool removeObj)
     {
-        // TODO: Just use whatever position the preview object has?
+        // TODO: Just use whatever position and rotation the preview object has?
 
         if (grid.CellExists(cell))
         {

@@ -18,26 +18,38 @@ namespace Towncastle.Editor
             base.OnInspectorGUI();
 
             EditorGUI.BeginDisabledGroup(targetHexGrid.hexBasePrefab == null);
-            ShapeTerrainButton();
-            PopulateHexBasesButton();
-            ReacquireHexBasesButton();
-            DestroyHexBasesButton();
-            EditorGUI.EndDisabledGroup();
-        }
 
-        private void ShapeTerrainButton()
-        {
             EditorGUI.BeginDisabledGroup(
                 targetHexGrid.HexBaseCount == 0 ||
                 targetHexGrid.terrainShapingHexBases == null ||
                 targetHexGrid.terrainShapingHexBases.Count == 0);
 
+            ShapeTerrainButton();
+            DestroySelectedHexBasesButton();
+
+            EditorGUI.EndDisabledGroup();
+
+            PopulateHexBasesButton();
+            ReacquireHexBasesButton();
+            DestroyAllHexBasesButton();
+
+            EditorGUI.EndDisabledGroup();
+        }
+
+        private void ShapeTerrainButton()
+        {
             if (GUILayout.Button("Shape Terrain With Selected HexBases"))
             {
                 targetHexGrid.ShapeTerrainWithSelectedHexBases();
             }
+        }
 
-            EditorGUI.EndDisabledGroup();
+        private void DestroySelectedHexBasesButton()
+        {
+            if (GUILayout.Button("Destroy Selected HexBases"))
+            {
+                targetHexGrid.DestroySelectedHexBases();
+            }
         }
 
         private void PopulateHexBasesButton()
@@ -64,13 +76,13 @@ namespace Towncastle.Editor
             EditorGUI.EndDisabledGroup();
         }
 
-        private void DestroyHexBasesButton()
+        private void DestroyAllHexBasesButton()
         {
             EditorGUI.BeginDisabledGroup(targetHexGrid.HexBaseCount == 0);
 
-            if (GUILayout.Button("Destroy Hex Bases"))
+            if (GUILayout.Button("Destroy All Hex Bases"))
             {
-                targetHexGrid.DestroyHexBases();
+                targetHexGrid.DestroyAllHexBases();
             }
 
             EditorGUI.EndDisabledGroup();
