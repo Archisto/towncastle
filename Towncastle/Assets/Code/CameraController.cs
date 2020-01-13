@@ -4,6 +4,16 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+#pragma warning disable 0649
+
+    [SerializeField]
+    private Transform orbitPoint;
+
+    [SerializeField]
+    private float speed = 1f;
+
+#pragma warning restore 0649
+
     private Vector3 startPosition;
     private Quaternion startRotation;
 
@@ -35,6 +45,24 @@ public class CameraController : MonoBehaviour
     {
         transform.position = t.position;
         transform.rotation = t.rotation;
+    }
+
+    public void Move(Utils.Direction direction)
+    {
+        Vector3 movement = Vector3.zero;
+
+        switch (direction)
+        {
+            case Utils.Direction.Left:
+                movement = Vector3.left;
+                break;
+            case Utils.Direction.Right:
+                movement = Vector3.right;
+                break;
+        }
+
+        movement = movement * speed * Time.deltaTime;
+        transform.position = transform.position + movement;
     }
 
     private void UpdatePositionBetweenObjects(List<LevelObject> levelObjects)

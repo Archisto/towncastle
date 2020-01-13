@@ -3,7 +3,6 @@
 public class Timer
 {
     private float duration;
-    private float elapsedTime;
 
     /// <summary>
     /// Is the timer active.
@@ -14,6 +13,11 @@ public class Timer
     /// Is the timer finished.
     /// </summary>
     public bool IsFinished { get; private set; }
+
+    /// <summary>
+    /// The elapsed time.
+    /// </summary>
+    public float ElapsedTime { get; private set; }
 
     /// <summary>
     /// The timer's completion ratio, from 0 to 1.
@@ -65,8 +69,8 @@ public class Timer
     {
         if (IsActive)
         {
-            elapsedTime += Time.deltaTime;
-            Ratio = elapsedTime / duration;
+            ElapsedTime += Time.deltaTime;
+            Ratio = ElapsedTime / duration;
         }
     }
 
@@ -111,7 +115,7 @@ public class Timer
     {
         IsActive = false;
         IsFinished = false;
-        elapsedTime = 0f;
+        ElapsedTime = 0f;
         Ratio = 0f;
     }
 }

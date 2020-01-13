@@ -7,16 +7,26 @@ using UnityEngine;
 /// </summary>
 public class InputManager : MonoBehaviour
 {
+    private CameraController cam;
     private MouseController mouse;
     private ObjectPlacer objPlacer;
     private PlayerController player;
 
-    private SingleInputHandler changeObjKey1;
-    private SingleInputHandler changeObjKey2;
-    private SingleInputHandler pickObjKey;
-    private SingleInputHandler resetKey;
+    private SingleInputHandler cameraMoveHorizontalInput;
+    private SingleInputHandler changeObjInput;
+    private SingleInputHandler turnObjInput;
+    private SingleInputHandler pickObjInput;
+    private SingleInputHandler hideObjInput;
+    private SingleInputHandler showAllInput;
+    private SingleInputHandler resetInput;
 
     private SingleInputHandler[] numberKeys;
+
+
+    // TEE NÄMÄ:
+    // 2. Input system - Hide, ShowAll
+    // 3. Input system - kameran kierto (kursori reunalla)
+    // 4. 3d - katulamppu
 
 
     /// <summary>
@@ -24,14 +34,18 @@ public class InputManager : MonoBehaviour
     /// </summary>
     private void Start()
     {
+        cam = GameManager.Instance.Camera;
         mouse = GameManager.Instance.Mouse;
         objPlacer = FindObjectOfType<ObjectPlacer>();
         player = GameManager.Instance.Player;
 
-        changeObjKey1 = new SingleInputHandler(KeyCode.Q);
-        changeObjKey2 = new SingleInputHandler(KeyCode.E);
-        pickObjKey = new SingleInputHandler(KeyCode.LeftShift);
-        resetKey = new SingleInputHandler(KeyCode.R);
+        cameraMoveHorizontalInput = new SingleInputHandler("Mouse ScrollWheel");
+        changeObjInput = new SingleInputHandler("Change Object");
+        turnObjInput = new SingleInputHandler("Turn Object");
+        pickObjInput = new SingleInputHandler("Alt Action 1");
+        hideObjInput = new SingleInputHandler("Alt Action 2");
+        showAllInput = new SingleInputHandler("Show All");
+        resetInput = new SingleInputHandler("Reset");
 
         numberKeys = new SingleInputHandler[] {
             new SingleInputHandler(KeyCode.Alpha0),
@@ -65,39 +79,49 @@ public class InputManager : MonoBehaviour
     /// </summary>
     private void HandleInput()
     {
-        pickObjKey.Update();
+        HandleCameraInput();
 
-        changeObjKey1.Update();
-        if (changeObjKey1.JustPressedDown)
+        pickObjInput.Update();
+        hideObjInput.Update();
+
+        changeObjInput.Update();
+        if (changeObjInput.JustPressedDown)
         {
-            objPlacer.ChangeObject(false);
+            objPlacer.ChangeObject(changeObjInput.PositiveAxis);
         }
 
-        changeObjKey2.Update();
-        if (changeObjKey2.JustPressedDown)
+        turnObjInput.Update();
+        if (turnObjInput.JustPressedDown)
         {
-            objPlacer.ChangeObject(true);
+            Utils.Direction direction =
+                turnObjInput.PositiveAxis ? Utils.Direction.Right : Utils.Direction.Left;
+            objPlacer.ChangeRotationForNextObject(direction);
         }
 
-        resetKey.Update();
-        if (resetKey.JustPressedDown)
+        showAllInput.Update();
+        if (showAllInput.JustPressedDown)
+        {
+            objPlacer.HideAllObjects(false);
+        }
+
+        resetInput.Update();
+        if (resetInput.JustPressedDown)
         {
             GameManager.Instance.ResetGame();
         }
 
-        numberKeys[1].Update();
-        if (numberKeys[1].JustPressedDown)
-        {
-            objPlacer.ChangeRotationForNextObject(Utils.Direction.Left);
-        }
-
-        numberKeys[2].Update();
-        if (numberKeys[2].JustPressedDown)
-        {
-            objPlacer.ChangeRotationForNextObject(Utils.Direction.Right);
-        }
-
         HandleObjPlacingInput();
+    }
+
+    private void HandleCameraInput()
+    {
+        cameraMoveHorizontalInput.Update();
+        if (cameraMoveHorizontalInput.PressedDown)
+        {
+            Utils.Direction direction =
+                cameraMoveHorizontalInput.PositiveAxis ? Utils.Direction.Right : Utils.Direction.Left;
+            cam.Move(direction);
+        }
     }
 
     private void HandleObjPlacingInput()
@@ -108,9 +132,13 @@ public class InputManager : MonoBehaviour
         {
             if (mouse.SelectingCoordinates)
             {
-                if (pickObjKey.PressedDown)
+                if (pickObjInput.PressedDown)
                 {
                     objPlacer.PickObject(mouse.Coordinates);
+                }
+                else if (hideObjInput.PressedDown)
+                {
+                    objPlacer.ToggleHideObject(mouse.Coordinates);
                 }
                 else
                 {

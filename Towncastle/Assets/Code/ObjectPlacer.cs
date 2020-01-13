@@ -186,13 +186,28 @@ public class ObjectPlacer : MonoBehaviour
         UpdatePreviewObjectHexMesh();
     }
 
+    public void ToggleHideObject(Vector2Int cell)
+    {
+        HexObject hexObject = grid.GetObjectInCell(cell);
+
+        if (hexObject == null)
+            return;
+
+        hexObject.Hide(!hexObject.Hidden);
+    }
+
+    public void HideAllObjects(bool hide)
+    {
+        grid.HideAllObjects(hide);
+    }
+
     public void TryPlaceObject(Vector2Int cell, bool removeObj)
     {
         // TODO: Just use whatever position and rotation the preview object has?
 
         // Rules for placing objects:
-        // 1. Each cell can have a maximum of 4 objects:
-        //    1 Floor, 1 Wall, 1 Content (Object, Support, Protrusion) and 1 Roof
+        // 1. Each cell can have a maximum of 3 objects:
+        //    {[1 Floor, 1 Wall] OR 1 Room and 1 Content (Object, Support, Protrusion)] OR 1 Roof
         // 2. There has to be a Wall or Support in a cell for placing objects in the cell above
         // 3. Protrusions are exceptions to rule 2:
         //    They can be placed if the neighboring cell on the same height level has a Wall

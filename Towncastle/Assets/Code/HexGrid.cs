@@ -382,6 +382,21 @@ public class HexGrid : MonoBehaviour
         }
     }
 
+    public void HideAllObjects(bool hide)
+    {
+        for (int y = 0; y < GridSizeY; y++)
+        {
+            for (int x = 0; x < GridSizeX; x++)
+            {
+                if (cellContents[y][x] != null)
+                {
+                    HexObject hexObject = cellContents[y][x].GetComponent<HexObject>();
+                    hexObject.Hide(hide);
+                }
+            }
+        }
+    }
+
     public void ResetGrid()
     {
         for (int y = 0; y < GridSizeY; y++)

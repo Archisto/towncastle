@@ -17,12 +17,16 @@ public class HexObject : LevelObject, IGridObject
         Undefined
     }
 
+    // Child object and its components
     private GameObject childObj;
-    private MeshFilter meshFilter; // This is in the child object, not the object with the script
+    private MeshFilter meshFilter;
+    private MeshRenderer meshRend;
 
     public HexMeshScriptableObject HexMesh { get; private set; }
 
     public Vector2Int Coordinates { get; set; }
+
+    public bool Hidden { get; private set; }
 
     public StructureType Type
     {
@@ -35,9 +39,23 @@ public class HexObject : LevelObject, IGridObject
         }
     }
 
+    public bool IsContentStructure
+    {
+        get
+        {
+            return
+                Type == StructureType.Support ||
+                Type == StructureType.Protrusion ||
+                Type == StructureType.Object;
+        }
+    }
+
     protected override void InitObject()
     {
         base.InitObject();
+
+        if (meshRend == null)
+            meshRend = childObj.GetComponent<MeshRenderer>();
 
         //if (!HexMesh.imported)
         //    childObj.transform.rotation = Quaternion.Euler(0, 0, 0);
@@ -64,16 +82,27 @@ public class HexObject : LevelObject, IGridObject
 
     public void SetMaterial(Material material, bool disableShadows)
     {
-        MeshRenderer meshRend = childObj.GetComponent<MeshRenderer>();
+        if (meshRend == null)
+            meshRend = childObj.GetComponent<MeshRenderer>();
+
         meshRend.material = material;
 
         if (disableShadows)
             meshRend.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
     }
 
+    public void Hide(bool hide)
+    {
+        Hidden = hide;
+        meshRend.enabled = !Hidden;
+    }
+
     public override void ResetObject()
     {
         base.ResetObject();
+
+        if (meshRend != null)
+            Hide(false);
 
         gameObject.SetActive(false);
     }

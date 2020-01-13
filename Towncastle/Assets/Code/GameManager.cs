@@ -40,6 +40,8 @@ public class GameManager : MonoBehaviour
 
     public MouseController Mouse { get; private set; }
 
+    public CameraController Camera { get; private set; }
+
     public HexGrid Grid { get; private set; }
 
     public ObjectPlacer ObjectPlacer { get; private set; }
@@ -78,6 +80,7 @@ public class GameManager : MonoBehaviour
 
         UI = FindObjectOfType<UIManager>();
         Mouse = FindObjectOfType<MouseController>();
+        Camera = FindObjectOfType<CameraController>();
         Grid = FindObjectOfType<HexGrid>();
         ObjectPlacer = FindObjectOfType<ObjectPlacer>();
         Player = FindObjectOfType<PlayerController>();
