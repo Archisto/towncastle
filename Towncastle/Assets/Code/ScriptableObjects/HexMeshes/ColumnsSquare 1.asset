@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mesh: {fileID: -4053646290255332751, guid: 2c7e1cd4f2b3342409dd152b8b1795ce, type: 3}
   imported: 1
-  structureType: 6
+  structureType: 4
   mainDirection: 1
   defaultRotationY: 0
   defaultPositionY: 0

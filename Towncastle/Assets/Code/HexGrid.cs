@@ -286,7 +286,7 @@ public class HexGrid : MonoBehaviour
         float yAxis = 0;
         if (!defaultYAxis && hexBases != null && hexBases.Count > 0)
         {
-            HexBase hexBase = GetHexBaseInHex(x, y);
+            HexBase hexBase = GetHexBaseInCell(x, y);
 
             if (hexBase != null)
                 yAxis = hexBase.Y;
@@ -350,12 +350,20 @@ public class HexGrid : MonoBehaviour
         }
     }
 
-    public LevelObject GetObjectInHex(int x, int y)
+    public HexObject GetObjectInCell(Vector2Int cell)
     {
+        if (CellExists(cell) &&
+            cellContents != null &&
+            cellContents[cell.y][cell.x] != null)
+        {
+            HexObject hexObject = cellContents[cell.y][cell.x].GetComponent<HexObject>();
+            return hexObject;
+        }
+
         return null;
     }
 
-    private HexBase GetHexBaseInHex(int x, int y)
+    private HexBase GetHexBaseInCell(int x, int y)
     {
         if (hexBases == null || hexBases.Count == 0)
         {

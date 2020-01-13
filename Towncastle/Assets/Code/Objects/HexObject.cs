@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[SelectionBase]
 public class HexObject : LevelObject, IGridObject
 {
     public enum StructureType
@@ -10,7 +11,7 @@ public class HexObject : LevelObject, IGridObject
         Wall,
         Room,
         Roof,
-        Canopy,
+        Support,
         Protrusion,
         Object,
         Undefined

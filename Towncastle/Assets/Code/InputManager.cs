@@ -13,6 +13,7 @@ public class InputManager : MonoBehaviour
 
     private SingleInputHandler changeObjKey1;
     private SingleInputHandler changeObjKey2;
+    private SingleInputHandler pickObjKey;
     private SingleInputHandler resetKey;
 
     private SingleInputHandler[] numberKeys;
@@ -29,6 +30,7 @@ public class InputManager : MonoBehaviour
 
         changeObjKey1 = new SingleInputHandler(KeyCode.Q);
         changeObjKey2 = new SingleInputHandler(KeyCode.E);
+        pickObjKey = new SingleInputHandler(KeyCode.LeftShift);
         resetKey = new SingleInputHandler(KeyCode.R);
 
         numberKeys = new SingleInputHandler[] {
@@ -63,6 +65,8 @@ public class InputManager : MonoBehaviour
     /// </summary>
     private void HandleInput()
     {
+        pickObjKey.Update();
+
         changeObjKey1.Update();
         if (changeObjKey1.JustPressedDown)
         {
@@ -104,7 +108,14 @@ public class InputManager : MonoBehaviour
         {
             if (mouse.SelectingCoordinates)
             {
-                objPlacer.TryPlaceObject(mouse.Coordinates, remove);
+                if (pickObjKey.PressedDown)
+                {
+                    objPlacer.PickObject(mouse.Coordinates);
+                }
+                else
+                {
+                    objPlacer.TryPlaceObject(mouse.Coordinates, remove);
+                }
             }
             //else
             //{

@@ -8,18 +8,30 @@ public class ObjectPlacer : MonoBehaviour
 
     private enum EditMode
     {
-        Edit,
-        Clear,
+        Edit, // Add and remove
+        Pick, // Copy object to preview
         Hide,
-        Isolate
+        Isolate // Hide all other objects
     }
 
     private enum PlacingMode
     {
-        Stack,
-        Insert,
-        Attach,
+        Stack, // On the top unoccupied level
+        Insert, // Same cell; pushes the cell and everything above up one height level
+        Replace, // Same cell
+        Attach, // On a neigboring cell
         Remove
+    }
+
+    private enum RemovalMode
+    {
+        MostRecent,
+        AllSingleCell,
+        AllFullHeight,
+        Floor,
+        Wall,
+        Content,
+        Roof
     }
 
 #pragma warning disable 0649
@@ -97,13 +109,13 @@ public class ObjectPlacer : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        UpdatePreviewObject();
+        UpdatePreviewObjectPosition();
     }
 
     /// <summary>
-    /// Updates the preview object.
+    /// Updates the preview object's position.
     /// </summary>
-    private void UpdatePreviewObject()
+    private void UpdatePreviewObjectPosition()
     {
         Vector2Int previewCell = GameManager.Instance.Mouse.Coordinates;
 
@@ -114,6 +126,19 @@ public class ObjectPlacer : MonoBehaviour
         {
             //Debug.Log("Previewing: " + previewCell);
             RepositionPreviewObject(previewCell);
+        }
+    }
+
+    /// <summary>
+    /// Updates the preview object's hex mesh.
+    /// </summary>
+    public void UpdatePreviewObjectHexMesh()
+    {
+        if (PreviewObj != null)
+        {
+            PreviewObj.SetHexMesh(hexMeshes[currentHexMesh]);
+            RepositionPreviewObject(PreviewObj.Coordinates);
+            SetRotationForObject(PreviewObj.gameObject);
         }
     }
 
@@ -138,18 +163,45 @@ public class ObjectPlacer : MonoBehaviour
             else if (currentHexMesh < 0)
                 currentHexMesh = hexMeshes.Length - 1;
 
-            if (PreviewObj != null)
+            UpdatePreviewObjectHexMesh();
+        }
+    }
+
+    public void PickObject(Vector2Int cell)
+    {
+        HexObject hexObject = grid.GetObjectInCell(cell);
+
+        if (hexObject == null)
+            return;
+
+        for (int i = 0; i < hexMeshes.Length; i++)
+        {
+            if (hexObject.HexMesh == hexMeshes[i])
             {
-                PreviewObj.SetHexMesh(hexMeshes[currentHexMesh]);
-                RepositionPreviewObject(PreviewObj.Coordinates);
-                SetRotationForObject(PreviewObj.gameObject);
+                currentHexMesh = i;
+                break;
             }
         }
+
+        UpdatePreviewObjectHexMesh();
     }
 
     public void TryPlaceObject(Vector2Int cell, bool removeObj)
     {
         // TODO: Just use whatever position and rotation the preview object has?
+
+        // Rules for placing objects:
+        // 1. Each cell can have a maximum of 4 objects:
+        //    1 Floor, 1 Wall, 1 Content (Object, Support, Protrusion) and 1 Roof
+        // 2. There has to be a Wall or Support in a cell for placing objects in the cell above
+        // 3. Protrusions are exceptions to rule 2:
+        //    They can be placed if the neighboring cell on the same height level has a Wall
+        // 4. If an object is removed and it is a prerequisite for building on the cells above,
+        //    the cells above are also cleared
+        //    (the user will be warned and asked to use the Replace mode if they do not want this)
+        // 5. Removing an object removes the most recent object in the selected cell
+        //    if a special removal mode is not active
+        // 6. The rotation of an object never matters
 
         if (grid.CellExists(cell))
         {
