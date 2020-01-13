@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[SelectionBase]
 public class HexBase : MonoBehaviour, IGridObject
 {
 #pragma warning disable 0649

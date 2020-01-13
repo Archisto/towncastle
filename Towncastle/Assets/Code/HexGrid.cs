@@ -27,6 +27,15 @@ public class HexGrid : MonoBehaviour
     public List<HexBase> terrainShapingHexBases;
 
     [SerializeField]
+    private Material hexBaseMaterial1;
+
+    [SerializeField]
+    private Material hexBaseMaterial2;
+
+    [SerializeField]
+    private Material hexBaseMaterial3;
+
+    [SerializeField]
     private Color gridColor = Color.black;
 
 #pragma warning restore 0649
@@ -118,7 +127,43 @@ public class HexGrid : MonoBehaviour
                 newHexBase.transform.position = newPosition;
                 newHexBase.Coordinates = new Vector2Int(x, y);
                 newHexBase.name = string.Format("HexBase ({0}, {1})", x, y);
+                SetHexBaseMaterial(newHexBase);
                 hexBases.Add(newHexBase);
+            }
+        }
+    }
+
+    private void SetHexBaseMaterial(HexBase hexBase)
+    {
+        MeshRenderer meshRend = hexBase.GetComponentInChildren<MeshRenderer>();
+        if (hexBase.Coordinates.y % 2 == 0)
+        {
+            if (hexBase.Coordinates.x % 3 == 0)
+            {
+                meshRend.material = hexBaseMaterial1;
+            }
+            else if (hexBase.Coordinates.x % 3 == 1)
+            {
+                meshRend.material = hexBaseMaterial2;
+            }
+            else
+            {
+                meshRend.material = hexBaseMaterial3;
+            }
+        }
+        else
+        {
+            if (hexBase.Coordinates.x % 3 == 0)
+            {
+                meshRend.material = hexBaseMaterial3;
+            }
+            else if (hexBase.Coordinates.x % 3 == 1)
+            {
+                meshRend.material = hexBaseMaterial1;
+            }
+            else
+            {
+                meshRend.material = hexBaseMaterial2;
             }
         }
     }

@@ -10,10 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c2c12c3f29d7d34a86252a7392a9ecd, type: 3}
-  m_Name: SquareColumns 1
+  m_Name: WallsHalf 1
   m_EditorClassIdentifier: 
-  mesh: {fileID: -4053646290255332751, guid: c0b358b6415a15945b75c2b5f21b199e, type: 3}
+  mesh: {fileID: 5666436763497646982, guid: 0eaa5ed850a1e7e448bec47c9b02a582, type: 3}
   imported: 1
-  structureType: 0
-  defaultPositionY: 0
+  structureType: 1
+  mainDirection: 1
   defaultRotationY: 0
+  defaultPositionY: 0

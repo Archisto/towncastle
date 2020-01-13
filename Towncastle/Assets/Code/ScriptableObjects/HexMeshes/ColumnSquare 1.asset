@@ -10,10 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c2c12c3f29d7d34a86252a7392a9ecd, type: 3}
-  m_Name: SquareColumn 1
+  m_Name: ColumnSquare 1
   m_EditorClassIdentifier: 
-  mesh: {fileID: 5020041512153237788, guid: 0d68927ccc1f5cb4d9cf79742c8b94ec, type: 3}
+  mesh: {fileID: -1634045812603037541, guid: 8119d77ad52c11f46b285292282d2829, type: 3}
   imported: 1
-  structureType: 0
-  defaultPositionY: 0
+  structureType: 6
+  mainDirection: 1
   defaultRotationY: 0
+  defaultPositionY: 0
