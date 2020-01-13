@@ -20,7 +20,7 @@ public class AnimationMover : MonoBehaviour
 
     public bool IsFinished { get; private set; }
 
-    public float Progress { get { return timer.Ratio; } }
+    public float Progress { get => timer.Ratio; }
 
     public void Play(Transform targetTransform)
     {

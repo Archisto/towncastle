@@ -11,7 +11,7 @@ public class Point : MonoBehaviour
     /// <summary>
     /// The coordinates.
     /// </summary>
-    public Vector3 Coordinates { get { return transform.position; } }
+    public Vector3 Coordinates { get => transform.position; }
 
     /// <summary>
     /// Draws gizmos.

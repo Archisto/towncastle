@@ -24,7 +24,7 @@ public class Bullet : MonoBehaviour
     private bool isMoving;
     private Utils.Direction cardinalDir = Utils.Direction.Up;
 
-    private bool UnlimitedLifeTime { get { return lifeTime <= 0; } }
+    private bool UnlimitedLifeTime { get => lifeTime <= 0; }
 
     private void InitObject()
     {

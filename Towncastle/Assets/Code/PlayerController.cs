@@ -24,7 +24,7 @@ public class PlayerController : MonoBehaviour
 
     public int Hitpoints { get; private set; }
 
-    public int MaxHitpoints { get { return maxHitpoints; } }
+    public int MaxHitpoints { get => maxHitpoints; }
 
     public bool IsDead { get; private set; }
 

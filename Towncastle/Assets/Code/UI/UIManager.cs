@@ -12,6 +12,8 @@ namespace Towncastle.UI
         private Vector2 canvasSize;
         private Vector2 uiOffset;
 
+        public Vector2 CanvasSize { get => canvasSize; }
+
         /// <summary>
         /// Initializes the object.
         /// </summary>

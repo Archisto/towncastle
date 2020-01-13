@@ -23,7 +23,7 @@ public class SingleInputHandler
 
     public bool Released { get; private set; }
 
-    public bool PressedDown { get { return Value != 0; } }
+    public bool PressedDown { get => Value != 0; }
 
     public bool JustPressedDown { get; private set; }
 

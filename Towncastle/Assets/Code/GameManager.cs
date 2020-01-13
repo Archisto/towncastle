@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
 
     public float ElapsedTime { get; private set; }
 
-    public bool PlayReady { get { return !GamePaused && !GameOver; } }
+    public bool PlayReady { get => !GamePaused && !GameOver; }
 
     public bool GameOver { get; private set; }
 

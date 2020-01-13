@@ -46,13 +46,13 @@ public class HexGrid : MonoBehaviour
     private MouseController mouse;
     private List<GameObject[]> cellContents;
 
-    public int GridSizeX { get { return gridSizeX; } }
+    public int GridSizeX { get => gridSizeX; }
 
-    public int GridSizeY { get { return gridSizeY; } }
+    public int GridSizeY { get => gridSizeY; }
 
-    public float CellHeight { get { return cellHeight; } }
+    public float CellHeight { get => cellHeight; }
 
-    public float HexBaseCount { get { return hexBases.Count; } }
+    public float HexBaseCount { get => hexBases.Count; }
 
     /// <summary>
     /// OnValidate is called when the script is loaded or a value is changed. (Editor only)

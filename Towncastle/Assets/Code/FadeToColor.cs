@@ -49,8 +49,8 @@ public class FadeToColor : MonoBehaviour
         }
     }
 
-    public float FadeOutTime { get { return _fadeOutTime; } }
-    public float FadeInTime { get { return _fadeInTime; } }
+    public float FadeOutTime { get => _fadeOutTime; }
+    public float FadeInTime { get => _fadeInTime; }
 
     /// <summary>
     /// Initializes the object.

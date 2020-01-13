@@ -24,13 +24,6 @@ public class InputManager : MonoBehaviour
 
     private SingleInputHandler[] numberKeys;
 
-
-    // TEE NÄMÄ:
-    // 2. Input system - Hide, ShowAll
-    // 3. Input system - kameran kierto (kursori reunalla)
-    // 4. 3d - katulamppu
-
-
     /// <summary>
     /// Start is called before the first frame update.
     /// </summary>
@@ -121,7 +114,16 @@ public class InputManager : MonoBehaviour
     {
         horizontalInput.Update();
         cameraMoveHorizontalInput.Update();
-        if (horizontalInput.PressedDown)
+
+        if (MouseCursorNearScreenEdge(Utils.Direction.Left, 200))
+        {
+            cam.Move(Utils.Direction.Left, 1);
+        }
+        else if (MouseCursorNearScreenEdge(Utils.Direction.Right, 200))
+        {
+            cam.Move(Utils.Direction.Right, 1);
+        }
+        else if (horizontalInput.PressedDown)
         {
             Utils.Direction direction =
                 horizontalInput.PositiveAxis ? Utils.Direction.Right : Utils.Direction.Left;
@@ -210,5 +212,55 @@ public class InputManager : MonoBehaviour
     private void HandleDebugInput()
     {
         
+    }
+
+    /// <summary>
+    /// Determines whether the mouse cursor is near the edge of the screen.
+    /// </summary>
+    /// <param name="side">A specific side or None for any</param>
+    /// <param name="maxDistance">How close to the edge should the cursor be (in pixels)</param>
+    /// <returns>Is the mouse cursor near the edge of the screen</returns>
+    private bool MouseCursorNearScreenEdge(Utils.Direction side, float maxDistance)
+    {
+        Vector2 screenDimensions = GameManager.Instance.UI.CanvasSize;
+
+        bool up = Input.mousePosition.y >= screenDimensions.y - maxDistance;
+        bool down = Input.mousePosition.y <= maxDistance;
+        bool left = Input.mousePosition.x <= maxDistance;
+        bool right = Input.mousePosition.x >= screenDimensions.x - maxDistance;
+
+        switch (side)
+        {
+            case Utils.Direction.Up:
+                return up;
+            case Utils.Direction.Down:
+                return down;
+            case Utils.Direction.Left:
+                return left;
+            case Utils.Direction.Right:
+                return right;
+
+            // Any side
+            case Utils.Direction.None:
+                Utils.Direction nearSide = Utils.Direction.None;
+                if (up)
+                    nearSide = Utils.Direction.Up;
+                else if (down)
+                    nearSide = Utils.Direction.Down;
+                else if(left)
+                    nearSide = Utils.Direction.Left;
+                else if (right)
+                    nearSide = Utils.Direction.Right;
+
+                if (nearSide != Utils.Direction.None)
+                {
+                    Debug.Log("Mouse cursor near edge: " + nearSide + " " + Input.mousePosition);
+                    return true;
+                }
+
+                break;
+        }
+
+        return false;
     }
 }

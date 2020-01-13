@@ -17,6 +17,9 @@ public class MouseController : MonoBehaviour
 
  #pragma warning restore 0649
 
+    /// <summary>
+    /// The world coordinates of the mouse cursor.
+    /// </summary>
     public Vector3 Position { get; private set; }
 
     public Vector2Int Coordinates { get; private set; }
