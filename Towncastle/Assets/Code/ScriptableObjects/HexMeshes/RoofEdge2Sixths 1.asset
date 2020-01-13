@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c2c12c3f29d7d34a86252a7392a9ecd, type: 3}
+  m_Name: RoofEdge2Sixths 1
+  m_EditorClassIdentifier: 
+  mesh: {fileID: -8838162254044700295, guid: a77b0c307d282584099a30c2bca7a7ca, type: 3}
+  imported: 1
+  structureType: 3
+  mainDirection: 0
+  defaultRotationY: 0
+  defaultPositionY: 0
