@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &8700096909968475455
+--- !u!1 &6706559366186284757
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,9 +8,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8700096909968475454}
-  - component: {fileID: 8700096909968475453}
-  - component: {fileID: 8700096909968475452}
+  - component: {fileID: 6706559366186284756}
+  - component: {fileID: 6706559366186284759}
+  - component: {fileID: 6706559366186284758}
   m_Layer: 0
   m_Name: HexGrid
   m_TagString: Untagged
@@ -18,13 +18,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8700096909968475454
+--- !u!4 &6706559366186284756
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8700096909968475455}
+  m_GameObject: {fileID: 6706559366186284757}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -32,13 +32,13 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8700096909968475453
+--- !u!114 &6706559366186284759
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8700096909968475455}
+  m_GameObject: {fileID: 6706559366186284757}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 27027f370ba0e004b9e649d63c1a5f54, type: 3}
@@ -46,23 +46,104 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hexBasePrefab: {fileID: 7675227451486952203, guid: 003a6906d5282de409ff93366b8870cf,
     type: 3}
+  hexBaseParent: {fileID: 0}
   gridSizeX: 8
   gridSizeY: 10
   cellSize: 1.905
   cellHeight: 2
-  hexBases: []
+  hexBases:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   terrainShapingHexBases: []
   hexBaseMaterial1: {fileID: 2100000, guid: 316624070e2dc9341b2422401037f662, type: 2}
   hexBaseMaterial2: {fileID: 2100000, guid: 7c8d0e416e9cc1a4dbcea930a5e67f17, type: 2}
   hexBaseMaterial3: {fileID: 2100000, guid: b0b138d349267d9478c37130d19854d7, type: 2}
   gridColor: {r: 0.735849, g: 0.114542544, b: 0.114542544, a: 0.3019608}
---- !u!114 &8700096909968475452
+--- !u!114 &6706559366186284758
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8700096909968475455}
+  m_GameObject: {fileID: 6706559366186284757}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 346e0bde785738243ae5386859e6caf2, type: 3}
@@ -70,13 +151,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hexObjPrefab: {fileID: 8644007892669904045, guid: 6f25910d3213bf04ca653441081d1464,
     type: 3}
-  previewObjMaterial: {fileID: 0}
+  previewObjMaterial: {fileID: 2100000, guid: 55c8c18d9ff0c0046ab88a31bd310a68, type: 2}
   hexMeshes:
   - {fileID: 11400000, guid: a9c35b96da646b247acd52a3f52d1f60, type: 2}
-  - {fileID: 11400000, guid: 2a60ed74517f2524b888fca82b23c680, type: 2}
+  - {fileID: 11400000, guid: a8a922151b0d81145b4ab900bc59ffac, type: 2}
+  - {fileID: 11400000, guid: f350d68c057fecf41a7ad17d4cdeb033, type: 2}
+  - {fileID: 11400000, guid: f086d8b43ee07994880fc546ed43f43a, type: 2}
+  - {fileID: 11400000, guid: 09f0a9c757fe15d4e9299984728f3f61, type: 2}
   - {fileID: 11400000, guid: c0d43659151176845a41c1dd982aeec0, type: 2}
+  - {fileID: 11400000, guid: a6a07c9f7ad191b43af0e0c1a6ae21f0, type: 2}
   - {fileID: 11400000, guid: 7e82f42facf5bd74ab1d24881e6e5764, type: 2}
   - {fileID: 11400000, guid: cd1b5f7b3dea88b4583590b036c7cdf4, type: 2}
-  - {fileID: 11400000, guid: 6c74bb3eb5d10b24c96243fc3ced2822, type: 2}
+  - {fileID: 11400000, guid: 2101a4eb7e77d1740a6450bf23de76c7, type: 2}
+  - {fileID: 11400000, guid: 645c2434f3d212842918b1a90d2b561e, type: 2}
+  - {fileID: 11400000, guid: ec9e105fae4610f47bb62311eb213001, type: 2}
+  - {fileID: 11400000, guid: 745b0367875f92f4ea51f0638e845c55, type: 2}
+  - {fileID: 11400000, guid: 3a899f25d47a940468c50ca7857b0cbb, type: 2}
+  - {fileID: 11400000, guid: 79eec457d9f91144a81bbe3ffad033ff, type: 2}
+  - {fileID: 11400000, guid: 45c43627ccf2fde4a91cf10ea662ce6b, type: 2}
+  - {fileID: 11400000, guid: bf86a490b964c634e874560164f59615, type: 2}
+  - {fileID: 11400000, guid: 09af6bd5eaeb3394b9d90d48900b4c68, type: 2}
+  - {fileID: 11400000, guid: 6ec3cac035088914ea2741c570918ef9, type: 2}
+  - {fileID: 11400000, guid: aff8710b3ee21a44981fcb56edc2e3a2, type: 2}
+  - {fileID: 11400000, guid: 2c10fc2546b12ff469a68bf45e1fd4b4, type: 2}
+  - {fileID: 11400000, guid: e202f3dd46aa8804a83f680fa9df1683, type: 2}
+  - {fileID: 11400000, guid: 31d1135b6bc53d94aa8fdc66b5915d4b, type: 2}
+  - {fileID: 11400000, guid: 1015ddf6e98590c43bc6c396afaf9efc, type: 2}
+  - {fileID: 11400000, guid: d66db880292d5394da9ea87508009239, type: 2}
+  - {fileID: 11400000, guid: f410aac400c8e7b4aa26ff8bcfaeb16d, type: 2}
+  - {fileID: 11400000, guid: 9c5a7e905442df846bcf3cf9d3fc92ed, type: 2}
   hexObjPoolSize: 36
   initialHexDirection: 1

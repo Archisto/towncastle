@@ -97,4 +97,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   orbitPoint: {fileID: 0}
-  speed: 100
+  rotationSpeed: 1
+  orbitAngle: 3.1415927

@@ -12,6 +12,8 @@ public class InputManager : MonoBehaviour
     private ObjectPlacer objPlacer;
     private PlayerController player;
 
+    private SingleInputHandler horizontalInput;
+    private SingleInputHandler verticalInput;
     private SingleInputHandler cameraMoveHorizontalInput;
     private SingleInputHandler changeObjInput;
     private SingleInputHandler turnObjInput;
@@ -39,6 +41,8 @@ public class InputManager : MonoBehaviour
         objPlacer = FindObjectOfType<ObjectPlacer>();
         player = GameManager.Instance.Player;
 
+        horizontalInput = new SingleInputHandler("Horizontal");
+        verticalInput = new SingleInputHandler("Vertical");
         cameraMoveHorizontalInput = new SingleInputHandler("Mouse ScrollWheel");
         changeObjInput = new SingleInputHandler("Change Object");
         turnObjInput = new SingleInputHandler("Turn Object");
@@ -115,12 +119,19 @@ public class InputManager : MonoBehaviour
 
     private void HandleCameraInput()
     {
+        horizontalInput.Update();
         cameraMoveHorizontalInput.Update();
-        if (cameraMoveHorizontalInput.PressedDown)
+        if (horizontalInput.PressedDown)
+        {
+            Utils.Direction direction =
+                horizontalInput.PositiveAxis ? Utils.Direction.Right : Utils.Direction.Left;
+            cam.Move(direction, 1);
+        }
+        else if (cameraMoveHorizontalInput.PressedDown)
         {
             Utils.Direction direction =
                 cameraMoveHorizontalInput.PositiveAxis ? Utils.Direction.Right : Utils.Direction.Left;
-            cam.Move(direction);
+            cam.Move(direction, 8);
         }
     }
 

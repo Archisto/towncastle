@@ -10,18 +10,33 @@ public class CameraController : MonoBehaviour
     private Transform orbitPoint;
 
     [SerializeField]
-    private float speed = 1f;
+    private float rotationSpeed = 1f;
+
+    [SerializeField]
+    private float orbitAngle = Mathf.PI; // radians
 
 #pragma warning restore 0649
 
     private Vector3 startPosition;
     private Quaternion startRotation;
 
+    private Vector3 leveledOrbitPoint;
+    private float orbitRadius;
+    //private float orbitAngle;
+
     /// <summary>
     /// Start is called before the first frame update.
     /// </summary>
     private void Start()
     {
+        if (orbitPoint != null)
+        {
+            leveledOrbitPoint = orbitPoint.position;
+            leveledOrbitPoint.y = transform.position.y;
+            orbitRadius = Vector3.Distance(transform.position, leveledOrbitPoint);
+            LookAt(orbitPoint.position);
+        }
+
         startPosition = transform.position;
         startRotation = transform.rotation;
     }
@@ -47,22 +62,35 @@ public class CameraController : MonoBehaviour
         transform.rotation = t.rotation;
     }
 
-    public void Move(Utils.Direction direction)
+    public void Move(Utils.Direction direction, float speedMultiplier)
     {
-        Vector3 movement = Vector3.zero;
+        if (orbitPoint == null)
+            return;
 
         switch (direction)
         {
             case Utils.Direction.Left:
-                movement = Vector3.left;
+                orbitAngle += rotationSpeed * speedMultiplier * Time.deltaTime;
+                if (orbitAngle > 0)
+                    orbitAngle -= 2 * Mathf.PI;
                 break;
             case Utils.Direction.Right:
-                movement = Vector3.right;
+                orbitAngle += -1 * rotationSpeed * speedMultiplier * Time.deltaTime;
+                if (orbitAngle < 2 * Mathf.PI)
+                    orbitAngle += 2 * Mathf.PI;
                 break;
         }
 
-        movement = movement * speed * Time.deltaTime;
-        transform.position = transform.position + movement;
+        Vector3 orbitDirection = new Vector3(Mathf.Sin(orbitAngle), 0, Mathf.Cos(orbitAngle));
+        transform.position = leveledOrbitPoint + orbitDirection * orbitRadius;
+
+        LookAt(orbitPoint.position);
+    }
+
+    public void LookAt(Vector3 position)
+    {
+        transform.rotation =
+            Quaternion.LookRotation(position - transform.position, Vector3.up);
     }
 
     private void UpdatePositionBetweenObjects(List<LevelObject> levelObjects)

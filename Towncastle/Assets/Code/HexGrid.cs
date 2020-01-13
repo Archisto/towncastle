@@ -5,6 +5,7 @@ using UnityEngine;
 public class HexGrid : MonoBehaviour
 {
     public HexBase hexBasePrefab;
+    public Transform hexBaseParent;
 
 #pragma warning disable 0649
 
@@ -117,7 +118,12 @@ public class HexGrid : MonoBehaviour
         {
             for (int x = 0; x < GridSizeX; x++)
             {
-                HexBase newHexBase = Instantiate(hexBasePrefab, transform);
+                HexBase newHexBase;
+                if (hexBaseParent != null)
+                    newHexBase = Instantiate(hexBasePrefab, hexBaseParent);
+                else
+                    newHexBase = Instantiate(hexBasePrefab);
+
                 newHexBase.HexGrid = this;
                 Vector3 newPosition = GetCellCenterWorld(x, y, defaultYAxis: true);
 
