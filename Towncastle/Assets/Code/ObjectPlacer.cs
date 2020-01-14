@@ -72,7 +72,7 @@ public class ObjectPlacer : MonoBehaviour
     private int currentHexMesh = 0;
     private float objRotation = 0;
 
-    public Utils.HexDirection ObjectDirection { get; private set; }
+    public Utils.HexDirection CurrentDirection { get; private set; }
 
     public HexObject PreviewObj { get; private set; }
 
@@ -105,9 +105,9 @@ public class ObjectPlacer : MonoBehaviour
     {
         grid = GameManager.Instance.Grid;
         coord = new Vector2Int(-1, -1);
-        ObjectDirection = initialHexDirection;
-        objRotation = Utils.AngleFromHexDirection(ObjectDirection);
-        SetRotationForNextObject(ObjectDirection);
+        CurrentDirection = initialHexDirection;
+        objRotation = Utils.AngleFromHexDirection(CurrentDirection);
+        SetRotationForNextObject(CurrentDirection);
 
         if (hexObjPrefab != null)
         {
@@ -116,7 +116,7 @@ public class ObjectPlacer : MonoBehaviour
             PreviewObj = hexObjPool.GetPooledObject(true);
         }
 
-        if (hexMeshes != null)
+        if (hexMeshes != null && PreviewObj != null)
         {
             InitPreviewObject();
         }
@@ -124,14 +124,11 @@ public class ObjectPlacer : MonoBehaviour
 
     private void InitPreviewObject()
     {
-        if (PreviewObj == null)
-            return;
-
         PreviewObj.gameObject.name = PreviewObjectString;
         PreviewObj.SetHexMesh(hexMeshes[currentHexMesh]);
         PreviewObj.SetMaterial(previewObjMaterialMain, true);
+        PreviewObj.SetLayer(0); // Default layer
         SetRotationForObject(PreviewObj.gameObject);
-        PreviewObj.gameObject.layer = 0; // Default layer
 
         if (placerObjMain != null)
         {
@@ -248,6 +245,17 @@ public class ObjectPlacer : MonoBehaviour
         }
     }
 
+    private void UpdatePreviewRotation()
+    {
+        SetRotationForObject(PreviewObj.gameObject);
+        SetSimpleRotationForObject(placerObjMain.gameObject);
+        foreach (PlacerObject placerObject in activeAltPlacerObjs)
+        {
+            if (placerObject != null)
+                SetSimpleRotationForObject(placerObject.gameObject);
+        }
+    }
+
     public void ChangeObject(bool next)
     {
         if (hexMeshes != null && hexMeshes.Length > 1)
@@ -297,8 +305,6 @@ public class ObjectPlacer : MonoBehaviour
 
     public void TryPlaceObject(Vector2Int cell, bool removeObj)
     {
-        // TODO: Just use whatever position and rotation the preview object has?
-
         // Rules for placing objects:
         // 1. Each cell can have a maximum of 3 objects:
         //    {[1 Floor, 1 Wall] OR 1 Room and 1 Content (Object, Support, Protrusion)} OR 1 Roof
@@ -368,6 +374,8 @@ public class ObjectPlacer : MonoBehaviour
 
     private void PlaceObject(HexObject hexObj, Vector2Int cell, float heightLevel, bool addToGrid)
     {
+        // TODO: Just use whatever position and rotation the preview object has?
+
         hexObj.Coordinates = cell;
 
         Vector3 newPosition = grid.GetCellCenterWorld(cell, defaultYAxis: false);
@@ -377,6 +385,7 @@ public class ObjectPlacer : MonoBehaviour
 
         if (addToGrid)
         {
+            hexObj.Direction = CurrentDirection;
             SetRotationForObject(hexObj.gameObject);
             hexObj.gameObject.SetActive(true);
             grid.EditCell(cell, hexObj);
@@ -387,37 +396,31 @@ public class ObjectPlacer : MonoBehaviour
     public void ChangeRotationForNextObject(Utils.Direction direction)
     {
         bool left = direction == Utils.Direction.Left;
-        switch (ObjectDirection)
+        switch (CurrentDirection)
         {
             case Utils.HexDirection.Left:
-                ObjectDirection = (left ? Utils.HexDirection.DownLeft : Utils.HexDirection.UpLeft);
+                CurrentDirection = (left ? Utils.HexDirection.DownLeft : Utils.HexDirection.UpLeft);
                 break;
             case Utils.HexDirection.Right:
-                ObjectDirection = (left ? Utils.HexDirection.UpRight : Utils.HexDirection.DownRight);
+                CurrentDirection = (left ? Utils.HexDirection.UpRight : Utils.HexDirection.DownRight);
                 break;
             case Utils.HexDirection.UpLeft:
-                ObjectDirection = (left ? Utils.HexDirection.Left : Utils.HexDirection.UpRight);
+                CurrentDirection = (left ? Utils.HexDirection.Left : Utils.HexDirection.UpRight);
                 break;
             case Utils.HexDirection.UpRight:
-                ObjectDirection = (left ? Utils.HexDirection.UpLeft : Utils.HexDirection.Right);
+                CurrentDirection = (left ? Utils.HexDirection.UpLeft : Utils.HexDirection.Right);
                 break;
             case Utils.HexDirection.DownLeft:
-                ObjectDirection = (left ? Utils.HexDirection.DownRight : Utils.HexDirection.Left);
+                CurrentDirection = (left ? Utils.HexDirection.DownRight : Utils.HexDirection.Left);
                 break;
             case Utils.HexDirection.DownRight:
-                ObjectDirection = (left ? Utils.HexDirection.Right : Utils.HexDirection.DownLeft);
+                CurrentDirection = (left ? Utils.HexDirection.Right : Utils.HexDirection.DownLeft);
                 break;
         }
 
-        objRotation = Utils.AngleFromHexDirection(ObjectDirection);
+        objRotation = Utils.AngleFromHexDirection(CurrentDirection);
 
-        SetRotationForObject(PreviewObj.gameObject);
-        SetSimpleRotationForObject(placerObjMain.gameObject);
-        foreach (PlacerObject placerObject in activeAltPlacerObjs)
-        {
-            if (placerObject != null)
-                SetSimpleRotationForObject(placerObject.gameObject);
-        }
+        UpdatePreviewRotation();
     }
 
     public void SetRotationForNextObject(Utils.HexDirection direction)
@@ -456,9 +459,23 @@ public class ObjectPlacer : MonoBehaviour
     public void SetSimpleRotationForObject(GameObject obj)
     {
         Vector3 newRotation = obj.transform.rotation.eulerAngles;
-        float rotY = Utils.AngleFromHexDirection(ObjectDirection);
+        float rotY = Utils.AngleFromHexDirection(CurrentDirection);
         newRotation.y = rotY;
         obj.transform.rotation = Quaternion.Euler(newRotation);
+    }
+
+    public void MatchRotation(HexObject hexObject)
+    {
+        if (hexObject == null)
+        {
+            Debug.LogWarning("Cannot match rotation; the selected object is not a HexObject");
+            return;
+        }
+
+        CurrentDirection = hexObject.Direction;
+        objRotation = Utils.AngleFromHexDirection(CurrentDirection);
+
+        UpdatePreviewRotation();
     }
 
     public string GetPlacementInfo()
@@ -467,7 +484,7 @@ public class ObjectPlacer : MonoBehaviour
             return "No hex meshes!";
         
         return string.Format("Selected item: {0} ({1})\nDirection: {2}\nHeight level: {3}",
-            hexMeshes[currentHexMesh].name, hexMeshes[currentHexMesh].structureType, ObjectDirection, HeightLevel);
+            hexMeshes[currentHexMesh].name, hexMeshes[currentHexMesh].structureType, CurrentDirection, HeightLevel);
     }
 
     public void ResetPlacer()

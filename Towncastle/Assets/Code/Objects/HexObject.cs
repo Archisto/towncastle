@@ -29,6 +29,8 @@ public class HexObject : LevelObject, IGridObject
 
     public Vector2Int Coordinates { get; set; }
 
+    public Utils.HexDirection Direction { get; set; }
+
     public bool Hidden { get; private set; }
 
     public StructureType Type
@@ -99,12 +101,17 @@ public class HexObject : LevelObject, IGridObject
             meshRend.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
     }
 
+    public void SetLayer(int layer)
+    {
+        gameObject.layer = layer;
+        childObj.layer = layer;
+    }
+
     public void Hide(bool hide)
     {
         Hidden = hide;
         meshRend.enabled = !Hidden;
-        gameObject.layer = (Hidden ? hiddenLayer : mainLayer);
-        childObj.layer = (Hidden ? hiddenLayer : mainLayer);
+        SetLayer(Hidden ? hiddenLayer : mainLayer);
     }
 
     public override void ResetObject()

@@ -165,8 +165,10 @@ public class InputManager : MonoBehaviour
             {
                 if (pickObjInput.PressedDown)
                 {
-                    objPlacer.PickObject(mouse.SelectedObject as HexObject);
-                    //objPlacer.PickObject(mouse.Coordinates);
+                    if (add)
+                        objPlacer.PickObject(mouse.SelectedObject as HexObject);
+                    else if (remove)
+                        objPlacer.MatchRotation(mouse.SelectedObject as HexObject);
                 }
                 else if (hideObjInput.PressedDown)
                 {
