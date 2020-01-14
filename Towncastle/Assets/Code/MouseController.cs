@@ -135,4 +135,16 @@ public class MouseController : MonoBehaviour
             RightButtonReleased = true;
         }
     }
+
+    public void ResetMouse()
+    {
+        LeftButtonDown = false;
+        RightButtonDown = false;
+        LeftButtonReleased = false;
+        RightButtonReleased = false;
+        Dragging = false;
+
+        SelectingCoordinates = false;
+        SelectedObject = null;
+    }
 }

@@ -241,6 +241,7 @@ public class InputManager : MonoBehaviour
         if (pauseInput.JustPressedDown)
         {
             GameManager.Instance.TogglePause();
+            mouse.ResetMouse();
         }
     }
 
