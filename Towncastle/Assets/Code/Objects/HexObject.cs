@@ -86,6 +86,11 @@ public class HexObject : LevelObject, IGridObject
 
         meshFilter.mesh = hexMesh.mesh;
 
+        int scaleX = HexMesh.flipX ? -1 : 1;
+        int scaleY = HexMesh.imported ? (HexMesh.flipZ ? -1 : 1) : 1;
+        int scaleZ = HexMesh.imported ? 1 : (HexMesh.flipZ ? -1 : 1);
+        childObj.transform.localScale = new Vector3(scaleX, scaleY, scaleZ);
+
         //float xAxis = HexMesh.imported ? -90 : 0;
         //childObj.transform.rotation = Quaternion.Euler(xAxis, 0, 0);
     }

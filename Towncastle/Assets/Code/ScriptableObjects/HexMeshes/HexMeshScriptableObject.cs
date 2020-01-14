@@ -13,4 +13,7 @@ public class HexMeshScriptableObject : ScriptableObject
     public Utils.HexDirection mainDirection = Utils.HexDirection.Right;
     public float defaultRotationY = 90;
     public float defaultPositionY = 0;
+
+    public bool flipX;
+    public bool flipZ;
 }

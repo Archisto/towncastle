@@ -10,13 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c2c12c3f29d7d34a86252a7392a9ecd, type: 3}
-  m_Name: Chest 1
+  m_Name: Mannequin
   m_EditorClassIdentifier: 
-  mesh: {fileID: 8781950163329836899, guid: 8ff264b5a973bdb48be7061afe490f0b, type: 3}
+  mesh: {fileID: 5854905714382785571, guid: 56ec6424e7dc85e46a2b7bf0cc219d20, type: 3}
   imported: 1
   structureType: 6
-  mainDirection: 4
-  defaultRotationY: 0
+  mainDirection: 1
+  defaultRotationY: -90
   defaultPositionY: 0
-  flipX: 0
-  flipZ: 0
