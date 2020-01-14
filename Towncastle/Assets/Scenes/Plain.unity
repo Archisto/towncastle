@@ -11865,6 +11865,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f350d68c057fecf41a7ad17d4cdeb033, type: 2}
   - {fileID: 11400000, guid: f086d8b43ee07994880fc546ed43f43a, type: 2}
   - {fileID: 11400000, guid: 09f0a9c757fe15d4e9299984728f3f61, type: 2}
+  - {fileID: 11400000, guid: 719ac4934f42c314183e64b5ce2459ac, type: 2}
+  - {fileID: 11400000, guid: 125c13088eed1e24db52fc6cf87c45d2, type: 2}
   - {fileID: 11400000, guid: c0d43659151176845a41c1dd982aeec0, type: 2}
   - {fileID: 11400000, guid: a6a07c9f7ad191b43af0e0c1a6ae21f0, type: 2}
   - {fileID: 11400000, guid: 7e82f42facf5bd74ab1d24881e6e5764, type: 2}
@@ -11887,6 +11889,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d66db880292d5394da9ea87508009239, type: 2}
   - {fileID: 11400000, guid: f410aac400c8e7b4aa26ff8bcfaeb16d, type: 2}
   - {fileID: 11400000, guid: 9c5a7e905442df846bcf3cf9d3fc92ed, type: 2}
+  - {fileID: 11400000, guid: ee1fc2aaebb7d364f8e3d2b3868c68f1, type: 2}
   hexObjPoolSize: 36
   initialHexDirection: 1
 --- !u!114 &163602084740923219

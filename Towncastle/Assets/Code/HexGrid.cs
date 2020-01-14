@@ -286,7 +286,7 @@ public class HexGrid : MonoBehaviour
         if (hexObject == null && !cells[coordinates.y][coordinates.x].IsEmpty)
         {
             cells[coordinates.y][coordinates.x].RemoveAllObjects();
-            Debug.Log("Cell " + coordinates + " is now empty");
+            //Debug.Log("Cell " + coordinates + " is now empty");
         }
         else if (hexObject != null)
         {
