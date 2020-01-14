@@ -60,6 +60,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   coordinates: {x: 0, y: 0}
   frozen: 0
+  mainMaterial: {fileID: 0}
+  containsHiddenObjsMaterial: {fileID: 0}
 --- !u!1001 &1652116880089490393
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -120,6 +122,11 @@ PrefabInstance:
     - target: {fileID: -4216859302048453862, guid: 511575ac9abbed14e828bdd0ba0e136e,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1504981713932161579, guid: 511575ac9abbed14e828bdd0ba0e136e,
+        type: 3}
+      propertyPath: m_CastShadows
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -927199367670048503, guid: 511575ac9abbed14e828bdd0ba0e136e,

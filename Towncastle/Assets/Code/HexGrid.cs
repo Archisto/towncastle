@@ -38,6 +38,9 @@ public class HexGrid : MonoBehaviour
 
     [SerializeField]
     private Material hexBaseMaterial3;
+    
+    [SerializeField]
+    private Material containsHiddenObjsMaterial;
 
     [SerializeField]
     private Color gridColor = Color.black;
@@ -183,6 +186,9 @@ public class HexGrid : MonoBehaviour
                 meshRend.material = hexBaseMaterial2;
             }
         }
+
+        hexBase.mainMaterial = meshRend.sharedMaterial;
+        hexBase.containsHiddenObjsMaterial = containsHiddenObjsMaterial;
     }
 
     /// <summary>
@@ -288,9 +294,12 @@ public class HexGrid : MonoBehaviour
 
     public void EditCell(Vector2Int coordinates, HexObject hexObject)
     {
+        // TODO: Also other kinds of removing in addition to all in cell
+
         if (hexObject == null && !cells[coordinates.y][coordinates.x].IsEmpty)
         {
             cells[coordinates.y][coordinates.x].RemoveAllObjects();
+            GetHexBaseInCell(coordinates.x, coordinates.y).ObjectsHidden(false);
             //Debug.Log("Cell " + coordinates + " is now empty");
         }
         else if (hexObject != null)
@@ -397,7 +406,7 @@ public class HexGrid : MonoBehaviour
         return null;
     }
 
-    private HexBase GetHexBaseInCell(int x, int y)
+    public HexBase GetHexBaseInCell(int x, int y)
     {
         if (hexBases == null || hexBases.Count == 0)
         {
@@ -418,7 +427,11 @@ public class HexGrid : MonoBehaviour
 
     public void HideObjectsInCell(Vector2Int cell, bool hide)
     {
+        if (CellIsEmpty(cell))
+            return;
+
         cells[cell.y][cell.x].ActionToAllObjects<HexObject>(hexObj => hexObj.Hide(hide));
+        GetHexBaseInCell(cell.x, cell.y).ObjectsHidden(hide);
     }
 
     public void HideAllObjects(bool hide)
@@ -428,6 +441,7 @@ public class HexGrid : MonoBehaviour
             for (int x = 0; x < GridSizeX; x++)
             {
                 cells[y][x].ActionToAllObjects<HexObject>(hexObj => hexObj.Hide(hide));
+                GetHexBaseInCell(x, y).ObjectsHidden(hide);
             }
         }
     }
@@ -439,6 +453,7 @@ public class HexGrid : MonoBehaviour
             for (int x = 0; x < GridSizeX; x++)
             {
                 cells[y][x].RemoveAllObjects();
+                GetHexBaseInCell(x, y).ObjectsHidden(false);
             }
         }
     }

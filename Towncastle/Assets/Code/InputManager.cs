@@ -122,6 +122,10 @@ public class InputManager : MonoBehaviour
         showAllInput.Update();
         if (showAllInput.JustPressedDown)
         {
+            // TESTING: Shows all objects, even untracked ones
+            objPlacer.HideAllObjectsDebug(false);
+
+            // Not part of testing but still needed:
             objPlacer.HideAllObjects(false);
         }
 
@@ -160,7 +164,11 @@ public class InputManager : MonoBehaviour
         bool remove = mouse.RightButtonReleased;
         if (add || remove)
         {
-            if (mouse.SelectingCoordinates)
+            // If coordinates don't have to be actively selected,
+            // the last valid coordinates remain
+            bool activeSelectionRequired = false;
+
+            if (!activeSelectionRequired || mouse.SelectingCoordinates)
             {
                 if (pickObjInput.PressedDown)
                 {
@@ -171,7 +179,16 @@ public class InputManager : MonoBehaviour
                 }
                 else if (hideObjInput.PressedDown)
                 {
-                    grid.HideObjectsInCell(mouse.Coordinates, true);
+                    // TESTING: Hides all objects in cell, even untracked ones
+                    bool somethingWasHidden = objPlacer.HideAllObjectsInCell(mouse.Coordinates, true);
+                    if (somethingWasHidden)
+                    {
+                        HexBase hexBase = grid.GetHexBaseInCell(mouse.Coordinates.x, mouse.Coordinates.y);
+                        if (hexBase != null)
+                            hexBase.ObjectsHidden(true);
+                    }
+
+                    //grid.HideObjectsInCell(mouse.Coordinates, true);
                 }
                 else
                 {

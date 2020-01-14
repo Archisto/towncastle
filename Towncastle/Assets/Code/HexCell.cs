@@ -166,7 +166,7 @@ public class HexCell : IGridObject
             {
                 // TODO: Allow any object in any hex? Have to add all of them to a list.
 
-                Debug.LogWarning(string.Format("Cell {0} occupied", Coordinates));
+                //Debug.LogWarning(string.Format("Cell {0} occupied", Coordinates));
                 return false;
             }
         }

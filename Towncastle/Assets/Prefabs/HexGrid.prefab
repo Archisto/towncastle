@@ -48,96 +48,18 @@ MonoBehaviour:
   hexBasePrefab: {fileID: 7675227451486952203, guid: 003a6906d5282de409ff93366b8870cf,
     type: 3}
   hexBaseParent: {fileID: 0}
-  gridSizeX: 8
+  gridSizeX: 12
   gridSizeY: 10
   cellSize: 1.905
   cellHeight: 2
   maxHeightLevel: 5
-  hexBases:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  hexBases: []
   terrainShapingHexBases: []
   hexBaseMaterial1: {fileID: 2100000, guid: 316624070e2dc9341b2422401037f662, type: 2}
   hexBaseMaterial2: {fileID: 2100000, guid: 7c8d0e416e9cc1a4dbcea930a5e67f17, type: 2}
   hexBaseMaterial3: {fileID: 2100000, guid: b0b138d349267d9478c37130d19854d7, type: 2}
+  containsHiddenObjsMaterial: {fileID: 2100000, guid: 4655c2fa863bf7445b796bb2605e4758,
+    type: 2}
   gridColor: {r: 0.735849, g: 0.114542544, b: 0.114542544, a: 0.3019608}
 --- !u!114 &2131579553875888579
 MonoBehaviour:
@@ -192,7 +114,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f410aac400c8e7b4aa26ff8bcfaeb16d, type: 2}
   - {fileID: 11400000, guid: 9c5a7e905442df846bcf3cf9d3fc92ed, type: 2}
   - {fileID: 11400000, guid: ee1fc2aaebb7d364f8e3d2b3868c68f1, type: 2}
-  hexObjPoolSize: 36
+  hexObjPoolSize: 100
   initialHexDirection: 1
 --- !u!1001 &2292859379457242458
 PrefabInstance:

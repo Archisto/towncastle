@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ObjectPlacer : MonoBehaviour
 {
@@ -60,12 +61,16 @@ public class ObjectPlacer : MonoBehaviour
     [SerializeField]
     private Utils.HexDirection initialHexDirection = Utils.HexDirection.Right;
 
+    [SerializeField]
+    private Text objectsRemainingText;
+
 #pragma warning restore 0649
 
     private HexGrid grid;
     private Vector2Int coord;
 
     private Pool<HexObject> hexObjPool;
+    private List<HexObject> hexObjsInPool;
     private Pool<PlacerObject> placerObjAltPool;
     private PlacerObject[] activeAltPlacerObjs;
 
@@ -112,7 +117,8 @@ public class ObjectPlacer : MonoBehaviour
         if (hexObjPrefab != null)
         {
             hexObjPool = new Pool<HexObject>(hexObjPrefab, hexObjPoolSize, false);
-            GameManager.Instance.AddLevelObjectsToList(hexObjPool.GetAllObjects());
+            hexObjsInPool = hexObjPool.GetAllObjects();
+            GameManager.Instance.AddLevelObjectsToList(hexObjsInPool);
             PreviewObj = hexObjPool.GetPooledObject(true);
         }
 
@@ -143,6 +149,21 @@ public class ObjectPlacer : MonoBehaviour
     private void Update()
     {
         UpdatePreviewObjectPosition();
+
+        // TODO: Smarter way to count active objects
+        if (objectsRemainingText)
+        {
+            int hexObjsInUse = 0;
+            foreach (HexObject hexObj in hexObjsInPool)
+            {
+                if (hexObj.gameObject.activeSelf)
+                    hexObjsInUse++;
+            }
+
+            objectsRemainingText.text =
+                string.Format("Objects remaining\n{0}/{1}",
+                    hexObjPoolSize - hexObjsInUse, hexObjPoolSize - 1);
+        }
     }
 
     /// <summary>
@@ -292,6 +313,37 @@ public class ObjectPlacer : MonoBehaviour
         PickObject(hexObject);
     }
 
+    public bool HideAllObjectsInCell(Vector2Int cell, bool hide)
+    {
+        bool success = false;
+
+        foreach (HexObject hexObj in hexObjsInPool)
+        {
+            if (hexObj.name.Equals(PreviewObjectString))
+                continue;
+
+            if (hexObj.gameObject.activeSelf && hexObj.Coordinates == cell)
+            {
+                hexObj.Hide(hide);
+                success = true;
+            }
+        }
+
+        return success;
+    }
+
+    public void HideAllObjectsDebug(bool hide)
+    {
+        foreach (HexObject hexObj in hexObjsInPool)
+        {
+            if (hexObj.name.Equals(PreviewObjectString))
+                continue;
+
+            if (hexObj.gameObject.activeSelf)
+                hexObj.Hide(hide);
+        }
+    }
+
     public void HideAllObjects(bool hide)
     {
         grid.HideAllObjects(hide);
@@ -325,9 +377,26 @@ public class ObjectPlacer : MonoBehaviour
             {
                 AddObjectToGridCell(cell, HeightLevel);
             }
-            else if (removeObj && !cellIsEmpty)
+            //else if (removeObj && !cellIsEmpty)
+            //{
+            //    grid.EditCell(cell, null);
+            //    RepositionPreviewObject(cell);
+            //}
+            else if (removeObj)
             {
+                // TESTING: Removes all objects in cell, even untracked ones
+
                 grid.EditCell(cell, null);
+
+                foreach (HexObject hexObj in hexObjsInPool)
+                {
+                    if (hexObj.name.Equals(PreviewObjectString))
+                        continue;
+
+                    if (hexObj.gameObject.activeSelf && hexObj.Coordinates == cell)
+                        hexObjPool.ReturnObject(hexObj);
+                }
+
                 RepositionPreviewObject(cell);
             }
             //else if (!removeObj && !cellIsEmpty)
