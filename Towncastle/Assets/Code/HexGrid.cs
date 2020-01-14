@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -44,7 +44,7 @@ public class HexGrid : MonoBehaviour
     private float cellGapZ;
 
     private MouseController mouse;
-    private List<GameObject[]> cellContents;
+    private List<HexCell[]> cells;
 
     public int GridSizeX { get => gridSizeX; }
 
@@ -68,9 +68,9 @@ public class HexGrid : MonoBehaviour
     void Start()
     {
         mouse = GameManager.Instance.Mouse;
+        InitCells();
         InitHexBases();
         UpdateCellGapZ();
-        InitCellContentList();
     }
 
     private void UpdateCellGapZ()
@@ -78,12 +78,18 @@ public class HexGrid : MonoBehaviour
         cellGapZ = Mathf.Sqrt(Mathf.Pow(cellSize, 2) - Mathf.Pow(cellSize / 2, 2));
     }
 
-    private void InitCellContentList()
+    private void InitCells()
     {
-        cellContents = new List<GameObject[]>();
-        for (int i = 0; i < GridSizeY; i++)
+        cells = new List<HexCell[]>();
+        for (int y = 0; y < GridSizeY; y++)
         {
-            cellContents.Add(new GameObject[GridSizeX]);
+            HexCell[] row = new HexCell[GridSizeX];
+            for (int x = 0; x < row.Length; x++)
+            {
+                row[x] = new HexCell(x, y);
+            }
+
+            cells.Add(row);
         }
     }
 
@@ -254,32 +260,40 @@ public class HexGrid : MonoBehaviour
         return CellExists(coordinates.x, coordinates.y);
     }
 
-    public bool CellIsAvailable(int x, int y)
+    public bool CellIsEmpty(int x, int y)
     {
         if (!CellExists(x, y))
             return false;
 
-        return cellContents[y][x] == null;
+        return cells[y][x].IsEmpty;
     }
 
-    public bool CellIsAvailable(Vector2Int coordinates)
+    public bool CellIsEmpty(Vector2Int coordinates)
     {
-        return CellIsAvailable(coordinates.x, coordinates.y);
+        return CellIsEmpty(coordinates.x, coordinates.y);
     }
 
-    public void EditCell(Vector2Int coordinates, GameObject obj)
+    public bool CellIsAvailable(Vector2Int coordinates, HexObject.StructureType objectType)
     {
-        if (obj == null && cellContents[coordinates.y][coordinates.x] != null)
+        if (!CellExists(coordinates))
+            return false;
+
+        return cells[coordinates.y][coordinates.x].IsAvailableForType(objectType);
+    }
+
+    public void EditCell(Vector2Int coordinates, HexObject hexObject)
+    {
+        if (hexObject == null && !cells[coordinates.y][coordinates.x].IsEmpty)
         {
-            cellContents[coordinates.y][coordinates.x].SetActive(false);
-            //Debug.Log("Cell " + coordinates + " is now empty");
+            cells[coordinates.y][coordinates.x].RemoveAllObjects();
+            Debug.Log("Cell " + coordinates + " is now empty");
         }
-        else if (obj != null)
+        else if (hexObject != null)
         {
             //Debug.Log("Cell " + coordinates + ": " + obj.name);
         }
 
-        cellContents[coordinates.y][coordinates.x] = obj;
+        cells[coordinates.y][coordinates.x].PlaceObject(hexObject);
     }
 
     public Vector3 GetCellCenterWorld(int x, int y, bool defaultYAxis)
@@ -356,14 +370,23 @@ public class HexGrid : MonoBehaviour
         }
     }
 
-    public HexObject GetObjectInCell(Vector2Int cell)
+    public HexObject GetObjectInCell(Vector2Int cell, bool acceptHidden)
     {
-        if (CellExists(cell) &&
-            cellContents != null &&
-            cellContents[cell.y][cell.x] != null)
+        if (CellExists(cell) && !cells[cell.y][cell.x].IsEmpty)
         {
-            HexObject hexObject = cellContents[cell.y][cell.x].GetComponent<HexObject>();
+            HexObject hexObject = cells[cell.y][cell.x].GetAny(acceptHidden);
             return hexObject;
+        }
+
+        return null;
+    }
+
+    public List<HexObject> GetObjectsInCell(Vector2Int cell, bool acceptHidden)
+    {
+        if (CellExists(cell) && !cells[cell.y][cell.x].IsEmpty)
+        {
+            List<HexObject> hexObjects = cells[cell.y][cell.x].GetAll(acceptHidden);
+            return hexObjects;
         }
 
         return null;
@@ -388,17 +411,18 @@ public class HexGrid : MonoBehaviour
         }
     }
 
+    public void HideObjectsInCell(Vector2Int cell, bool hide)
+    {
+        cells[cell.y][cell.x].ActionToAllObjects<HexObject>(hexObj => hexObj.Hide(hide));
+    }
+
     public void HideAllObjects(bool hide)
     {
         for (int y = 0; y < GridSizeY; y++)
         {
             for (int x = 0; x < GridSizeX; x++)
             {
-                if (cellContents[y][x] != null)
-                {
-                    HexObject hexObject = cellContents[y][x].GetComponent<HexObject>();
-                    hexObject.Hide(hide);
-                }
+                cells[y][x].ActionToAllObjects<HexObject>(hexObj => hexObj.Hide(hide));
             }
         }
     }
@@ -409,7 +433,7 @@ public class HexGrid : MonoBehaviour
         {
             for (int x = 0; x < GridSizeX; x++)
             {
-                cellContents[y][x] = null;
+                cells[y][x].RemoveAllObjects();
             }
         }
     }

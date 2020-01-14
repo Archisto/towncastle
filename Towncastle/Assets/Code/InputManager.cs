@@ -9,6 +9,7 @@ public class InputManager : MonoBehaviour
 {
     private CameraController cam;
     private MouseController mouse;
+    private HexGrid grid;
     private ObjectPlacer objPlacer;
     private PlayerController player;
 
@@ -24,6 +25,8 @@ public class InputManager : MonoBehaviour
 
     private SingleInputHandler[] numberKeys;
 
+    private Vector2 screenDimensions;
+
     /// <summary>
     /// Start is called before the first frame update.
     /// </summary>
@@ -31,7 +34,8 @@ public class InputManager : MonoBehaviour
     {
         cam = GameManager.Instance.Camera;
         mouse = GameManager.Instance.Mouse;
-        objPlacer = FindObjectOfType<ObjectPlacer>();
+        grid = GameManager.Instance.Grid;
+        objPlacer = GameManager.Instance.ObjectPlacer;
         player = GameManager.Instance.Player;
 
         horizontalInput = new SingleInputHandler("Horizontal");
@@ -56,6 +60,8 @@ public class InputManager : MonoBehaviour
             new SingleInputHandler(KeyCode.Alpha8),
             new SingleInputHandler(KeyCode.Alpha9)
         };
+
+        screenDimensions = GameManager.Instance.UI.CanvasSize;
     }
 
     /// <summary>
@@ -115,11 +121,11 @@ public class InputManager : MonoBehaviour
         horizontalInput.Update();
         cameraMoveHorizontalInput.Update();
 
-        if (MouseCursorNearScreenEdge(Utils.Direction.Left, 200))
+        if (MouseCursorNearScreenEdgePercentage(Utils.Direction.Left, 0.1f))
         {
             cam.Move(Utils.Direction.Left, 1);
         }
-        else if (MouseCursorNearScreenEdge(Utils.Direction.Right, 200))
+        else if (MouseCursorNearScreenEdgePercentage(Utils.Direction.Right, 0.1f))
         {
             cam.Move(Utils.Direction.Right, 1);
         }
@@ -151,20 +157,16 @@ public class InputManager : MonoBehaviour
                 }
                 else if (hideObjInput.PressedDown)
                 {
-                    objPlacer.ToggleHideObject(mouse.Coordinates);
+                    grid.HideObjectsInCell(mouse.Coordinates, true);
                 }
                 else
                 {
                     objPlacer.TryPlaceObject(mouse.Coordinates, remove);
                 }
             }
-            //else
-            //{
-            //    objPlacer.TryPlaceObject(mouse.Position, remove);
-            //}
         }
 
-        //removeKey.Update();
+        // NUMBER KEYS
 
         //for (int i = 0; i < numberKeys.Length; i++)
         //{
@@ -222,8 +224,6 @@ public class InputManager : MonoBehaviour
     /// <returns>Is the mouse cursor near the edge of the screen</returns>
     private bool MouseCursorNearScreenEdge(Utils.Direction side, float maxDistance)
     {
-        Vector2 screenDimensions = GameManager.Instance.UI.CanvasSize;
-
         bool up = Input.mousePosition.y >= screenDimensions.y - maxDistance;
         bool down = Input.mousePosition.y <= maxDistance;
         bool left = Input.mousePosition.x <= maxDistance;
@@ -262,5 +262,32 @@ public class InputManager : MonoBehaviour
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Determines whether the mouse cursor is near the edge of the screen.
+    /// </summary>
+    /// <param name="side">A specific side or None for any</param>
+    /// <param name="screenSizeRatio">How close to the edge should the cursor be
+    /// (a percentage of the screen width/height)</param>
+    /// <returns>Is the mouse cursor near the edge of the screen</returns>
+    private bool MouseCursorNearScreenEdgePercentage(Utils.Direction side, float screenSizeRatio)
+    {
+        screenSizeRatio = Mathf.Clamp01(screenSizeRatio);
+
+        float maxDistance = 0f;
+        switch (side)
+        {
+            case Utils.Direction.Up:
+            case Utils.Direction.Down:
+                maxDistance = screenSizeRatio * screenDimensions.y;
+                break;
+            case Utils.Direction.Left:
+            case Utils.Direction.Right:
+                maxDistance = screenSizeRatio * screenDimensions.x;
+                break;
+        }
+
+        return MouseCursorNearScreenEdge(side, maxDistance);
     }
 }

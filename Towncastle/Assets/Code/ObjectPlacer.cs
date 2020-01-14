@@ -147,7 +147,7 @@ public class ObjectPlacer : MonoBehaviour
         // TODO: Better height level
 
         int heightLevel = 1;
-        if (!grid.CellIsAvailable(previewCell))
+        if (!grid.CellIsAvailable(previewCell, hexMeshes[currentHexMesh].structureType))
             heightLevel = 2;
 
         PlaceObject(PreviewObj, previewCell, heightLevel, false);
@@ -169,7 +169,7 @@ public class ObjectPlacer : MonoBehaviour
 
     public void PickObject(Vector2Int cell)
     {
-        HexObject hexObject = grid.GetObjectInCell(cell);
+        HexObject hexObject = grid.GetObjectInCell(cell, false);
 
         if (hexObject == null)
             return;
@@ -186,16 +186,6 @@ public class ObjectPlacer : MonoBehaviour
         UpdatePreviewObjectHexMesh();
     }
 
-    public void ToggleHideObject(Vector2Int cell)
-    {
-        HexObject hexObject = grid.GetObjectInCell(cell);
-
-        if (hexObject == null)
-            return;
-
-        hexObject.Hide(!hexObject.Hidden);
-    }
-
     public void HideAllObjects(bool hide)
     {
         grid.HideAllObjects(hide);
@@ -207,7 +197,7 @@ public class ObjectPlacer : MonoBehaviour
 
         // Rules for placing objects:
         // 1. Each cell can have a maximum of 3 objects:
-        //    {[1 Floor, 1 Wall] OR 1 Room and 1 Content (Object, Support, Protrusion)] OR 1 Roof
+        //    {[1 Floor, 1 Wall] OR 1 Room and 1 Content (Object, Support, Protrusion)} OR 1 Roof
         // 2. There has to be a Wall or Support in a cell for placing objects in the cell above
         // 3. Protrusions are exceptions to rule 2:
         //    They can be placed if the neighboring cell on the same height level has a Wall
@@ -220,18 +210,19 @@ public class ObjectPlacer : MonoBehaviour
 
         if (grid.CellExists(cell))
         {
-            bool cellAvailable = grid.CellIsAvailable(cell);
+            bool cellIsEmpty = grid.CellIsEmpty(cell);
+            bool cellAvailable = grid.CellIsAvailable(cell, hexMeshes[currentHexMesh].structureType);
 
             if (!removeObj && cellAvailable)
             {
                 AddObjectToGridCell(cell, 1);
             }
-            else if (removeObj && !cellAvailable)
+            else if (removeObj && !cellIsEmpty)
             {
                 grid.EditCell(cell, null);
                 RepositionPreviewObject(cell);
             }
-            else if (!removeObj && !cellAvailable)
+            else if (!removeObj && !cellIsEmpty)
             {
                 // Testing heightLevel
                 AddObjectToGridCell(cell, 2);
@@ -281,7 +272,7 @@ public class ObjectPlacer : MonoBehaviour
         {
             SetRotationForObject(hexObj.gameObject);
             hexObj.gameObject.SetActive(true);
-            grid.EditCell(cell, hexObj.gameObject);
+            grid.EditCell(cell, hexObj);
             RepositionPreviewObject(cell);
         }
     }
