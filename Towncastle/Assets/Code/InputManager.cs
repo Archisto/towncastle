@@ -15,7 +15,7 @@ public class InputManager : MonoBehaviour
 
     private SingleInputHandler horizontalInput;
     private SingleInputHandler verticalInput;
-    private SingleInputHandler cameraMoveHorizontalInput;
+    private SingleInputHandler scrollWheelInput;
     private SingleInputHandler changeObjInput;
     private SingleInputHandler turnObjInput;
     private SingleInputHandler pickObjInput;
@@ -41,7 +41,7 @@ public class InputManager : MonoBehaviour
 
         horizontalInput = new SingleInputHandler("Horizontal");
         verticalInput = new SingleInputHandler("Vertical");
-        cameraMoveHorizontalInput = new SingleInputHandler("Mouse ScrollWheel");
+        scrollWheelInput = new SingleInputHandler("Mouse ScrollWheel");
         changeObjInput = new SingleInputHandler("Change Object");
         turnObjInput = new SingleInputHandler("Turn Object");
         pickObjInput = new SingleInputHandler("Alt Action 1");
@@ -112,6 +112,14 @@ public class InputManager : MonoBehaviour
             objPlacer.ChangeRotationForNextObject(direction);
         }
 
+        scrollWheelInput.Update();
+        if (scrollWheelInput.PressedDown)
+        {
+            int heightLevelChange =
+                scrollWheelInput.PositiveAxis ? 1 : -1;
+            objPlacer.HeightLevel += heightLevelChange;
+        }
+
         showAllInput.Update();
         if (showAllInput.JustPressedDown)
         {
@@ -130,7 +138,6 @@ public class InputManager : MonoBehaviour
     private void HandleCameraInput()
     {
         horizontalInput.Update();
-        cameraMoveHorizontalInput.Update();
 
         if (MouseCursorNearScreenEdgePercentage(Utils.Direction.Left, 0.1f))
         {
@@ -145,12 +152,6 @@ public class InputManager : MonoBehaviour
             Utils.Direction direction =
                 horizontalInput.PositiveAxis ? Utils.Direction.Right : Utils.Direction.Left;
             cam.Move(direction, 1);
-        }
-        else if (cameraMoveHorizontalInput.PressedDown)
-        {
-            Utils.Direction direction =
-                cameraMoveHorizontalInput.PositiveAxis ? Utils.Direction.Right : Utils.Direction.Left;
-            cam.Move(direction, 8);
         }
     }
 
@@ -246,7 +247,7 @@ public class InputManager : MonoBehaviour
     /// </summary>
     private void HandleDebugInput()
     {
-
+        
     }
 
     /// <summary>

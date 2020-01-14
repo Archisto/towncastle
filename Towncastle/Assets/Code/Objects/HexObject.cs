@@ -22,6 +22,9 @@ public class HexObject : LevelObject, IGridObject
     private MeshFilter meshFilter;
     private MeshRenderer meshRend;
 
+    private int mainLayer;
+    private int hiddenLayer = 0; // Default layer
+
     public HexMeshScriptableObject HexMesh { get; private set; }
 
     public Vector2Int Coordinates { get; set; }
@@ -54,11 +57,16 @@ public class HexObject : LevelObject, IGridObject
     {
         base.InitObject();
 
+        if (childObj == null)
+            childObj = transform.GetChild(0).gameObject;
+
         if (meshRend == null)
             meshRend = childObj.GetComponent<MeshRenderer>();
 
         //if (!HexMesh.imported)
         //    childObj.transform.rotation = Quaternion.Euler(0, 0, 0);
+
+        mainLayer = childObj.layer;
     }
 
     public void SetHexMesh(HexMeshScriptableObject hexMesh)
@@ -95,6 +103,8 @@ public class HexObject : LevelObject, IGridObject
     {
         Hidden = hide;
         meshRend.enabled = !Hidden;
+        gameObject.layer = (Hidden ? hiddenLayer : mainLayer);
+        childObj.layer = (Hidden ? hiddenLayer : mainLayer);
     }
 
     public override void ResetObject()

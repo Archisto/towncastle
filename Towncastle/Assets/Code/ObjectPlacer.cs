@@ -40,7 +40,16 @@ public class ObjectPlacer : MonoBehaviour
     private HexObject hexObjPrefab;
 
     [SerializeField]
-    private Material previewObjMaterial;
+    private PlacerObject placerObjMain;
+
+    [SerializeField]
+    private PlacerObject placerObjAltPrefab;
+
+    [SerializeField]
+    private Material previewObjMaterialMain;
+
+    [SerializeField]
+    private Material previewObjMaterialOccupied;
 
     [SerializeField]
     private HexMeshScriptableObject[] hexMeshes;
@@ -56,7 +65,9 @@ public class ObjectPlacer : MonoBehaviour
     private HexGrid grid;
     private Vector2Int coord;
 
-    private Pool<HexObject> pool;
+    private Pool<HexObject> hexObjPool;
+    private Pool<PlacerObject> placerObjAltPool;
+    private PlacerObject[] activeAltPlacerObjs;
 
     private int currentHexMesh = 0;
     private float objRotation = 0;
@@ -64,6 +75,28 @@ public class ObjectPlacer : MonoBehaviour
     public Utils.HexDirection ObjectDirection { get; private set; }
 
     public HexObject PreviewObj { get; private set; }
+
+    private float heightLevel = 1;
+    public float HeightLevel
+    {
+        get
+        {
+            return heightLevel;
+        }
+        set
+        {
+            if (value < 1)
+                heightLevel = 1;
+            else if (value > grid.MaxHeightLevel)
+                heightLevel = grid.MaxHeightLevel;
+            else
+                heightLevel = value;
+
+            RepositionPreviewObject(PreviewObj.Coordinates);
+        }
+    }
+
+    public int HeightLevelRounded { get => (int)(HeightLevel + 0.5f); }
 
     /// <summary>
     /// Start is called before the first frame update.
@@ -78,9 +111,9 @@ public class ObjectPlacer : MonoBehaviour
 
         if (hexObjPrefab != null)
         {
-            pool = new Pool<HexObject>(hexObjPrefab, hexObjPoolSize, false);
-            GameManager.Instance.AddLevelObjectsToList(pool.GetAllObjects());
-            PreviewObj = pool.GetPooledObject(true);
+            hexObjPool = new Pool<HexObject>(hexObjPrefab, hexObjPoolSize, false);
+            GameManager.Instance.AddLevelObjectsToList(hexObjPool.GetAllObjects());
+            PreviewObj = hexObjPool.GetPooledObject(true);
         }
 
         if (hexMeshes != null)
@@ -96,12 +129,15 @@ public class ObjectPlacer : MonoBehaviour
 
         PreviewObj.gameObject.name = PreviewObjectString;
         PreviewObj.SetHexMesh(hexMeshes[currentHexMesh]);
-        PreviewObj.SetMaterial(previewObjMaterial, true);
+        PreviewObj.SetMaterial(previewObjMaterialMain, true);
         SetRotationForObject(PreviewObj.gameObject);
         PreviewObj.gameObject.layer = 0; // Default layer
 
-        // TODO: Proper support for objects following the mouse cursor
-        //GameManager.Instance.Mouse.testObj = PreviewObj.gameObject;
+        if (placerObjMain != null)
+        {
+            placerObjAltPool = new Pool<PlacerObject>(placerObjAltPrefab, grid.MaxHeightLevel, false);
+            activeAltPlacerObjs = new PlacerObject[grid.MaxHeightLevel - 1];
+        }
     }
 
     /// <summary>
@@ -146,11 +182,70 @@ public class ObjectPlacer : MonoBehaviour
     {
         // TODO: Better height level
 
-        int heightLevel = 1;
+        /*int testHeightLevel = 1;
         if (!grid.CellIsAvailable(previewCell, hexMeshes[currentHexMesh].structureType))
-            heightLevel = 2;
+            testHeightLevel = 2;*/
 
-        PlaceObject(PreviewObj, previewCell, heightLevel, false);
+        PlaceObject(PreviewObj, previewCell, HeightLevelRounded, false);
+
+        if (placerObjMain != null)
+        {
+            DisableAllAltPlacerObjects();
+
+            for (int i = 0; i < HeightLevelRounded && i < activeAltPlacerObjs.Length + 1; i++)
+            {
+                // Top to bottom
+                bool topLevel = (i == 0);
+
+                if (topLevel)
+                {
+                    Material material;
+
+                    // Any object in the cell makes the placer change color.
+                    // This is helpful when the hex object has been hidden.
+                    if (grid.CellIsEmpty(previewCell))
+                    //else if (grid.CellIsAvailable(previewCell, hexMeshes[currentHexMesh].structureType))
+                    {
+                        material = previewObjMaterialMain;
+                    }
+                    else
+                    {
+                        material = previewObjMaterialOccupied;
+                    }
+
+                    SetupPlacerObject(placerObjMain, i);
+                    placerObjMain.SetMaterial(material);
+                }
+                else
+                {
+                    activeAltPlacerObjs[i - 1] = placerObjAltPool.GetPooledObject(true);
+                    if (activeAltPlacerObjs[i - 1] != null)
+                        SetupPlacerObject(activeAltPlacerObjs[i - 1], i);
+                }
+            }
+        }
+    }
+
+    private void SetupPlacerObject(PlacerObject placerObject, int distFromGround)
+    {
+        // Top to bottom
+        Vector3 newPosition = PreviewObj.transform.position;
+        newPosition.y = (HeightLevel - (distFromGround + 1)) * grid.CellHeight;
+        placerObject.transform.position = newPosition;
+
+        SetSimpleRotationForObject(placerObject.gameObject);
+    }
+
+    private void DisableAllAltPlacerObjects()
+    {
+        for (int i = activeAltPlacerObjs.Length - 1; i >= 0; i--)
+        {
+            if (activeAltPlacerObjs[i] != null)
+            {
+                placerObjAltPool.ReturnObject(activeAltPlacerObjs[i]);
+                activeAltPlacerObjs[i] = null;
+            }
+        }
     }
 
     public void ChangeObject(bool next)
@@ -222,20 +317,23 @@ public class ObjectPlacer : MonoBehaviour
             bool cellIsEmpty = grid.CellIsEmpty(cell);
             bool cellAvailable = grid.CellIsAvailable(cell, hexMeshes[currentHexMesh].structureType);
 
-            if (!removeObj && cellAvailable)
+            // Testing:
+            // - Nothing prevents placing
+            // - Height level can be changed manually
+
+            if (!removeObj)// && cellAvailable)
             {
-                AddObjectToGridCell(cell, 1);
+                AddObjectToGridCell(cell, HeightLevel);
             }
             else if (removeObj && !cellIsEmpty)
             {
                 grid.EditCell(cell, null);
                 RepositionPreviewObject(cell);
             }
-            else if (!removeObj && !cellIsEmpty)
-            {
-                // Testing heightLevel
-                AddObjectToGridCell(cell, 2);
-            }
+            //else if (!removeObj && !cellIsEmpty)
+            //{
+            //    AddObjectToGridCell(cell, 2);
+            //}
             else
             {
                 // TODO: Make it possible to remove [heightLevel > 1] objects
@@ -251,9 +349,9 @@ public class ObjectPlacer : MonoBehaviour
         TryPlaceObject(cell, removeObj);
     }
 
-    private void AddObjectToGridCell(Vector2Int cell, int heightLevel)
+    private void AddObjectToGridCell(Vector2Int cell, float heightLevel)
     {
-        HexObject newObj = pool.GetPooledObject(false);
+        HexObject newObj = hexObjPool.GetPooledObject(false);
 
         if (newObj != null)
         {
@@ -268,7 +366,7 @@ public class ObjectPlacer : MonoBehaviour
         }
     }
 
-    private void PlaceObject(HexObject hexObj, Vector2Int cell, int heightLevel, bool addToGrid)
+    private void PlaceObject(HexObject hexObj, Vector2Int cell, float heightLevel, bool addToGrid)
     {
         hexObj.Coordinates = cell;
 
@@ -312,7 +410,14 @@ public class ObjectPlacer : MonoBehaviour
         }
 
         objRotation = Utils.AngleFromHexDirection(ObjectDirection);
+
         SetRotationForObject(PreviewObj.gameObject);
+        SetSimpleRotationForObject(placerObjMain.gameObject);
+        foreach (PlacerObject placerObject in activeAltPlacerObjs)
+        {
+            if (placerObject != null)
+                SetSimpleRotationForObject(placerObject.gameObject);
+        }
     }
 
     public void SetRotationForNextObject(Utils.HexDirection direction)
@@ -348,13 +453,21 @@ public class ObjectPlacer : MonoBehaviour
         obj.transform.rotation = Quaternion.Euler(newRotation);
     }
 
+    public void SetSimpleRotationForObject(GameObject obj)
+    {
+        Vector3 newRotation = obj.transform.rotation.eulerAngles;
+        float rotY = Utils.AngleFromHexDirection(ObjectDirection);
+        newRotation.y = rotY;
+        obj.transform.rotation = Quaternion.Euler(newRotation);
+    }
+
     public string GetPlacementInfo()
     {
         if (hexMeshes == null || hexMeshes.Length == 0)
             return "No hex meshes!";
         
-        return string.Format("Selected item: {0} ({1})\nDirection: {2}",
-            hexMeshes[currentHexMesh].name, hexMeshes[currentHexMesh].structureType, ObjectDirection);
+        return string.Format("Selected item: {0} ({1})\nDirection: {2}\nHeight level: {3}",
+            hexMeshes[currentHexMesh].name, hexMeshes[currentHexMesh].structureType, ObjectDirection, HeightLevel);
     }
 
     public void ResetPlacer()
@@ -362,6 +475,7 @@ public class ObjectPlacer : MonoBehaviour
         if (PreviewObj != null)
         {
             PreviewObj.gameObject.SetActive(true);
+            RepositionPreviewObject(PreviewObj.Coordinates);
         }
     }
 

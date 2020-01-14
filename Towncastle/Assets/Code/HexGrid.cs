@@ -22,6 +22,9 @@ public class HexGrid : MonoBehaviour
     private float cellHeight = 2f;
 
     [SerializeField]
+    private int maxHeightLevel = 5;
+
+    [SerializeField]
     private List<HexBase> hexBases;
 
     [SerializeField]
@@ -51,6 +54,8 @@ public class HexGrid : MonoBehaviour
     public int GridSizeY { get => gridSizeY; }
 
     public float CellHeight { get => cellHeight; }
+
+    public int MaxHeightLevel { get => maxHeightLevel; }
 
     public float HexBaseCount { get => hexBases.Count; }
 

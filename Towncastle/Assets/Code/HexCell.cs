@@ -55,14 +55,34 @@ public class HexCell : IGridObject
             return true;
 
         // Roof must be the only object in the cell
-        if (type == HexObject.StructureType.Roof || HexObjects[RoofIndex] != null)
+        if (HexObjects[RoofIndex] != null)
             return false;
 
-        int index = GetTypeIndex(type);
-        if (index < 0)
-            return false;
-        else
-            return HexObjects[index] == null;
+        switch (type)
+        {
+            // Floor cannot be in the same cell with a Room
+            case HexObject.StructureType.Floor:
+                return HexObjects[FloorIndex] == null
+                    && HexObjects[RoomIndex] == null;
+            // Wall cannot be in the same cell with a Room
+            case HexObject.StructureType.Wall:
+                return HexObjects[WallIndex] == null
+                    && HexObjects[RoomIndex] == null;
+            // Room cannot be in the same cell with either a Floor or a Wall
+            case HexObject.StructureType.Room:
+                return HexObjects[RoomIndex] == null
+                    && HexObjects[FloorIndex] == null
+                    && HexObjects[WallIndex] == null;
+            case HexObject.StructureType.Support:
+            case HexObject.StructureType.Protrusion:
+            case HexObject.StructureType.Object:
+                return HexObjects[ContentIndex] == null;
+            // Roof must be the only object in the cell
+            case HexObject.StructureType.Roof:
+                return false;
+            default:
+                return false;
+        }
     }
 
     public bool Has(HexObject hexObject)
@@ -144,7 +164,7 @@ public class HexCell : IGridObject
             }
             else
             {
-                Debug.LogWarning(string.Format("Cannot add object to {0}; cell occupied", Coordinates));
+                Debug.LogWarning(string.Format("Cell {0} occupied", Coordinates));
                 return false;
             }
         }
