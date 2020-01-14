@@ -22,6 +22,7 @@ public class InputManager : MonoBehaviour
     private SingleInputHandler hideObjInput;
     private SingleInputHandler showAllInput;
     private SingleInputHandler resetInput;
+    private SingleInputHandler pauseInput;
 
     private SingleInputHandler[] numberKeys;
 
@@ -47,6 +48,7 @@ public class InputManager : MonoBehaviour
         hideObjInput = new SingleInputHandler("Alt Action 2");
         showAllInput = new SingleInputHandler("Show All");
         resetInput = new SingleInputHandler("Reset");
+        pauseInput = new SingleInputHandler("Pause");
 
         numberKeys = new SingleInputHandler[] {
             new SingleInputHandler(KeyCode.Alpha0),
@@ -69,10 +71,19 @@ public class InputManager : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        HandleInput();
+        if (!GameManager.Instance.GamePaused)
+        {
+            HandleGameInput();
 
-        if (player != null)
-            HandlePlayerMovement();
+            if (player != null)
+                HandlePlayerMovement();
+
+            HandlePauseInput();
+        }
+        else
+        {
+            HandleMenuInput();
+        }
 
         HandleDebugInput();
     }
@@ -80,7 +91,7 @@ public class InputManager : MonoBehaviour
     /// <summary>
     /// Handles user input.
     /// </summary>
-    private void HandleInput()
+    private void HandleGameInput()
     {
         HandleCameraInput();
 
@@ -210,11 +221,32 @@ public class InputManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Handles user input in the menus.
+    /// </summary>
+    private void HandleMenuInput()
+    {
+        HandlePauseInput();
+    }
+
+    /// <summary>
+    /// Handles user input for pausing and unpausing the game
+    /// and going back in the menus.
+    /// </summary>
+    private void HandlePauseInput()
+    {
+        pauseInput.Update();
+        if (pauseInput.JustPressedDown)
+        {
+            GameManager.Instance.TogglePause();
+        }
+    }
+
+    /// <summary>
     /// Handles user input for debugging.
     /// </summary>
     private void HandleDebugInput()
     {
-        
+
     }
 
     /// <summary>

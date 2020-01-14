@@ -11,9 +11,8 @@ public class MouseController : MonoBehaviour
     [SerializeField]
     private LayerMask mask;
 
-    // Testing
     [SerializeField]
-    public GameObject testObj;
+    public GameObject cursorFollowerObj;
 
  #pragma warning restore 0649
 
@@ -45,14 +44,17 @@ public class MouseController : MonoBehaviour
     /// </summary>
     private void Update()
     {
+        if (GameManager.Instance.GamePaused)
+            return;
+
         UpdatePosition();
         CheckInput();
 
-        // Testing / Object Preview
-        if (testObj)
+        // Object placing preview
+        if (cursorFollowerObj != null)
         {
             if (SelectingCoordinates)
-                testObj.transform.position = Position;
+                cursorFollowerObj.transform.position = Position;
             //else
             //    testObj.transform.position =
             //        new Vector3(Position.x, testObj.transform.position.y, Position.z);

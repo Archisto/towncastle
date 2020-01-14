@@ -7,8 +7,16 @@ namespace Towncastle.UI
 {
     public class UIManager : MonoBehaviour
     {
+#pragma warning disable 0649
+
+        [SerializeField]
+        private PauseMenu pauseMenu;
+
+#pragma warning restore 0649
+
         private Canvas canvas;
         private Camera cam;
+
         private Vector2 canvasSize;
         private Vector2 uiOffset;
 
@@ -47,9 +55,14 @@ namespace Towncastle.UI
             return proportionalPosition + uiOffset + screenSpaceOffset;
         }
 
+        public void ActivatePauseMenu(bool activate)
+        {
+            pauseMenu.gameObject.SetActive(activate);
+        }
+
         public void ResetUI()
         {
-            
+            ActivatePauseMenu(false);
         }
     }
 }

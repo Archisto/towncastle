@@ -139,12 +139,28 @@ public class GameManager : MonoBehaviour
         ElapsedTime += Time.deltaTime;
     }
 
+    public void PauseGame(bool pause)
+    {
+        GamePaused = pause;
+        UI.ActivatePauseMenu(pause);
+    }
+
+    public void TogglePause()
+    {
+        PauseGame(!GamePaused);
+    }
+
     public void EndGame()
     {
         GameOver = true;
 
         if (counter != null)
             counter.StopCounter();
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 
     public void ResetGame()
