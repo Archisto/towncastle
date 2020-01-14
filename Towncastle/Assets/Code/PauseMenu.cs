@@ -21,5 +21,12 @@ namespace Towncastle.UI
         {
             GameManager.Instance.QuitGame();
         }
+
+        public void ChangeToggleState(bool on)
+        {
+            // TODO: Move to options menu
+
+            GameManager.Instance.Input.SetMouseCameraMoveActive(on);
+        }
     }
 }

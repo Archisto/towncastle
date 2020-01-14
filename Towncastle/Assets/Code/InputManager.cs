@@ -27,6 +27,7 @@ public class InputManager : MonoBehaviour
     private SingleInputHandler[] numberKeys;
 
     private Vector2 screenDimensions;
+    private bool mouseCameraMoveActive = true;
 
     /// <summary>
     /// Start is called before the first frame update.
@@ -142,11 +143,13 @@ public class InputManager : MonoBehaviour
     {
         horizontalInput.Update();
 
-        if (MouseCursorNearScreenEdgePercentage(Utils.Direction.Left, 0.1f))
+        if (mouseCameraMoveActive &&
+            MouseCursorNearScreenEdgePercentage(Utils.Direction.Left, 0.05f))
         {
             cam.Move(Utils.Direction.Left, 1);
         }
-        else if (MouseCursorNearScreenEdgePercentage(Utils.Direction.Right, 0.1f))
+        else if (mouseCameraMoveActive &&
+                 MouseCursorNearScreenEdgePercentage(Utils.Direction.Right, 0.05f))
         {
             cam.Move(Utils.Direction.Right, 1);
         }
@@ -342,5 +345,10 @@ public class InputManager : MonoBehaviour
         }
 
         return MouseCursorNearScreenEdge(side, maxDistance);
+    }
+
+    public void SetMouseCameraMoveActive(bool active)
+    {
+        mouseCameraMoveActive = active;
     }
 }

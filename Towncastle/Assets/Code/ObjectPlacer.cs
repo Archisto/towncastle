@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 public class ObjectPlacer : MonoBehaviour
 {
-    private const string PreviewObjectString = "PreviewObject";
-
     private enum EditMode
     {
         Edit, // Add and remove
@@ -38,13 +36,16 @@ public class ObjectPlacer : MonoBehaviour
 #pragma warning disable 0649
 
     [SerializeField]
-    private HexObject hexObjPrefab;
+    private HexObject previewObject;
 
     [SerializeField]
     private PlacerObject placerObjMain;
 
     [SerializeField]
     private PlacerObject placerObjAltPrefab;
+
+    [SerializeField]
+    private HexObject hexObjPrefab;
 
     [SerializeField]
     private Material previewObjMaterialMain;
@@ -79,7 +80,7 @@ public class ObjectPlacer : MonoBehaviour
 
     public Utils.HexDirection CurrentDirection { get; private set; }
 
-    public HexObject PreviewObj { get; private set; }
+    public HexObject PreviewObj { get => previewObject; }
 
     private float heightLevel = 1;
     public float HeightLevel
@@ -119,7 +120,6 @@ public class ObjectPlacer : MonoBehaviour
             hexObjPool = new Pool<HexObject>(hexObjPrefab, hexObjPoolSize, false);
             hexObjsInPool = hexObjPool.GetAllObjects();
             GameManager.Instance.AddLevelObjectsToList(hexObjsInPool);
-            PreviewObj = hexObjPool.GetPooledObject(true);
         }
 
         if (hexMeshes != null && PreviewObj != null)
@@ -130,10 +130,7 @@ public class ObjectPlacer : MonoBehaviour
 
     private void InitPreviewObject()
     {
-        PreviewObj.gameObject.name = PreviewObjectString;
         PreviewObj.SetHexMesh(hexMeshes[currentHexMesh]);
-        PreviewObj.SetMaterial(previewObjMaterialMain, true);
-        PreviewObj.SetLayer(0); // Default layer
         SetRotationForObject(PreviewObj.gameObject);
 
         if (placerObjMain != null)
@@ -162,7 +159,7 @@ public class ObjectPlacer : MonoBehaviour
 
             objectsRemainingText.text =
                 string.Format("Objects remaining\n{0}/{1}",
-                    hexObjPoolSize - hexObjsInUse, hexObjPoolSize - 1);
+                    hexObjPoolSize - hexObjsInUse, hexObjPoolSize);
         }
     }
 
@@ -319,9 +316,6 @@ public class ObjectPlacer : MonoBehaviour
 
         foreach (HexObject hexObj in hexObjsInPool)
         {
-            if (hexObj.name.Equals(PreviewObjectString))
-                continue;
-
             if (hexObj.gameObject.activeSelf && hexObj.Coordinates == cell)
             {
                 hexObj.Hide(hide);
@@ -336,9 +330,6 @@ public class ObjectPlacer : MonoBehaviour
     {
         foreach (HexObject hexObj in hexObjsInPool)
         {
-            if (hexObj.name.Equals(PreviewObjectString))
-                continue;
-
             if (hexObj.gameObject.activeSelf)
                 hexObj.Hide(hide);
         }
@@ -390,9 +381,6 @@ public class ObjectPlacer : MonoBehaviour
 
                 foreach (HexObject hexObj in hexObjsInPool)
                 {
-                    if (hexObj.name.Equals(PreviewObjectString))
-                        continue;
-
                     if (hexObj.gameObject.activeSelf && hexObj.Coordinates == cell)
                         hexObjPool.ReturnObject(hexObj);
                 }

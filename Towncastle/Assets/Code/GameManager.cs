@@ -38,6 +38,8 @@ public class GameManager : MonoBehaviour
 
     public UIManager UI { get; private set; }
 
+    public InputManager Input { get; private set; }
+
     public MouseController Mouse { get; private set; }
 
     public CameraController Camera { get; private set; }
@@ -79,10 +81,13 @@ public class GameManager : MonoBehaviour
         Debug.Log("Initializing GameManager...");
 
         UI = FindObjectOfType<UIManager>();
+        Input = FindObjectOfType<InputManager>();
         Mouse = FindObjectOfType<MouseController>();
         Camera = FindObjectOfType<CameraController>();
         Grid = FindObjectOfType<HexGrid>();
         ObjectPlacer = FindObjectOfType<ObjectPlacer>();
+
+        // TODO: Remove
         Player = FindObjectOfType<PlayerController>();
         shooter = FindObjectOfType<Shooter>();
         counter = FindObjectOfType<TimeCounter>();
