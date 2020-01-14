@@ -167,12 +167,15 @@ public class ObjectPlacer : MonoBehaviour
         }
     }
 
-    public void PickObject(Vector2Int cell)
+    public void PickObject(HexObject hexObject)
     {
-        HexObject hexObject = grid.GetObjectInCell(cell, false);
+        // TODO: Equal size hitboxes make picking the desired object difficult
 
         if (hexObject == null)
+        {
+            Debug.LogWarning("Cannot pick; the selected object is not a HexObject");
             return;
+        }
 
         for (int i = 0; i < hexMeshes.Length; i++)
         {
@@ -184,6 +187,12 @@ public class ObjectPlacer : MonoBehaviour
         }
 
         UpdatePreviewObjectHexMesh();
+    }
+
+    public void PickObject(Vector2Int cell)
+    {
+        HexObject hexObject = grid.GetObjectInCell(cell, false);
+        PickObject(hexObject);
     }
 
     public void HideAllObjects(bool hide)

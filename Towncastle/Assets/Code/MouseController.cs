@@ -26,6 +26,8 @@ public class MouseController : MonoBehaviour
 
     public bool SelectingCoordinates { get; private set; }
 
+    public IGridObject SelectedObject { get; private set; }
+
     public Vector3 LBDownPosition { get; private set; }
 
     public bool LeftButtonDown { get; private set; }
@@ -93,6 +95,7 @@ public class MouseController : MonoBehaviour
         T gridObject = hit.transform.GetComponent<T>();
         if (gridObject != null)
         {
+            SelectedObject = gridObject;
             Coordinates = gridObject.Coordinates;
             return true;
         }

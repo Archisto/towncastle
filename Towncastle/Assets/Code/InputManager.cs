@@ -153,7 +153,8 @@ public class InputManager : MonoBehaviour
             {
                 if (pickObjInput.PressedDown)
                 {
-                    objPlacer.PickObject(mouse.Coordinates);
+                    objPlacer.PickObject(mouse.SelectedObject as HexObject);
+                    //objPlacer.PickObject(mouse.Coordinates);
                 }
                 else if (hideObjInput.PressedDown)
                 {
