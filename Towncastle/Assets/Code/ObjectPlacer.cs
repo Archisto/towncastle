@@ -177,13 +177,7 @@ public class ObjectPlacer : MonoBehaviour
 
     private void RepositionPreviewObject(Vector2Int previewCell)
     {
-        // TODO: Better height level
-
-        /*int testHeightLevel = 1;
-        if (!grid.CellIsAvailable(previewCell, hexMeshes[currentHexMesh].structureType))
-            testHeightLevel = 2;*/
-
-        PlaceObject(PreviewObj, previewCell, HeightLevelRounded, false);
+        PlaceObject(PreviewObj, previewCell, HeightLevel, false);
 
         if (placerObjMain != null)
         {
@@ -210,24 +204,24 @@ public class ObjectPlacer : MonoBehaviour
                         material = previewObjMaterialOccupied;
                     }
 
-                    SetupPlacerObject(placerObjMain, i);
+                    SetupPlacerObject(placerObjMain, i, false);
                     placerObjMain.SetMaterial(material);
                 }
                 else
                 {
                     activeAltPlacerObjs[i - 1] = placerObjAltPool.GetPooledObject(true);
                     if (activeAltPlacerObjs[i - 1] != null)
-                        SetupPlacerObject(activeAltPlacerObjs[i - 1], i);
+                        SetupPlacerObject(activeAltPlacerObjs[i - 1], i, true);
                 }
             }
         }
     }
 
-    private void SetupPlacerObject(PlacerObject placerObject, int distFromGround)
+    private void SetupPlacerObject(PlacerObject placerObject, int distFromGround, bool snapToFullHeight)
     {
         // Top to bottom
         Vector3 newPosition = PreviewObj.transform.position;
-        newPosition.y = (HeightLevel - (distFromGround + 1)) * grid.CellHeight;
+        newPosition.y = ((snapToFullHeight ?  HeightLevelRounded : HeightLevel) - (distFromGround + 1)) * grid.CellHeight;
         placerObject.transform.position = newPosition;
 
         SetSimpleRotationForObject(placerObject.gameObject);

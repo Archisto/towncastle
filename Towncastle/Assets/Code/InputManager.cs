@@ -115,9 +115,8 @@ public class InputManager : MonoBehaviour
         scrollWheelInput.Update();
         if (scrollWheelInput.PressedDown)
         {
-            int heightLevelChange =
-                scrollWheelInput.PositiveAxis ? 1 : -1;
-            objPlacer.HeightLevel += heightLevelChange;
+            float heightLevelChange = pickObjInput.PressedDown ? 0.5f : 1f;
+            objPlacer.HeightLevel += (scrollWheelInput.PositiveAxis ? 1 : -1) * heightLevelChange;
         }
 
         showAllInput.Update();
