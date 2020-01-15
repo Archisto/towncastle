@@ -97,5 +97,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   orbitPoint: {fileID: 0}
+  zoomSpeed: 0.75
   rotationSpeed: 1
+  minRadius: 5
+  minY: 10
   orbitAngle: 3.1415927

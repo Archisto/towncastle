@@ -10,7 +10,16 @@ public class CameraController : MonoBehaviour
     private Transform orbitPoint;
 
     [SerializeField]
+    private float zoomSpeed = 1f;
+
+    [SerializeField]
     private float rotationSpeed = 1f;
+
+    [SerializeField]
+    private float minRadius = 10f;
+
+    [SerializeField]
+    private float minY = 10f;
 
     [SerializeField]
     private float orbitAngle = Mathf.PI; // radians
@@ -21,8 +30,10 @@ public class CameraController : MonoBehaviour
     private Quaternion startRotation;
 
     private Vector3 leveledOrbitPoint;
+    private float zoomRatio = 1;
     private float orbitRadius;
-    //private float orbitAngle;
+    private float maxRadius;
+    private float maxY;
 
     /// <summary>
     /// Start is called before the first frame update.
@@ -34,6 +45,16 @@ public class CameraController : MonoBehaviour
             leveledOrbitPoint = orbitPoint.position;
             leveledOrbitPoint.y = transform.position.y;
             orbitRadius = Vector3.Distance(transform.position, leveledOrbitPoint);
+            maxY = leveledOrbitPoint.y;
+
+            maxRadius = orbitRadius;
+
+            if (minRadius < 0 || minRadius >= maxRadius)
+                minRadius = maxRadius - 1;
+
+            if (minY < 0 || minY < orbitPoint.position.y)
+                minY = orbitPoint.position.y + 1;
+
             LookAt(orbitPoint.position);
         }
 
@@ -50,6 +71,11 @@ public class CameraController : MonoBehaviour
         {
             // TODO
         }
+    }
+
+    private Vector3 GetOrbitDirection()
+    {
+        return new Vector3(Mathf.Sin(orbitAngle), 0, Mathf.Cos(orbitAngle));
     }
 
     /// <summary>
@@ -69,22 +95,45 @@ public class CameraController : MonoBehaviour
 
         switch (direction)
         {
+            case Utils.Direction.Up:
+                Zoom(-1 * speedMultiplier);
+                break;
+            case Utils.Direction.Down:
+                Zoom(speedMultiplier);
+                break;
             case Utils.Direction.Left:
-                orbitAngle += rotationSpeed * speedMultiplier * Time.deltaTime;
-                if (orbitAngle > 0)
-                    orbitAngle -= 2 * Mathf.PI;
+                Orbit(speedMultiplier);
                 break;
             case Utils.Direction.Right:
-                orbitAngle += -1 * rotationSpeed * speedMultiplier * Time.deltaTime;
-                if (orbitAngle < 2 * Mathf.PI)
-                    orbitAngle += 2 * Mathf.PI;
+                Orbit(-1 * speedMultiplier);
                 break;
         }
 
-        Vector3 orbitDirection = new Vector3(Mathf.Sin(orbitAngle), 0, Mathf.Cos(orbitAngle));
-        transform.position = leveledOrbitPoint + orbitDirection * orbitRadius;
-
         LookAt(orbitPoint.position);
+    }
+
+    private void Zoom(float speedMultiplier)
+    {
+        zoomRatio += speedMultiplier * zoomSpeed * Time.deltaTime;
+        zoomRatio = Mathf.Clamp01(zoomRatio);
+        //zoomRatio = (orbitRadius - minRadius) / (maxRadius - minRadius);
+
+        orbitRadius = minRadius + zoomRatio * (maxRadius - minRadius);
+        leveledOrbitPoint.y = minY + zoomRatio * (maxY - minY);
+
+        transform.position = leveledOrbitPoint + GetOrbitDirection() * orbitRadius;
+    }
+
+    private void Orbit(float speedMultiplier)
+    {
+        orbitAngle += speedMultiplier * rotationSpeed * Time.deltaTime;
+
+        if (speedMultiplier > 0 && orbitAngle > 2 * Mathf.PI)
+            orbitAngle -= 2 * Mathf.PI;
+        else if (speedMultiplier < 0 && orbitAngle < 0)
+            orbitAngle += 2 * Mathf.PI;
+
+        transform.position = leveledOrbitPoint + GetOrbitDirection() * orbitRadius;
     }
 
     public void LookAt(Vector3 position)

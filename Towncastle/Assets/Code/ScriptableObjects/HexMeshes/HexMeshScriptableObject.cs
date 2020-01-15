@@ -11,6 +11,8 @@ public class HexMeshScriptableObject : ScriptableObject
 
     public HexObject.StructureType structureType = HexObject.StructureType.Object;
     public Utils.HexDirection mainDirection = Utils.HexDirection.Right;
+    public bool halfHeight;
+
     public float defaultRotationY = 90;
     public float defaultPositionY = 0;
 

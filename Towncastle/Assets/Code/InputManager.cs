@@ -142,6 +142,7 @@ public class InputManager : MonoBehaviour
     private void HandleCameraInput()
     {
         horizontalInput.Update();
+        verticalInput.Update();
 
         if (mouseCameraMoveActive &&
             MouseCursorNearScreenEdgePercentage(Utils.Direction.Left, 0.05f))
@@ -157,6 +158,13 @@ public class InputManager : MonoBehaviour
         {
             Utils.Direction direction =
                 horizontalInput.PositiveAxis ? Utils.Direction.Right : Utils.Direction.Left;
+            cam.Move(direction, 1);
+        }
+
+        if (verticalInput.PressedDown)
+        {
+            Utils.Direction direction =
+                verticalInput.PositiveAxis ? Utils.Direction.Up : Utils.Direction.Down;
             cam.Move(direction, 1);
         }
     }
