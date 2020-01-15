@@ -20,6 +20,7 @@ public class InputManager : MonoBehaviour
     private SingleInputHandler turnObjInput;
     private SingleInputHandler pickObjInput;
     private SingleInputHandler hideObjInput;
+    private SingleInputHandler alt3Input;
     private SingleInputHandler showAllInput;
     private SingleInputHandler resetInput;
     private SingleInputHandler pauseInput;
@@ -47,6 +48,7 @@ public class InputManager : MonoBehaviour
         turnObjInput = new SingleInputHandler("Turn Object");
         pickObjInput = new SingleInputHandler("Alt Action 1");
         hideObjInput = new SingleInputHandler("Alt Action 2");
+        alt3Input = new SingleInputHandler("Alt Action 3");
         showAllInput = new SingleInputHandler("Show All");
         resetInput = new SingleInputHandler("Reset");
         pauseInput = new SingleInputHandler("Pause");
@@ -98,26 +100,22 @@ public class InputManager : MonoBehaviour
 
         pickObjInput.Update();
         hideObjInput.Update();
+        alt3Input.Update();
 
+        // Changing the object
         changeObjInput.Update();
         if (changeObjInput.JustPressedDown)
         {
             objPlacer.ChangeObject(changeObjInput.PositiveAxis);
         }
 
+        // Turning the object
         turnObjInput.Update();
         if (turnObjInput.JustPressedDown)
         {
             Utils.Direction direction =
                 turnObjInput.PositiveAxis ? Utils.Direction.Right : Utils.Direction.Left;
             objPlacer.ChangeRotationForNextObject(direction);
-        }
-
-        scrollWheelInput.Update();
-        if (scrollWheelInput.PressedDown)
-        {
-            float heightLevelChange = pickObjInput.PressedDown ? 0.5f : 1f;
-            objPlacer.HeightLevel += (scrollWheelInput.PositiveAxis ? 1 : -1) * heightLevelChange;
         }
 
         showAllInput.Update();
@@ -136,6 +134,7 @@ public class InputManager : MonoBehaviour
             GameManager.Instance.ResetGame();
         }
 
+        HandleScrollWheelInput();
         HandleObjPlacingInput();
     }
 
@@ -166,6 +165,32 @@ public class InputManager : MonoBehaviour
             Utils.Direction direction =
                 verticalInput.PositiveAxis ? Utils.Direction.Up : Utils.Direction.Down;
             cam.Move(direction, 1);
+        }
+    }
+
+    private void HandleScrollWheelInput()
+    {
+        scrollWheelInput.Update();
+        if (scrollWheelInput.PressedDown)
+        {
+            // Changing the object
+            if (alt3Input.PressedDown)
+            {
+                objPlacer.ChangeObject(!scrollWheelInput.PositiveAxis);
+            }
+            // Turning the object
+            else if (hideObjInput.PressedDown)
+            {
+                Utils.Direction direction =
+                   scrollWheelInput.PositiveAxis ? Utils.Direction.Left : Utils.Direction.Right;
+                objPlacer.ChangeRotationForNextObject(direction);
+            }
+            // Changing the height level
+            else
+            {
+                float heightLevelChange = pickObjInput.PressedDown ? 0.5f : 1f;
+                objPlacer.HeightLevel += (scrollWheelInput.PositiveAxis ? 1 : -1) * heightLevelChange;
+            }
         }
     }
 
