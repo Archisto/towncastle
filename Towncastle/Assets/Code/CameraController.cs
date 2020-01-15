@@ -116,9 +116,7 @@ public class CameraController : MonoBehaviour
     {
         zoomRatio += speedMultiplier * zoomSpeed * Time.deltaTime;
         zoomRatio = Mathf.Clamp01(zoomRatio);
-        //zoomRatio = (orbitRadius - minRadius) / (maxRadius - minRadius);
-
-        orbitRadius = minRadius + zoomRatio * (maxRadius - minRadius);
+        orbitRadius = Utils.ValueFromRatio(zoomRatio, minRadius, maxRadius);
         leveledOrbitPoint.y = minY + zoomRatio * (maxY - minY);
 
         transform.position = leveledOrbitPoint + GetOrbitDirection() * orbitRadius;

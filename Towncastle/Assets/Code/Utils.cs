@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -63,6 +64,19 @@ public static class Utils
         return string.Format("An instance of {0} could not be found in the scene.", obj);
     }
 
+    /// <summary>
+    /// Gets how many values does an enumerator have.
+    /// </summary>
+    /// <param name="enumType">An enum type</param>
+    /// <returns>The length of the enum; -1 if not an enum</returns>
+    public static int GetEnumLength(Type enumType)
+    {
+        if (enumType.IsEnum)
+            return Enum.GetValues(enumType).Length;
+        else
+            return -1;
+    }
+
     public static Vector3 VectorFromDirection(Direction direction)
     {
         switch (direction)
@@ -108,5 +122,34 @@ public static class Utils
     public static float AngleFromHexDirectionToAnother(HexDirection direction1, HexDirection direction2)
     {
         return AngleFromHexDirection(direction1) - AngleFromHexDirection(direction2);
+    }
+
+    public static Vector3 GetCurvePoint(Vector3 p0, Vector3 p1, Vector3 p2, float t)
+    {
+        // Bézier curve:
+        // B(t) = (1 - t) * [(1 - t) * p0 + t * p1] + t * [(1 - t) * p1 + t * p2]
+        // 0 <= t <= 1
+
+        return Vector3.Lerp(Vector3.Lerp(p0, p1, t), Vector3.Lerp(p1, p2, t), t);
+    }
+
+    public static float Ratio(float value, float lowBound, float highBound)
+    {
+        if (value <= lowBound)
+            return 0;
+        else if (value >= highBound)
+            return 1;
+        else
+            return ((value - lowBound) / (highBound - lowBound));
+    }
+
+    public static float ValueFromRatio(float ratio, float lowBound, float highBound)
+    {
+        if (ratio <= 0f)
+            return lowBound;
+        else if (ratio >= 1f)
+            return highBound;
+        else
+            return lowBound + ratio * (highBound - lowBound);
     }
 }

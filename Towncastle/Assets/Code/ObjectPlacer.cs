@@ -54,9 +54,6 @@ public class ObjectPlacer : MonoBehaviour
     private Material previewObjMaterialOccupied;
 
     [SerializeField]
-    private HexMeshScriptableObject[] hexMeshes;
-
-    [SerializeField]
     private int hexObjPoolSize = 20;
 
     [SerializeField]
@@ -68,6 +65,7 @@ public class ObjectPlacer : MonoBehaviour
 #pragma warning restore 0649
 
     private HexGrid grid;
+    private ObjectCatalog catalog;
     private Vector2Int coord;
 
     private Pool<HexObject> hexObjPool;
@@ -110,6 +108,7 @@ public class ObjectPlacer : MonoBehaviour
     private void Start()
     {
         grid = GameManager.Instance.Grid;
+        catalog = FindObjectOfType<ObjectCatalog>();
         coord = new Vector2Int(-1, -1);
         CurrentDirection = initialHexDirection;
         objRotation = Utils.AngleFromHexDirection(CurrentDirection);
@@ -122,7 +121,7 @@ public class ObjectPlacer : MonoBehaviour
             GameManager.Instance.AddLevelObjectsToList(hexObjsInPool);
         }
 
-        if (hexMeshes != null && PreviewObj != null)
+        if (catalog != null && PreviewObj != null)
         {
             InitPreviewObject();
         }
@@ -130,8 +129,8 @@ public class ObjectPlacer : MonoBehaviour
 
     private void InitPreviewObject()
     {
-        PreviewObj.SetHexMesh(hexMeshes[currentHexMesh]);
-        SetRotationForObject(PreviewObj.gameObject);
+        PreviewObj.SetHexMesh(catalog.GetHexMesh(currentHexMesh));
+        SetRotationForObject(PreviewObj);
 
         if (placerObjMain != null)
         {
@@ -187,9 +186,9 @@ public class ObjectPlacer : MonoBehaviour
     {
         if (PreviewObj != null)
         {
-            PreviewObj.SetHexMesh(hexMeshes[currentHexMesh]);
+            PreviewObj.SetHexMesh(catalog.GetHexMesh(currentHexMesh));
             RepositionPreviewObject(PreviewObj.Coordinates);
-            SetRotationForObject(PreviewObj.gameObject);
+            SetRotationForObject(PreviewObj);
         }
     }
 
@@ -259,7 +258,7 @@ public class ObjectPlacer : MonoBehaviour
 
     private void UpdatePreviewRotation()
     {
-        SetRotationForObject(PreviewObj.gameObject);
+        SetRotationForObject(PreviewObj);
         SetSimpleRotationForObject(placerObjMain.gameObject);
         foreach (PlacerObject placerObject in activeAltPlacerObjs)
         {
@@ -270,13 +269,13 @@ public class ObjectPlacer : MonoBehaviour
 
     public void ChangeObject(bool next)
     {
-        if (hexMeshes != null && hexMeshes.Length > 1)
+        if (catalog != null && catalog.HexMeshCount > 1)
         {
             currentHexMesh += next ? 1 : -1;
-            if (currentHexMesh >= hexMeshes.Length)
+            if (currentHexMesh >= catalog.HexMeshCount)
                 currentHexMesh = 0;
             else if (currentHexMesh < 0)
-                currentHexMesh = hexMeshes.Length - 1;
+                currentHexMesh = catalog.HexMeshCount - 1;
 
             UpdatePreviewObjectHexMesh();
         }
@@ -292,9 +291,9 @@ public class ObjectPlacer : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < hexMeshes.Length; i++)
+        for (int i = 0; i < catalog.HexMeshCount; i++)
         {
-            if (hexObject.HexMesh == hexMeshes[i])
+            if (hexObject.HexMesh == catalog.GetHexMesh(i))
             {
                 currentHexMesh = i;
                 break;
@@ -358,7 +357,7 @@ public class ObjectPlacer : MonoBehaviour
         if (grid.CellExists(cell))
         {
             bool cellIsEmpty = grid.CellIsEmpty(cell);
-            bool cellAvailable = grid.CellIsAvailable(cell, hexMeshes[currentHexMesh].structureType);
+            bool cellAvailable = grid.CellIsAvailable(cell, catalog.GetHexMesh(currentHexMesh).structureType);
 
             // Testing:
             // - Nothing prevents placing
@@ -412,7 +411,7 @@ public class ObjectPlacer : MonoBehaviour
 
         if (newObj != null)
         {
-            newObj.SetHexMesh(hexMeshes[currentHexMesh]);
+            newObj.SetHexMesh(catalog.GetHexMesh(currentHexMesh));
             PlaceObject(newObj, cell, heightLevel, true);
 
             return;
@@ -437,7 +436,7 @@ public class ObjectPlacer : MonoBehaviour
         if (addToGrid)
         {
             hexObj.Direction = CurrentDirection;
-            SetRotationForObject(hexObj.gameObject);
+            SetRotationForObject(hexObj);
             hexObj.gameObject.SetActive(true);
             grid.EditCell(cell, hexObj);
             RepositionPreviewObject(cell);
@@ -494,17 +493,17 @@ public class ObjectPlacer : MonoBehaviour
         }
     }
 
-    public void SetRotationForObject(GameObject obj)
+    public void SetRotationForObject(HexObject hexObj)
     {
-        Vector3 newRotation = obj.transform.rotation.eulerAngles;
+        Vector3 newRotation = hexObj.transform.rotation.eulerAngles;
 
         float rotY = objRotation +
-                     hexMeshes[currentHexMesh].defaultRotationY +
+                     hexObj.HexMesh.defaultRotationY +
                      Utils.AngleFromHexDirectionToAnother
-                        (Utils.HexDirection.Right, hexMeshes[currentHexMesh].mainDirection); // Right is the world main direction
+                        (Utils.HexDirection.Right, hexObj.HexMesh.mainDirection); // Right is the world main direction
 
         newRotation.y = rotY;
-        obj.transform.rotation = Quaternion.Euler(newRotation);
+        hexObj.transform.rotation = Quaternion.Euler(newRotation);
     }
 
     public void SetSimpleRotationForObject(GameObject obj)
@@ -531,11 +530,13 @@ public class ObjectPlacer : MonoBehaviour
 
     public string GetPlacementInfo()
     {
-        if (hexMeshes == null || hexMeshes.Length == 0)
-            return "No hex meshes!";
-        
+        if (catalog == null || catalog.HexMeshCount == 0)
+            return "Can't access object catalog or it is empty.";
+
+        HexMeshScriptableObject hexMesh = catalog.GetHexMesh(currentHexMesh);
+
         return string.Format("Selected item: {0} ({1})\nDirection: {2}\nHeight level: {3}",
-            hexMeshes[currentHexMesh].name, hexMeshes[currentHexMesh].structureType, CurrentDirection, HeightLevel);
+            hexMesh.name, hexMesh.structureType, CurrentDirection, HeightLevel);
     }
 
     public void ResetPlacer()
