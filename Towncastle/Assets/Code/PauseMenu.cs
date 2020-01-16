@@ -7,6 +7,16 @@ namespace Towncastle.UI
 {
     public class PauseMenu : MonoBehaviour
     {
+        private UIManager ui;
+
+        /// <summary>
+        /// Start is called before the first frame update.
+        /// </summary>
+        private void Start()
+        {
+            ui = GameManager.Instance.UI;
+        }
+
         public void ResumeGame()
         {
             GameManager.Instance.PauseGame(false);
@@ -15,6 +25,8 @@ namespace Towncastle.UI
         public void ActivateOptionsMenu()
         {
             // TODO
+
+            ui.ToggleHelp();
         }
 
         public void QuitGame()

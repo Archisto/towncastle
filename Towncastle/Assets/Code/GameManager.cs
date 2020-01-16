@@ -146,8 +146,11 @@ public class GameManager : MonoBehaviour
 
     public void PauseGame(bool pause)
     {
-        GamePaused = pause;
-        UI.ActivatePauseMenu(pause);
+        if (GamePaused != pause)
+        {
+            GamePaused = pause;
+            UI.ActivatePauseMenu(pause);
+        }
     }
 
     public void TogglePause()

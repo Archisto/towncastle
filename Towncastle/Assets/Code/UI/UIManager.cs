@@ -12,6 +12,9 @@ namespace Towncastle.UI
         [SerializeField]
         private PauseMenu pauseMenu;
 
+        [SerializeField]
+        private GameObject helpMenu;
+
 #pragma warning restore 0649
 
         private Canvas canvas;
@@ -21,6 +24,8 @@ namespace Towncastle.UI
         private Vector2 uiOffset;
 
         public Vector2 CanvasSize { get => canvasSize; }
+
+        public bool HelpActive { get; private set; }
 
         /// <summary>
         /// Initializes the object.
@@ -58,6 +63,18 @@ namespace Towncastle.UI
         public void ActivatePauseMenu(bool activate)
         {
             pauseMenu.gameObject.SetActive(activate);
+
+            if (activate && HelpActive)
+                ToggleHelp();
+        }
+
+        public void ToggleHelp()
+        {
+            HelpActive = !HelpActive;
+            helpMenu.gameObject.SetActive(HelpActive);
+
+            if (HelpActive && GameManager.Instance.GamePaused)
+                GameManager.Instance.PauseGame(false);
         }
 
         public void ResetUI()

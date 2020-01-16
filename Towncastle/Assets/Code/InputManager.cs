@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Towncastle.UI;
 
 /// <summary>
 /// Manages user input.
 /// </summary>
 public class InputManager : MonoBehaviour
 {
+    private UIManager ui;
     private CameraController cam;
     private MouseController mouse;
     private HexGrid grid;
@@ -24,17 +26,19 @@ public class InputManager : MonoBehaviour
     private SingleInputHandler showAllInput;
     private SingleInputHandler resetInput;
     private SingleInputHandler pauseInput;
+    private SingleInputHandler helpInput;
 
     private SingleInputHandler[] numberKeys;
 
     private Vector2 screenDimensions;
-    private bool mouseCameraMoveActive = true;
+    private bool mouseCameraMoveActive; // Enabled by default if we get the screen dimensions
 
     /// <summary>
     /// Start is called before the first frame update.
     /// </summary>
     private void Start()
     {
+        ui = GameManager.Instance.UI;
         cam = GameManager.Instance.Camera;
         mouse = GameManager.Instance.Mouse;
         grid = GameManager.Instance.Grid;
@@ -52,6 +56,7 @@ public class InputManager : MonoBehaviour
         showAllInput = new SingleInputHandler("Show All");
         resetInput = new SingleInputHandler("Reset");
         pauseInput = new SingleInputHandler("Pause");
+        helpInput = new SingleInputHandler("Help");
 
         numberKeys = new SingleInputHandler[] {
             new SingleInputHandler(KeyCode.Alpha0),
@@ -66,7 +71,11 @@ public class InputManager : MonoBehaviour
             new SingleInputHandler(KeyCode.Alpha9)
         };
 
-        screenDimensions = GameManager.Instance.UI.CanvasSize;
+        if (GameManager.Instance.UI != null)
+        {
+            screenDimensions = GameManager.Instance.UI.CanvasSize;
+            mouseCameraMoveActive = true;
+        }
     }
 
     /// <summary>
@@ -292,8 +301,23 @@ public class InputManager : MonoBehaviour
         pauseInput.Update();
         if (pauseInput.JustPressedDown)
         {
-            GameManager.Instance.TogglePause();
-            mouse.ResetMouse();
+            // Closes the help screen
+            if (ui.HelpActive)
+            {
+                ui.ToggleHelp();
+            }
+            // Toggles between game and pause menu
+            else
+            {
+                GameManager.Instance.TogglePause();
+                mouse.ResetMouse();
+            }
+        }
+
+        helpInput.Update();
+        if (helpInput.JustPressedDown)
+        {
+            ui.ToggleHelp();
         }
     }
 
