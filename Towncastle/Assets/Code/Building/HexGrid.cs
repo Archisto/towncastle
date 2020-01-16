@@ -47,8 +47,6 @@ public class HexGrid : MonoBehaviour
 
 #pragma warning restore 0649
 
-    private float cellGapZ;
-
     private MouseController mouse;
     private List<HexCell[]> cells;
 
@@ -56,7 +54,11 @@ public class HexGrid : MonoBehaviour
 
     public int GridSizeY { get => gridSizeY; }
 
+    public float CellSize { get => cellSize; }
+
     public float CellHeight { get => cellHeight; }
+
+    public float CellGapZ { get; private set; }
 
     public int MaxHeightLevel { get => maxHeightLevel; }
 
@@ -83,7 +85,7 @@ public class HexGrid : MonoBehaviour
 
     private void UpdateCellGapZ()
     {
-        cellGapZ = Mathf.Sqrt(Mathf.Pow(cellSize, 2) - Mathf.Pow(cellSize / 2, 2));
+        CellGapZ = Mathf.Sqrt(Mathf.Pow(cellSize, 2) - Mathf.Pow(cellSize / 2, 2));
     }
 
     private void InitCells()
@@ -326,7 +328,7 @@ public class HexGrid : MonoBehaviour
                 yAxis = hexBase.Y;
         }
 
-        Vector3 result = transform.position + new Vector3(x * cellSize, yAxis, y * cellGapZ);
+        Vector3 result = transform.position + new Vector3(x * cellSize, yAxis, y * CellGapZ);
 
         if (y % 2 != 0)
         {
@@ -352,7 +354,7 @@ public class HexGrid : MonoBehaviour
             return new Vector2Int(-1, -1);
 
         float x = (position.x - transform.position.x + 0.5f * cellSize) / cellSize;
-        float y = (position.z - transform.position.z + 0.5f * cellGapZ) / cellGapZ;
+        float y = (position.z - transform.position.z + 0.5f * CellGapZ) / CellGapZ;
 
         if (x < 0 || y < 0)
         {
