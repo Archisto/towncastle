@@ -341,19 +341,6 @@ public class ObjectPlacer : MonoBehaviour
 
     public void TryPlaceObject(Vector2Int cell, bool removeObj)
     {
-        // Rules for placing objects:
-        // 1. Each cell can have a maximum of 3 objects:
-        //    {[1 Floor, 1 Wall] OR 1 Room and 1 Content (Object, Support, Protrusion)} OR 1 Roof
-        // 2. There has to be a Wall or Support in a cell for placing objects in the cell above
-        // 3. Protrusions are exceptions to rule 2:
-        //    They can be placed if the neighboring cell on the same height level has a Wall
-        // 4. If an object is removed and it is a prerequisite for building on the cells above,
-        //    the cells above are also cleared
-        //    (the user will be warned and asked to use the Replace mode if they do not want this)
-        // 5. Removing an object removes the most recent object in the selected cell
-        //    if a special removal mode is not active
-        // 6. The rotation of an object never matters
-
         if (grid.CellExists(cell))
         {
             bool cellIsEmpty = grid.CellIsEmpty(cell);
