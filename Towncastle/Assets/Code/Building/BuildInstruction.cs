@@ -2,24 +2,28 @@
 
 public class BuildInstruction
 {
-    public HexMeshScriptableObject HexMesh { get; private set; }
+    public HexMeshScriptableObject HexMesh { get; set; }
 
-    public Vector2Int Cell { get; private set; }
+    public Vector2Int Cell { get; set; }
 
-    public Utils.HexDirection Direction { get; private set; }
+    public Utils.HexDirection Direction { get; set; }
+
+    public float HeightLevel { get; set; }
 
     public BuildInstruction(HexMeshScriptableObject hexMesh,
                             Vector2Int cell,
-                            Utils.HexDirection direction)
+                            Utils.HexDirection direction,
+                            float heightLevel = 1)
     {
         HexMesh = hexMesh;
         Cell = cell;
         Direction = direction;
+        HeightLevel = heightLevel;
     }
 
-    public string GetInfo()
+    public override string ToString()
     {
-        return string.Format("Object {0} at {1} looking {2}",
-            HexMesh, Cell, Direction);
+        return string.Format("HexMesh {0} at {1} (heightLevel: {2}) looking {3}",
+            HexMesh.name, Cell, HeightLevel, Direction);
     }
 }

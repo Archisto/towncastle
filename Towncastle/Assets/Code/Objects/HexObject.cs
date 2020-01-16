@@ -17,19 +17,106 @@ public class HexObject : LevelObject, IGridObject
         Undefined
     }
 
+#pragma warning disable 0649
+
+    [SerializeField]
+    private bool isPreviewObject;
+
+#pragma warning restore 0649
+
     // Child object and its components
     private GameObject childObj;
     private MeshFilter meshFilter;
     private MeshRenderer meshRend;
+    private BuildInstruction buildInstruction;
+
+    private Vector2Int coordinates;
+    private Utils.HexDirection direction;
+    private float heightLevel = 1;
 
     private int mainLayer;
     private int hiddenLayer = 0; // Default layer
 
     public HexMeshScriptableObject HexMesh { get; private set; }
 
-    public Vector2Int Coordinates { get; set; }
+    public Vector2Int Coordinates
+    {
+        get
+        {
+            return coordinates;
+        }
+        set
+        {
+            coordinates = value;
 
-    public Utils.HexDirection Direction { get; set; }
+            if (CanBeBuilt)
+            {
+                if (BuildInstruction == null)
+                    SetupBuildInstruction();
+                else
+                    BuildInstruction.Cell = coordinates;
+            }
+        }
+    }
+
+    public Utils.HexDirection Direction
+    {
+        get
+        {
+            return direction;
+        }
+        set
+        {
+            direction = value;
+
+            if (CanBeBuilt)
+            {
+                if (BuildInstruction == null)
+                    SetupBuildInstruction();
+                else
+                    BuildInstruction.Direction = direction;
+            }
+        }
+    }
+
+    public float HeightLevel
+    {
+        get
+        {
+            return heightLevel;
+        }
+        set
+        {
+            heightLevel = value;
+
+            if (CanBeBuilt)
+            {
+                if (BuildInstruction == null)
+                    SetupBuildInstruction();
+                else
+                    BuildInstruction.HeightLevel = heightLevel;
+            }
+        }
+    }
+
+    public BuildInstruction BuildInstruction
+    {
+        get
+        {
+            if (CanBeBuilt)
+                return buildInstruction;
+            else
+                return null;
+        }
+        set
+        {
+            buildInstruction = value;
+        }
+    }
+
+    public bool CanBeBuilt { get => !isPreviewObject; }
+
+    public bool IsBuilt { get => CanBeBuilt && gameObject.activeSelf; }
 
     public bool Hidden { get; private set; }
 
@@ -65,10 +152,38 @@ public class HexObject : LevelObject, IGridObject
         if (meshRend == null)
             meshRend = childObj.GetComponent<MeshRenderer>();
 
-        //if (!HexMesh.imported)
-        //    childObj.transform.rotation = Quaternion.Euler(0, 0, 0);
-
         mainLayer = childObj.layer;
+    }
+
+    private void SetupBuildInstruction()
+    {
+        if (buildInstruction == null)
+        {
+            BuildInstruction =
+                new BuildInstruction(HexMesh, Coordinates, Direction, HeightLevel);
+        }
+    }
+
+    public void Build()
+    {
+        // TODO: Grid needs to know about this
+
+        if (BuildInstruction != null)
+        {
+            SetHexMesh(buildInstruction.HexMesh);
+            Coordinates = buildInstruction.Cell;
+            Direction = buildInstruction.Direction;
+            HeightLevel = buildInstruction.HeightLevel;
+
+            Vector3 newPosition = GameManager.Instance.Grid.GetCellCenterWorld(Coordinates, false);
+            newPosition.y += (HeightLevel - 1) * GameManager.Instance.Grid.CellHeight;
+            transform.position = newPosition;
+
+            // TODO: Rotation
+
+            Hide(false);
+            gameObject.SetActive(true);
+        }
     }
 
     public void SetHexMesh(HexMeshScriptableObject hexMesh)
@@ -91,8 +206,10 @@ public class HexObject : LevelObject, IGridObject
         int scaleZ = HexMesh.imported ? 1 : (HexMesh.flipZ ? -1 : 1);
         childObj.transform.localScale = new Vector3(scaleX, scaleY, scaleZ);
 
-        //float xAxis = HexMesh.imported ? -90 : 0;
-        //childObj.transform.rotation = Quaternion.Euler(xAxis, 0, 0);
+        if (BuildInstruction == null)
+            SetupBuildInstruction();
+        else
+            BuildInstruction.HexMesh = HexMesh;
     }
 
     public void SetMaterial(Material material, bool disableShadows)

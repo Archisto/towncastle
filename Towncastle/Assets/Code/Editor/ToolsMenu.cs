@@ -31,6 +31,44 @@ public class ToolsMenu : ScriptableObject
         }
     }
 
+    [MenuItem("Tools/Hex Objects/Print All Build Instructions")]
+    static void PrintBuildInstructionsOfBuiltObjects()
+    {
+        HexObject[] hexObjects = FindObjectsOfType<HexObject>();
+        foreach (HexObject hexObj in hexObjects)
+        {
+            if (hexObj.IsBuilt)
+            {
+                Debug.Log(hexObj.name + ": " + hexObj.BuildInstruction.ToString());
+            }
+        }
+    }
+
+    [MenuItem("Tools/Hex Objects/Copy Random Object To Random Cell")]
+    static void CopyRandomObjectToRandomCell()
+    {
+        HexObject[] hexObjects = FindObjectsOfType<HexObject>();
+        BuildInstruction instruction = null;
+        foreach (HexObject hexObj in hexObjects)
+        {
+            if (hexObj.IsBuilt)
+            {
+                instruction = hexObj.BuildInstruction;
+                break;
+            }
+        }
+
+        if (instruction != null)
+        {
+            int randX = UnityEngine.Random.Range(0, GameManager.Instance.Grid.GridSizeX);
+            int randY = UnityEngine.Random.Range(0, GameManager.Instance.Grid.GridSizeY);
+            instruction.Cell = new Vector2Int(randX, randY);
+            FindObjectOfType<ObjectPlacer>().TryPlaceObject(instruction);
+        }
+        else
+            Debug.LogError("Couldn't get a BuildInstruction");
+    }
+
     [MenuItem("Tools/Test/Binary Test")]
     static void BinaryTest()
     {

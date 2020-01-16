@@ -339,7 +339,9 @@ public class ObjectPlacer : MonoBehaviour
         grid.HideAllObjects(hide);
     }
 
-    public void TryPlaceObject(Vector2Int cell, bool removeObj)
+    public bool TryPlaceObject(Vector2Int cell,
+                               bool removeObj,
+                               BuildInstruction buildInstruction = null)
     {
         if (grid.CellExists(cell))
         {
@@ -352,7 +354,12 @@ public class ObjectPlacer : MonoBehaviour
 
             if (!removeObj)// && cellAvailable)
             {
-                AddObjectToGridCell(cell, HeightLevel);
+                if (buildInstruction != null)
+                    AddObjectToGridCell(buildInstruction);
+                else
+                    AddObjectToGridCell(cell, HeightLevel);
+
+                return true;
             }
             //else if (removeObj && !cellIsEmpty)
             //{
@@ -372,6 +379,8 @@ public class ObjectPlacer : MonoBehaviour
                 }
 
                 RepositionPreviewObject(cell);
+
+                return true;
             }
             //else if (!removeObj && !cellIsEmpty)
             //{
@@ -384,12 +393,19 @@ public class ObjectPlacer : MonoBehaviour
                 Debug.LogWarning("Cannot perform action to cell: " + cell);
             }
         }
+
+        return false;
     }
 
     public void TryPlaceObject(Vector3 position, bool removeObj)
     {
         Vector2Int cell = grid.GetCellFromWorldPos(position);
         TryPlaceObject(cell, removeObj);
+    }
+
+    public void TryPlaceObject(BuildInstruction buildInstruction)
+    {
+        TryPlaceObject(Vector2Int.zero, false, buildInstruction);
     }
 
     private void AddObjectToGridCell(Vector2Int cell, float heightLevel)
@@ -409,11 +425,33 @@ public class ObjectPlacer : MonoBehaviour
         }
     }
 
-    private void PlaceObject(HexObject hexObj, Vector2Int cell, float heightLevel, bool addToGrid)
+    private void AddObjectToGridCell(BuildInstruction buildInstruction)
+    {
+        HexObject newObj = hexObjPool.GetPooledObject(false);
+
+        if (newObj != null)
+        {
+            newObj.SetHexMesh(buildInstruction.HexMesh);
+            PlaceObjectUsingBuildInstruction(newObj, buildInstruction);
+
+            return;
+        }
+        else
+        {
+            Debug.LogWarning("No more objects to add");
+        }
+    }
+
+    private void PlaceObject(HexObject hexObj,
+                             Vector2Int cell,
+                             float rotationY,
+                             float heightLevel,
+                             bool addToGrid)
     {
         // TODO: Just use whatever position and rotation the preview object has?
 
         hexObj.Coordinates = cell;
+        hexObj.HeightLevel = heightLevel;
 
         Vector3 newPosition = grid.GetCellCenterWorld(cell, defaultYAxis: false);
         newPosition.y +=
@@ -423,11 +461,25 @@ public class ObjectPlacer : MonoBehaviour
         if (addToGrid)
         {
             hexObj.Direction = CurrentDirection;
-            SetRotationForObject(hexObj);
+            SetRotationForObject(hexObj, rotationY);
             hexObj.gameObject.SetActive(true);
             grid.EditCell(cell, hexObj);
             RepositionPreviewObject(cell);
         }
+    }
+
+    private void PlaceObject(HexObject hexObj, Vector2Int cell, float heightLevel, bool addToGrid)
+    {
+        PlaceObject(hexObj, cell, objRotation, heightLevel, addToGrid);
+    }
+
+    private void PlaceObjectUsingBuildInstruction(HexObject hexObj, BuildInstruction buildInstruction)
+    {
+        PlaceObject(hexObj,
+                    buildInstruction.Cell,
+                    Utils.AngleFromHexDirection(buildInstruction.Direction),
+                    buildInstruction.HeightLevel,
+                    true);
     }
 
     public void ChangeRotationForNextObject(Utils.Direction direction)
@@ -480,17 +532,22 @@ public class ObjectPlacer : MonoBehaviour
         }
     }
 
-    public void SetRotationForObject(HexObject hexObj)
+    public void SetRotationForObject(HexObject hexObj, float rotationY)
     {
         Vector3 newRotation = hexObj.transform.rotation.eulerAngles;
 
-        float rotY = objRotation +
+        float rotY = rotationY +
                      hexObj.HexMesh.defaultRotationY +
                      Utils.AngleFromHexDirectionToAnother
                         (Utils.HexDirection.Right, hexObj.HexMesh.mainDirection); // Right is the world main direction
 
         newRotation.y = rotY;
         hexObj.transform.rotation = Quaternion.Euler(newRotation);
+    }
+
+    public void SetRotationForObject(HexObject hexObj)
+    {
+        SetRotationForObject(hexObj, objRotation);
     }
 
     public void SetSimpleRotationForObject(GameObject obj)
