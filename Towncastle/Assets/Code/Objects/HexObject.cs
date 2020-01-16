@@ -49,13 +49,8 @@ public class HexObject : LevelObject, IGridObject
         {
             coordinates = value;
 
-            if (CanBeBuilt)
-            {
-                if (BuildInstruction == null)
-                    SetupBuildInstruction();
-                else
-                    BuildInstruction.Cell = coordinates;
-            }
+            if (CanBeBuilt && !SetupBuildInstruction())
+                BuildInstruction.Cell = coordinates;
         }
     }
 
@@ -69,13 +64,8 @@ public class HexObject : LevelObject, IGridObject
         {
             direction = value;
 
-            if (CanBeBuilt)
-            {
-                if (BuildInstruction == null)
-                    SetupBuildInstruction();
-                else
-                    BuildInstruction.Direction = direction;
-            }
+            if (CanBeBuilt && !SetupBuildInstruction())
+                BuildInstruction.Direction = direction;
         }
     }
 
@@ -89,13 +79,8 @@ public class HexObject : LevelObject, IGridObject
         {
             heightLevel = value;
 
-            if (CanBeBuilt)
-            {
-                if (BuildInstruction == null)
-                    SetupBuildInstruction();
-                else
-                    BuildInstruction.HeightLevel = heightLevel;
-            }
+            if (CanBeBuilt && !SetupBuildInstruction())
+                BuildInstruction.HeightLevel = heightLevel;
         }
     }
 
@@ -155,18 +140,23 @@ public class HexObject : LevelObject, IGridObject
         mainLayer = childObj.layer;
     }
 
-    private void SetupBuildInstruction()
+    private bool SetupBuildInstruction()
     {
         if (buildInstruction == null)
         {
             BuildInstruction =
                 new BuildInstruction(HexMesh, Coordinates, Direction, HeightLevel);
+            return true;
         }
+
+        return false;
     }
 
     public void Build()
     {
-        // TODO: Grid needs to know about this
+        // TODO: Is this needed? ObjectPlacer handles building.
+
+        // Grid needs to know about this
 
         if (BuildInstruction != null)
         {
@@ -206,9 +196,7 @@ public class HexObject : LevelObject, IGridObject
         int scaleZ = HexMesh.imported ? 1 : (HexMesh.flipZ ? -1 : 1);
         childObj.transform.localScale = new Vector3(scaleX, scaleY, scaleZ);
 
-        if (BuildInstruction == null)
-            SetupBuildInstruction();
-        else
+        if (!SetupBuildInstruction())
             BuildInstruction.HexMesh = HexMesh;
     }
 

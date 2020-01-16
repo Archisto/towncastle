@@ -25,7 +25,10 @@ namespace Towncastle.UI
         public void ActivateOptionsMenu()
         {
             // TODO
+        }
 
+        public void ActivateInputHelp()
+        {
             ui.ToggleHelp();
         }
 
