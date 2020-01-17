@@ -10,11 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c2c12c3f29d7d34a86252a7392a9ecd, type: 3}
-  m_Name: Cylinder
+  m_Name: SlabTop
   m_EditorClassIdentifier: 
-  mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
-  imported: 0
-  structureType: 6
+  mesh: {fileID: -7158247418717641203, guid: 511575ac9abbed14e828bdd0ba0e136e, type: 3}
+  imported: 1
+  structureType: 3
   mainDirection: 1
-  defaultRotationY: 90
-  defaultPositionY: 0.5
+  halfHeight: 0
+  defaultRotationY: 0
+  defaultPositionY: 1.75
+  flipX: 0
+  flipZ: 0

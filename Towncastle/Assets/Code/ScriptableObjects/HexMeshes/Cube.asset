@@ -16,5 +16,8 @@ MonoBehaviour:
   imported: 0
   structureType: 6
   mainDirection: 1
+  halfHeight: 1
   defaultRotationY: 90
   defaultPositionY: 0.5
+  flipX: 0
+  flipZ: 0

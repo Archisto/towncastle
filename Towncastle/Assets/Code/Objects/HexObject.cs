@@ -178,8 +178,8 @@ public class HexObject : LevelObject, IGridObject
 
     public void SetHexMesh(HexMeshScriptableObject hexMesh)
     {
-        // TODO: Change hitbox also
-        // TODO: Weird rotations, with child object especially
+        // TODO: Change hitbox also (half height is a start) (cube & cylinder broken)
+        // TODO: Weird rotations, with child object especially. Test different main directions.
 
         HexMesh = hexMesh;
 
@@ -190,6 +190,10 @@ public class HexObject : LevelObject, IGridObject
             meshFilter = childObj.GetComponent<MeshFilter>();
 
         meshFilter.mesh = hexMesh.mesh;
+
+        Vector3 newRotation = childObj.transform.rotation.eulerAngles;
+        newRotation.x = (HexMesh.imported ? -90 : 0);
+        childObj.transform.rotation = Quaternion.Euler(newRotation);
 
         int scaleX = HexMesh.flipX ? -1 : 1;
         int scaleY = HexMesh.imported ? (HexMesh.flipZ ? -1 : 1) : 1;

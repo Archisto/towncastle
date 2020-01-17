@@ -51777,7 +51777,7 @@ MonoBehaviour:
   gridSizeY: 20
   cellSize: 1.905
   cellHeight: 2
-  maxHeightLevel: 5
+  maxHeightLevel: 10
   hexBases:
   - {fileID: 1943464287}
   - {fileID: 977029430}
@@ -52674,7 +52674,7 @@ PrefabInstance:
     - target: {fileID: 8795464568863911462, guid: 2c11c4cdabb06d64d9dbb3740b55e033,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 19.92
+      value: 23.16
       objectReference: {fileID: 0}
     - target: {fileID: 8795464568863911462, guid: 2c11c4cdabb06d64d9dbb3740b55e033,
         type: 3}
