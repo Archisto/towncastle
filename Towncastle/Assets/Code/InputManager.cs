@@ -237,6 +237,14 @@ public class InputManager : MonoBehaviour
                 }
             }
         }
+        // Match height
+        else if (hideObjInput.PressedDown)
+        {
+            // TODO: Annoyingly preview movement and height change happen in different frames
+
+            if (mouse.SelectedObject is HexObject)
+                objPlacer.HeightLevel = mouse.SelectedObject.HeightLevel;
+        }
 
         // NUMBER KEYS
 

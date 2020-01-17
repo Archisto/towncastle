@@ -318,6 +318,7 @@ public class ObjectPlacer : MonoBehaviour
     {
         if (grid.CellExists(cell))
         {
+            // Add
             if (!removeObj)
             {
                 // Adds an object according to the build instruction
@@ -387,19 +388,21 @@ public class ObjectPlacer : MonoBehaviour
             bool stopAtOneAndHalf = (HeightLevel % 1 != 0) && !currentHexMesh.halfHeight;
             for (height = HeightLevel; height >= (stopAtOneAndHalf ? 1.5f : 1f); height -= heightStep)
             {
-                AddObjectToGridCell(cell, height);
+                if (!AddObjectToGridCell(cell, height))
+                    break;
             }
         }
         else
         {
             for (height = 1; height <= grid.MaxHeightLevel; height += heightStep)
             {
-                AddObjectToGridCell(cell, height);
+                if (!AddObjectToGridCell(cell, height))
+                    break;
             }
         }
     }
 
-    private void AddObjectToGridCell(Vector2Int cell, float heightLevel)
+    private bool AddObjectToGridCell(Vector2Int cell, float heightLevel)
     {
         HexObject newObj = hexObjPool.GetPooledObject(false);
 
@@ -407,16 +410,16 @@ public class ObjectPlacer : MonoBehaviour
         {
             newObj.SetHexMesh(catalog.GetHexMesh(currentHexMeshIndex));
             PlaceObject(newObj, cell, heightLevel, true);
-
-            return;
+            return true;
         }
         else
         {
             Debug.LogWarning("No more objects to add");
+            return false;
         }
     }
 
-    private void AddObjectToGridCell(BuildInstruction buildInstruction)
+    private bool AddObjectToGridCell(BuildInstruction buildInstruction)
     {
         HexObject newObj = hexObjPool.GetPooledObject(false);
 
@@ -424,12 +427,12 @@ public class ObjectPlacer : MonoBehaviour
         {
             newObj.SetHexMesh(buildInstruction.HexMesh);
             PlaceObjectUsingBuildInstruction(newObj, buildInstruction);
-
-            return;
+            return true;
         }
         else
         {
             Debug.LogWarning("No more objects to add");
+            return false;
         }
     }
 
@@ -439,8 +442,6 @@ public class ObjectPlacer : MonoBehaviour
                              float heightLevel,
                              bool build)
     {
-        // TODO: Just use whatever position and rotation the preview object has?
-
         hexObj.Coordinates = cell;
         hexObj.HeightLevel = heightLevel;
 

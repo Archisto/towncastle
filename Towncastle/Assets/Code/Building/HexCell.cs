@@ -11,6 +11,8 @@ public class HexCell : IGridObject
 
     public Vector2Int Coordinates { get; set; }
 
+    public float HeightLevel { get => 1; set { } }
+
     public bool IsEmpty
     {
         get => totalObjectCount == 0;

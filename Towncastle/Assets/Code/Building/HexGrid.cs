@@ -302,21 +302,28 @@ public class HexGrid : MonoBehaviour
         {
             cells[coordinates.y][coordinates.x].PlaceObject(hexObject, heightLevelRounded);
         }
-        // Remove
+        // Remove if not hidden
         else if (hexObject == null && !cells[coordinates.y][coordinates.x].IsEmpty)
         {
-            RemoveObjects(coordinates, heightLevelRounded);
+            RemoveObjects(coordinates, false, heightLevelRounded);
         }
     }
 
-    private void RemoveObjects(Vector2Int coordinates, int heightLevelRounded = 0)
+    private void RemoveObjects(Vector2Int coordinates, bool removeHidden, int heightLevelRounded = 0)
     {
+        HexBase hexBase = GetHexBaseInCell(coordinates.x, coordinates.y);
+
+        if (hexBase.ObjectsHidden && !removeHidden)
+            return;
+
+        // Full height
         if (heightLevelRounded == 0)
         {
             cells[coordinates.y][coordinates.x].RemoveAllObjects();
-            GetHexBaseInCell(coordinates.x, coordinates.y).ObjectsHidden(false);
+            hexBase.ObjectsHidden = false;
             Debug.Log("Cell " + coordinates + " is now empty");
         }
+        // Selected height
         else
         {
             bool success = cells[coordinates.y][coordinates.x].RemoveObjects(heightLevelRounded);
@@ -449,7 +456,7 @@ public class HexGrid : MonoBehaviour
             return;
 
         cells[cell.y][cell.x].ActionToAllObjects<HexObject>(hexObj => hexObj.Hide(hide));
-        GetHexBaseInCell(cell.x, cell.y).ObjectsHidden(hide);
+        GetHexBaseInCell(cell.x, cell.y).ObjectsHidden = hide;
     }
 
     public void HideAllObjects(bool hide)
@@ -459,7 +466,7 @@ public class HexGrid : MonoBehaviour
             for (int x = 0; x < GridSizeX; x++)
             {
                 cells[y][x].ActionToAllObjects<HexObject>(hexObj => hexObj.Hide(hide));
-                GetHexBaseInCell(x, y).ObjectsHidden(hide);
+                GetHexBaseInCell(x, y).ObjectsHidden = hide;
             }
         }
     }
@@ -471,7 +478,7 @@ public class HexGrid : MonoBehaviour
             for (int x = 0; x < GridSizeX; x++)
             {
                 cells[y][x].RemoveAllObjects();
-                GetHexBaseInCell(x, y).ObjectsHidden(false);
+                GetHexBaseInCell(x, y).ObjectsHidden = false;
             }
         }
     }

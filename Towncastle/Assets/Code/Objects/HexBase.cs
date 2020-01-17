@@ -19,12 +19,31 @@ public class HexBase : MonoBehaviour, IGridObject
     public Material containsHiddenObjsMaterial;
 
     private MeshRenderer meshRend;
+    private bool objectsHidden;
 
     public Vector2Int Coordinates { get => coordinates; set => coordinates = value; }
+
+    public float HeightLevel { get => 1; set { } }
 
     public float Y { get => transform.position.y; }
 
     public HexGrid HexGrid { get; set; }
+
+    public bool ObjectsHidden
+    {
+        get
+        {
+            return objectsHidden;
+        }
+        set
+        {
+            if (containsHiddenObjsMaterial == null)
+                return;
+
+            objectsHidden = value;
+            meshRend.material = (value ? containsHiddenObjsMaterial : mainMaterial);
+        }
+    }
 
     private void Start()
     {
@@ -39,13 +58,5 @@ public class HexBase : MonoBehaviour, IGridObject
         Vector3 newPosition = transform.position;
         newPosition.y = HexGrid.GetYWhereHitAbove(newPosition);
         transform.position = newPosition;
-    }
-
-    public void ObjectsHidden(bool hidden)
-    {
-        if (containsHiddenObjsMaterial == null)
-            return;
-
-        meshRend.material = (hidden ? containsHiddenObjsMaterial : mainMaterial);
     }
 }
