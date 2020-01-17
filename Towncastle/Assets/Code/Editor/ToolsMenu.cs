@@ -145,9 +145,9 @@ public class ToolsMenu : ScriptableObject
         int a = 0b_11011011;
         int b = 0b_01101010;
         int c = a ^ b;        // 10110001
-        Debug.Log(string.Format("C: {0}", Binary(c)));
+        //Debug.Log(string.Format("C: {0}", Binary(c)));
 
-        //Debug.Log(string.Format("Please edit ToolsMenu.Print()"));
+        Debug.Log(string.Format("Please edit ToolsMenu.Print()"));
     }
 
     static string Binary(int number)

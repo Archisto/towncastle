@@ -33,10 +33,10 @@ namespace Towncastle.Editor
         {
             if (GUILayout.Button("Print Build Instruction"))
             {
-                if (targetHexObject.CanBeBuilt)
+                if (targetHexObject.IsBuilt)
                     Debug.Log(targetHexObject.BuildInstruction.ToString());
                 else
-                    Debug.LogWarning("Object is not buildable");
+                    Debug.LogWarning("Object is not built.");
             }
         }
     }

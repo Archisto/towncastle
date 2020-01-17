@@ -73,7 +73,7 @@ public class ObjectPlacer : MonoBehaviour
     private Pool<PlacerObject> placerObjAltPool;
     private PlacerObject[] activeAltPlacerObjs;
 
-    private int currentHexMesh = 0;
+    private int currentHexMeshIndex = 0;
     private float objRotation = 0;
 
     public Utils.HexDirection CurrentDirection { get; private set; }
@@ -100,7 +100,9 @@ public class ObjectPlacer : MonoBehaviour
         }
     }
 
-    public int HeightLevelRounded { get => (int)(HeightLevel + 0.5f); }
+    public int HeightLevelRoundedUp { get => (int)(HeightLevel + 0.5f); }
+
+    public int HeightLevelRoundedDown { get => (int)HeightLevel; }
 
     /// <summary>
     /// Start is called before the first frame update.
@@ -129,7 +131,7 @@ public class ObjectPlacer : MonoBehaviour
 
     private void InitPreviewObject()
     {
-        PreviewObj.SetHexMesh(catalog.GetHexMesh(currentHexMesh));
+        PreviewObj.SetHexMesh(catalog.GetHexMesh(currentHexMeshIndex));
         SetRotationForObject(PreviewObj);
 
         if (placerObjMain != null)
@@ -186,7 +188,7 @@ public class ObjectPlacer : MonoBehaviour
     {
         if (PreviewObj != null)
         {
-            PreviewObj.SetHexMesh(catalog.GetHexMesh(currentHexMesh));
+            PreviewObj.SetHexMesh(catalog.GetHexMesh(currentHexMeshIndex));
             RepositionPreviewObject(PreviewObj.Coordinates);
             SetRotationForObject(PreviewObj);
         }
@@ -200,7 +202,7 @@ public class ObjectPlacer : MonoBehaviour
         {
             DisableAllAltPlacerObjects();
 
-            for (int i = 0; i < HeightLevelRounded && i < activeAltPlacerObjs.Length + 1; i++)
+            for (int i = 0; i < HeightLevelRoundedUp && i < activeAltPlacerObjs.Length + 1; i++)
             {
                 // Top to bottom
                 bool topLevel = (i == 0);
@@ -238,7 +240,7 @@ public class ObjectPlacer : MonoBehaviour
     {
         // Top to bottom
         Vector3 newPosition = PreviewObj.transform.position;
-        newPosition.y = ((snapToFullHeight ?  HeightLevelRounded : HeightLevel) - (distFromGround + 1)) * grid.CellHeight;
+        newPosition.y = ((snapToFullHeight ?  HeightLevelRoundedUp : HeightLevel) - (distFromGround + 1)) * grid.CellHeight;
         placerObject.transform.position = newPosition;
 
         SetSimpleRotationForObject(placerObject.gameObject);
@@ -271,11 +273,11 @@ public class ObjectPlacer : MonoBehaviour
     {
         if (catalog != null && catalog.HexMeshCount > 1)
         {
-            currentHexMesh += next ? 1 : -1;
-            if (currentHexMesh >= catalog.HexMeshCount)
-                currentHexMesh = 0;
-            else if (currentHexMesh < 0)
-                currentHexMesh = catalog.HexMeshCount - 1;
+            currentHexMeshIndex += next ? 1 : -1;
+            if (currentHexMeshIndex >= catalog.HexMeshCount)
+                currentHexMeshIndex = 0;
+            else if (currentHexMeshIndex < 0)
+                currentHexMeshIndex = catalog.HexMeshCount - 1;
 
             UpdatePreviewObjectHexMesh();
         }
@@ -295,7 +297,7 @@ public class ObjectPlacer : MonoBehaviour
         {
             if (hexObject.HexMesh == catalog.GetHexMesh(i))
             {
-                currentHexMesh = i;
+                currentHexMeshIndex = i;
                 break;
             }
         }
@@ -309,83 +311,48 @@ public class ObjectPlacer : MonoBehaviour
         PickObject(hexObject);
     }
 
-    public bool HideAllObjectsInCell(Vector2Int cell, bool hide)
-    {
-        bool success = false;
-
-        foreach (HexObject hexObj in hexObjsInPool)
-        {
-            if (hexObj.gameObject.activeSelf && hexObj.Coordinates == cell)
-            {
-                hexObj.Hide(hide);
-                success = true;
-            }
-        }
-
-        return success;
-    }
-
-    public void HideAllObjectsDebug(bool hide)
-    {
-        foreach (HexObject hexObj in hexObjsInPool)
-        {
-            if (hexObj.gameObject.activeSelf)
-                hexObj.Hide(hide);
-        }
-    }
-
-    public void HideAllObjects(bool hide)
-    {
-        grid.HideAllObjects(hide);
-    }
-
     public bool TryPlaceObject(Vector2Int cell,
+                               bool fullHeight,
                                bool removeObj,
                                BuildInstruction buildInstruction = null)
     {
         if (grid.CellExists(cell))
         {
-            bool cellIsEmpty = grid.CellIsEmpty(cell);
-            bool cellAvailable = grid.CellIsAvailable(cell, catalog.GetHexMesh(currentHexMesh).structureType);
-
-            // Testing:
-            // - Nothing prevents placing
-            // - Height level can be changed manually
-
-            if (!removeObj)// && cellAvailable)
+            if (!removeObj)
             {
+                // Adds an object according to the build instruction
                 if (buildInstruction != null)
+                {
                     AddObjectToGridCell(buildInstruction);
+                }
+                // Adds objects to the cell in all height levels
+                // if on the ground level or all the way down if not
+                else if (fullHeight)
+                    BuildTower(cell);
+
+                // Add a single objects to the cell on the selected height level
                 else
                     AddObjectToGridCell(cell, HeightLevel);
 
                 return true;
             }
-            //else if (removeObj && !cellIsEmpty)
-            //{
-            //    grid.EditCell(cell, null);
-            //    RepositionPreviewObject(cell);
-            //}
+            // Remove
             else if (removeObj)
             {
-                // TESTING: Removes all objects in cell, even untracked ones
-
-                grid.EditCell(cell, null);
-
-                foreach (HexObject hexObj in hexObjsInPool)
+                // Removes all objects in cell from all height levels
+                if (fullHeight)
                 {
-                    if (hexObj.gameObject.activeSelf && hexObj.Coordinates == cell)
-                        hexObjPool.ReturnObject(hexObj);
+                    grid.EditCell(cell, null, 0);
+                }
+                // Removes all objects in cell from the selected rounded height level
+                else
+                {
+                    grid.EditCell(cell, null, HeightLevelRoundedDown);
                 }
 
                 RepositionPreviewObject(cell);
-
                 return true;
             }
-            //else if (!removeObj && !cellIsEmpty)
-            //{
-            //    AddObjectToGridCell(cell, 2);
-            //}
             else
             {
                 // TODO: Make it possible to remove [heightLevel > 1] objects
@@ -400,12 +367,36 @@ public class ObjectPlacer : MonoBehaviour
     public void TryPlaceObject(Vector3 position, bool removeObj)
     {
         Vector2Int cell = grid.GetCellFromWorldPos(position);
-        TryPlaceObject(cell, removeObj);
+        TryPlaceObject(cell, false, removeObj);
     }
 
     public void TryPlaceObject(BuildInstruction buildInstruction)
     {
-        TryPlaceObject(Vector2Int.zero, false, buildInstruction);
+        TryPlaceObject(Vector2Int.zero, false, false, buildInstruction);
+    }
+
+    private void BuildTower(Vector2Int cell)
+    {
+        HexMeshScriptableObject currentHexMesh = catalog.GetHexMesh(currentHexMeshIndex);
+
+        float height;
+        float heightStep = currentHexMesh.halfHeight ? 0.5f : 1f;
+
+        if (HeightLevel > 1)
+        {
+            bool stopAtOneAndHalf = (HeightLevel % 1 != 0) && !currentHexMesh.halfHeight;
+            for (height = HeightLevel; height >= (stopAtOneAndHalf ? 1.5f : 1f); height -= heightStep)
+            {
+                AddObjectToGridCell(cell, height);
+            }
+        }
+        else
+        {
+            for (height = 1; height <= grid.MaxHeightLevel; height += heightStep)
+            {
+                AddObjectToGridCell(cell, height);
+            }
+        }
     }
 
     private void AddObjectToGridCell(Vector2Int cell, float heightLevel)
@@ -414,7 +405,7 @@ public class ObjectPlacer : MonoBehaviour
 
         if (newObj != null)
         {
-            newObj.SetHexMesh(catalog.GetHexMesh(currentHexMesh));
+            newObj.SetHexMesh(catalog.GetHexMesh(currentHexMeshIndex));
             PlaceObject(newObj, cell, heightLevel, true);
 
             return;
@@ -446,7 +437,7 @@ public class ObjectPlacer : MonoBehaviour
                              Vector2Int cell,
                              float rotationY,
                              float heightLevel,
-                             bool addToGrid)
+                             bool build)
     {
         // TODO: Just use whatever position and rotation the preview object has?
 
@@ -458,19 +449,19 @@ public class ObjectPlacer : MonoBehaviour
             hexObj.HexMesh.defaultPositionY + (heightLevel - 1) * grid.CellHeight;
         hexObj.transform.position = newPosition;
 
-        if (addToGrid)
+        if (build)
         {
             hexObj.Direction = CurrentDirection;
             SetRotationForObject(hexObj, rotationY);
             hexObj.gameObject.SetActive(true);
-            grid.EditCell(cell, hexObj);
+            grid.EditCell(cell, hexObj, (int)heightLevel); // Height level is rounded down
             RepositionPreviewObject(cell);
         }
     }
 
-    private void PlaceObject(HexObject hexObj, Vector2Int cell, float heightLevel, bool addToGrid)
+    private void PlaceObject(HexObject hexObj, Vector2Int cell, float heightLevel, bool build)
     {
-        PlaceObject(hexObj, cell, objRotation, heightLevel, addToGrid);
+        PlaceObject(hexObj, cell, objRotation, heightLevel, build);
     }
 
     private void PlaceObjectUsingBuildInstruction(HexObject hexObj, BuildInstruction buildInstruction)
@@ -577,7 +568,7 @@ public class ObjectPlacer : MonoBehaviour
         if (catalog == null || catalog.HexMeshCount == 0)
             return "Can't access object catalog or it is empty.";
 
-        HexMeshScriptableObject hexMesh = catalog.GetHexMesh(currentHexMesh);
+        HexMeshScriptableObject hexMesh = catalog.GetHexMesh(currentHexMeshIndex);
 
         return string.Format("Selected item: {0} ({1})\nDirection: {2}\nHeight level: {3}",
             hexMesh.name, hexMesh.structureType, CurrentDirection, HeightLevel);

@@ -96,7 +96,7 @@ public class HexGrid : MonoBehaviour
             HexCell[] row = new HexCell[GridSizeX];
             for (int x = 0; x < row.Length; x++)
             {
-                row[x] = new HexCell(x, y);
+                row[x] = new HexCell(x, y, MaxHeightLevel);
             }
 
             cells.Add(row);
@@ -286,30 +286,46 @@ public class HexGrid : MonoBehaviour
         return CellIsEmpty(coordinates.x, coordinates.y);
     }
 
-    public bool CellIsAvailable(Vector2Int coordinates, HexObject.StructureType objectType)
+    /// <summary>
+    /// Adds an object to or removes an object from a cell.
+    /// The rounded height level determines to which
+    /// height level list does the object belong.
+    /// </summary>
+    /// <param name="coordinates">The grid coordinates</param>
+    /// <param name="hexObject">The object to add or null to remove</param>
+    /// <param name="heightLevelRounded">The rounded height level.
+    /// Can be 0 only when removing (removes all height levels).</param>
+    public void EditCell(Vector2Int coordinates, HexObject hexObject, int heightLevelRounded)
     {
-        if (!CellExists(coordinates))
-            return false;
-
-        return cells[coordinates.y][coordinates.x].IsAvailableForType(objectType);
+        // Add
+        if (hexObject != null)
+        {
+            cells[coordinates.y][coordinates.x].PlaceObject(hexObject, heightLevelRounded);
+        }
+        // Remove
+        else if (hexObject == null && !cells[coordinates.y][coordinates.x].IsEmpty)
+        {
+            RemoveObjects(coordinates, heightLevelRounded);
+        }
     }
 
-    public void EditCell(Vector2Int coordinates, HexObject hexObject)
+    private void RemoveObjects(Vector2Int coordinates, int heightLevelRounded = 0)
     {
-        // TODO: Also other kinds of removing in addition to all in cell
-
-        if (hexObject == null && !cells[coordinates.y][coordinates.x].IsEmpty)
+        if (heightLevelRounded == 0)
         {
             cells[coordinates.y][coordinates.x].RemoveAllObjects();
             GetHexBaseInCell(coordinates.x, coordinates.y).ObjectsHidden(false);
-            //Debug.Log("Cell " + coordinates + " is now empty");
+            Debug.Log("Cell " + coordinates + " is now empty");
         }
-        else if (hexObject != null)
+        else
         {
-            //Debug.Log("Cell " + coordinates + ": " + obj.name);
-        }
+            bool success = cells[coordinates.y][coordinates.x].RemoveObjects(heightLevelRounded);
 
-        cells[coordinates.y][coordinates.x].PlaceObject(hexObject);
+            if (success)
+                Debug.Log(string.Format("Cell {0} (heightLevel: {1}) is now empty", coordinates, heightLevelRounded));
+            else
+                Debug.LogWarning(string.Format("There are no objects in cell {0} (heightLevel: {1})", coordinates, heightLevelRounded));
+        }
     }
 
     public Vector3 GetCellCenterWorld(int x, int y, bool defaultYAxis)

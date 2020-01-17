@@ -51754,7 +51754,7 @@ MonoBehaviour:
     type: 2}
   previewObjMaterialOccupied: {fileID: 2100000, guid: 4c829398dae5bd643a2c4b11fde10547,
     type: 2}
-  hexObjPoolSize: 500
+  hexObjPoolSize: 800
   initialHexDirection: 1
   objectsRemainingText: {fileID: 714052049}
 --- !u!114 &163602084740923219

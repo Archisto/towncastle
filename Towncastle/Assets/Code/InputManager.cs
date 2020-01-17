@@ -130,11 +130,7 @@ public class InputManager : MonoBehaviour
         showAllInput.Update();
         if (showAllInput.JustPressedDown)
         {
-            // TESTING: Shows all objects, even untracked ones
-            objPlacer.HideAllObjectsDebug(false);
-
-            // Not part of testing but still needed:
-            objPlacer.HideAllObjects(false);
+            grid.HideAllObjects(false);
         }
 
         resetInput.Update();
@@ -209,6 +205,8 @@ public class InputManager : MonoBehaviour
         bool remove = mouse.RightButtonReleased;
         if (add || remove)
         {
+            // TODO: Undergrid selection hitbox
+
             // If coordinates don't have to be actively selected,
             // the last valid coordinates remain
             bool activeSelectionRequired = false;
@@ -224,20 +222,18 @@ public class InputManager : MonoBehaviour
                 }
                 else if (hideObjInput.PressedDown)
                 {
-                    // TESTING: Hides all objects in cell, even untracked ones
-                    bool somethingWasHidden = objPlacer.HideAllObjectsInCell(mouse.Coordinates, true);
-                    if (somethingWasHidden)
-                    {
-                        HexBase hexBase = grid.GetHexBaseInCell(mouse.Coordinates.x, mouse.Coordinates.y);
-                        if (hexBase != null)
-                            hexBase.ObjectsHidden(true);
-                    }
-
-                    //grid.HideObjectsInCell(mouse.Coordinates, true);
+                    grid.HideObjectsInCell(mouse.Coordinates, true);
+                }
+                else if (alt3Input.PressedDown)
+                {
+                    if (add)
+                        objPlacer.TryPlaceObject(mouse.Coordinates, true, false);
+                    else if (remove)
+                        objPlacer.TryPlaceObject(mouse.Coordinates, true, true);
                 }
                 else
                 {
-                    objPlacer.TryPlaceObject(mouse.Coordinates, remove);
+                    objPlacer.TryPlaceObject(mouse.Coordinates, false, remove);
                 }
             }
         }

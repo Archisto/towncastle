@@ -49,7 +49,7 @@ public class HexObject : LevelObject, IGridObject
         {
             coordinates = value;
 
-            if (CanBeBuilt && !SetupBuildInstruction())
+            if (IsBuildable && !SetupBuildInstruction())
                 BuildInstruction.Cell = coordinates;
         }
     }
@@ -64,7 +64,7 @@ public class HexObject : LevelObject, IGridObject
         {
             direction = value;
 
-            if (CanBeBuilt && !SetupBuildInstruction())
+            if (IsBuildable && !SetupBuildInstruction())
                 BuildInstruction.Direction = direction;
         }
     }
@@ -79,7 +79,7 @@ public class HexObject : LevelObject, IGridObject
         {
             heightLevel = value;
 
-            if (CanBeBuilt && !SetupBuildInstruction())
+            if (IsBuildable && !SetupBuildInstruction())
                 BuildInstruction.HeightLevel = heightLevel;
         }
     }
@@ -88,7 +88,7 @@ public class HexObject : LevelObject, IGridObject
     {
         get
         {
-            if (CanBeBuilt)
+            if (IsBuildable)
                 return buildInstruction;
             else
                 return null;
@@ -99,9 +99,9 @@ public class HexObject : LevelObject, IGridObject
         }
     }
 
-    public bool CanBeBuilt { get => !isPreviewObject; }
+    public bool IsBuildable { get => !isPreviewObject; }
 
-    public bool IsBuilt { get => CanBeBuilt && gameObject.activeSelf; }
+    public bool IsBuilt { get => IsBuildable && gameObject.activeSelf; }
 
     public bool Hidden { get; private set; }
 
@@ -196,7 +196,7 @@ public class HexObject : LevelObject, IGridObject
         int scaleZ = HexMesh.imported ? 1 : (HexMesh.flipZ ? -1 : 1);
         childObj.transform.localScale = new Vector3(scaleX, scaleY, scaleZ);
 
-        if (!SetupBuildInstruction())
+        if (IsBuildable && !SetupBuildInstruction())
             BuildInstruction.HexMesh = HexMesh;
     }
 
