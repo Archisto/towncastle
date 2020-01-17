@@ -17,18 +17,41 @@ public class ToolsMenu : ScriptableObject
     [MenuItem("Tools/Create Stage Center")]
     static void CreateStageCenter()
     {
+        GameObject stageCenter = new GameObject("StageCenter");
+        Vector3 position = GetStageCenterPosition();
+        position.y = 2.5f;
+        stageCenter.transform.position = position;
+    }
+
+    [MenuItem("Tools/Move Selected Object To Stage Center")]
+    static void MoveSelectedToStageCenter()
+    {
+        GameObject selection = Selection.activeObject as GameObject;
+        if (selection != null)
+        {
+            Vector3 position = GetStageCenterPosition();
+            position.y = selection.transform.position.y;
+            selection.transform.position = position;
+
+            Debug.Log(string.Format("Grid center point: {0}", position));
+        }
+    }
+
+    private static Vector3 GetStageCenterPosition()
+    {
         HexGrid grid = FindObjectOfType<HexGrid>();
         if (grid != null && grid.GridSizeX > 0 && grid.GridSizeY > 0)
         {
-            GameObject stageCenter = new GameObject("StageCenter");
-            float x = 0.5f * grid.CellSize * (grid.GridSizeX - 1);
+            float x = 0.5f * grid.CellSize * (grid.GridSizeX - 1) + 0.25f * grid.CellSize;
             float z = 0.5f * grid.CellGapZ * (grid.GridSizeY - 1);
-            Vector3 position = grid.transform.position + new Vector3(x, 2.5f, z);
-            stageCenter.transform.position = position;
+            Vector3 position = grid.transform.position + new Vector3(x, 0, z);
 
-            Debug.Log(string.Format("GridSizeX: {0}, GridSizeY: {1}, CellSize: {2}, CellGapZ: {3}",
-                grid.GridSizeX, grid.GridSizeY, grid.CellSize, grid.CellGapZ));
+            Debug.Log(string.Format("Grid center: {0}", position));
+
+            return position;
         }
+
+        return Vector3.zero;
     }
 
     [MenuItem("Tools/Hex Objects/Print All Build Instructions")]

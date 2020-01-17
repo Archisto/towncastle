@@ -80,10 +80,15 @@ public class MouseController : MonoBehaviour
         if (Physics.Raycast(position, dir, out hit, maxDistance, mask))
         {
             Position = hit.point;
+            SelectingCoordinates = true;
 
-            SelectingCoordinates =
-                TrySelectHitObjectCoordinates<HexObject>(hit) ||
+            if (!TrySelectHitObjectCoordinates<HexObject>(hit))
                 TrySelectHitObjectCoordinates<HexBase>(hit);
+
+            // Cleaner but introduces a useless variable
+            //bool gridObjectHit =
+            //    TrySelectHitObjectCoordinates<HexObject>(hit) ||
+            //    TrySelectHitObjectCoordinates<HexBase>(hit);
         }
         else
         {

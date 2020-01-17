@@ -182,7 +182,10 @@ public class InputManager : MonoBehaviour
         if (!objPlacer.MultiSelectionActive)
         {
             HandleScrollWheelInput();
-            HandleObjPlacingInput();
+
+            if (mouse.SelectingCoordinates)
+                HandleObjPlacingInput();
+
             HandleModeSelectionInput();
             HandleMultiSelectionInput();
         }
@@ -257,36 +260,27 @@ public class InputManager : MonoBehaviour
 
         if (add || remove)
         {
-            // TODO: Undergrid selection hitbox
-
-            // If coordinates don't have to be actively selected,
-            // the last valid coordinates remain
-            bool activeSelectionRequired = false;
-
-            if (!activeSelectionRequired || mouse.SelectingCoordinates)
+            if (pickObjInput.PressedDown)
             {
-                if (pickObjInput.PressedDown)
-                {
-                    if (add)
-                        objPlacer.PickObject(mouse.SelectedObject as HexObject);
-                    else if (remove)
-                        objPlacer.MatchRotation(mouse.SelectedObject as HexObject);
-                }
-                else if (hideObjInput.PressedDown)
-                {
-                    grid.HideObjectsInCell(mouse.Coordinates, true);
-                }
-                else if (alt3Input.PressedDown)
-                {
-                    if (add)
-                        objPlacer.AddOrRemoveObject(mouse.Coordinates, true, false);
-                    else if (remove)
-                        objPlacer.AddOrRemoveObject(mouse.Coordinates, true, true);
-                }
-                else
-                {
-                    objPlacer.AddOrRemoveObject(mouse.Coordinates, false, remove);
-                }
+                if (add)
+                    objPlacer.PickObject(mouse.SelectedObject as HexObject);
+                else if (remove)
+                    objPlacer.MatchRotation(mouse.SelectedObject as HexObject);
+            }
+            else if (hideObjInput.PressedDown)
+            {
+                grid.HideObjectsInCell(mouse.Coordinates, true);
+            }
+            else if (alt3Input.PressedDown)
+            {
+                if (add)
+                    objPlacer.AddOrRemoveObject(mouse.Coordinates, true, false);
+                else if (remove)
+                    objPlacer.AddOrRemoveObject(mouse.Coordinates, true, true);
+            }
+            else
+            {
+                objPlacer.AddOrRemoveObject(mouse.Coordinates, false, remove);
             }
         }
         // Match height level

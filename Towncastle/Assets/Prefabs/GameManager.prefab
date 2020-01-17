@@ -17,7 +17,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &5962873498684166007
 Transform:
@@ -73,4 +73,4 @@ MonoBehaviour:
   mask:
     serializedVersion: 2
     m_Bits: 768
-  testObj: {fileID: 0}
+  cursorFollowerObj: {fileID: 0}
