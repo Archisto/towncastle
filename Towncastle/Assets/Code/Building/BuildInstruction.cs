@@ -21,6 +21,12 @@ public class BuildInstruction
         HeightLevel = heightLevel;
     }
 
+    public static BuildInstruction Default()
+    {
+        // TODO: HexMesh shouldn't be null
+        return new BuildInstruction(null, Vector2Int.zero, Utils.HexDirection.Right);
+    }
+
     public override string ToString()
     {
         return string.Format("HexMesh {0} at {1} (heightLevel: {2}) looking {3}",

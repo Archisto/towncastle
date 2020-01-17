@@ -5,12 +5,12 @@ using UnityEngine.UI;
 
 public class ObjectPlacer : MonoBehaviour
 {
-    private enum EditMode
+    public enum EditMode
     {
-        Edit, // Add and remove
-        Pick, // Copy object to preview
-        Hide,
-        Isolate // Hide all other objects
+        None,
+        Add,
+        Remove,
+        Hide
     }
 
     private enum PlacingMode
@@ -66,7 +66,7 @@ public class ObjectPlacer : MonoBehaviour
 
     private HexGrid grid;
     private ObjectCatalog catalog;
-    private Vector2Int coord;
+    private LineRenderer line;
 
     private Pool<HexObject> hexObjPool;
     private List<HexObject> hexObjsInPool;
@@ -75,10 +75,15 @@ public class ObjectPlacer : MonoBehaviour
 
     private int currentHexMeshIndex = 0;
     private float objRotation = 0;
+    private Vector2Int multiSelectionStartCell;
 
     public Utils.HexDirection CurrentDirection { get; private set; }
 
     public HexObject PreviewObj { get => previewObject; }
+
+    public bool MultiSelectionActive { get; private set; }
+
+    private HexMeshScriptableObject CurrentHexMesh { get => catalog.GetHexMesh(currentHexMeshIndex); }
 
     private float heightLevel = 1;
     public float HeightLevel
@@ -111,10 +116,12 @@ public class ObjectPlacer : MonoBehaviour
     {
         grid = GameManager.Instance.Grid;
         catalog = FindObjectOfType<ObjectCatalog>();
-        coord = new Vector2Int(-1, -1);
+        InitLine();
+        
         CurrentDirection = initialHexDirection;
         objRotation = Utils.AngleFromHexDirection(CurrentDirection);
         SetRotationForNextObject(CurrentDirection);
+        ResetMultiSelection();
 
         if (hexObjPrefab != null)
         {
@@ -131,7 +138,7 @@ public class ObjectPlacer : MonoBehaviour
 
     private void InitPreviewObject()
     {
-        PreviewObj.SetHexMesh(catalog.GetHexMesh(currentHexMeshIndex));
+        PreviewObj.SetHexMesh(CurrentHexMesh);
         SetRotationForObject(PreviewObj);
 
         if (placerObjMain != null)
@@ -139,6 +146,14 @@ public class ObjectPlacer : MonoBehaviour
             placerObjAltPool = new Pool<PlacerObject>(placerObjAltPrefab, grid.MaxHeightLevel, false);
             activeAltPlacerObjs = new PlacerObject[grid.MaxHeightLevel - 1];
         }
+    }
+
+    private void InitLine()
+    {
+        line = GetComponent<LineRenderer>();
+        line.enabled = false;
+
+        Debug.Log("Line initialized");
     }
 
     /// <summary>
@@ -188,7 +203,7 @@ public class ObjectPlacer : MonoBehaviour
     {
         if (PreviewObj != null)
         {
-            PreviewObj.SetHexMesh(catalog.GetHexMesh(currentHexMeshIndex));
+            PreviewObj.SetHexMesh(CurrentHexMesh);
             RepositionPreviewObject(PreviewObj.Coordinates);
             SetRotationForObject(PreviewObj);
         }
@@ -311,10 +326,10 @@ public class ObjectPlacer : MonoBehaviour
         PickObject(hexObject);
     }
 
-    public bool TryPlaceObject(Vector2Int cell,
-                               bool fullHeight,
-                               bool removeObj,
-                               BuildInstruction buildInstruction = null)
+    public bool AddOrRemoveObject(Vector2Int cell,
+                                  bool fullHeight,
+                                  bool removeObj,
+                                  BuildInstruction buildInstruction = null)
     {
         if (grid.CellExists(cell))
         {
@@ -331,7 +346,7 @@ public class ObjectPlacer : MonoBehaviour
                 else if (fullHeight)
                     BuildTower(cell);
 
-                // Add a single objects to the cell on the selected height level
+                // Add a single object to the cell on the selected height level
                 else
                     AddObjectToGridCell(cell, HeightLevel);
 
@@ -365,20 +380,20 @@ public class ObjectPlacer : MonoBehaviour
         return false;
     }
 
-    public void TryPlaceObject(Vector3 position, bool removeObj)
+    public void AddOrRemoveObject(Vector3 position, bool removeObj)
     {
         Vector2Int cell = grid.GetCellFromWorldPos(position);
-        TryPlaceObject(cell, false, removeObj);
+        AddOrRemoveObject(cell, fullHeight: false, removeObj);
     }
 
-    public void TryPlaceObject(BuildInstruction buildInstruction)
+    public void AddObject(BuildInstruction buildInstruction)
     {
-        TryPlaceObject(Vector2Int.zero, false, false, buildInstruction);
+        AddOrRemoveObject(Vector2Int.zero, false, false, buildInstruction);
     }
 
     private void BuildTower(Vector2Int cell)
     {
-        HexMeshScriptableObject currentHexMesh = catalog.GetHexMesh(currentHexMeshIndex);
+        HexMeshScriptableObject currentHexMesh = CurrentHexMesh;
 
         float height;
         float heightStep = currentHexMesh.halfHeight ? 0.5f : 1f;
@@ -408,7 +423,7 @@ public class ObjectPlacer : MonoBehaviour
 
         if (newObj != null)
         {
-            newObj.SetHexMesh(catalog.GetHexMesh(currentHexMeshIndex));
+            newObj.SetHexMesh(CurrentHexMesh);
             PlaceObject(newObj, cell, heightLevel, true);
             return true;
         }
@@ -569,10 +584,84 @@ public class ObjectPlacer : MonoBehaviour
         if (catalog == null || catalog.HexMeshCount == 0)
             return "Can't access object catalog or it is empty.";
 
-        HexMeshScriptableObject hexMesh = catalog.GetHexMesh(currentHexMeshIndex);
+        HexMeshScriptableObject hexMesh = CurrentHexMesh;
 
         return string.Format("Selected item: {0} ({1})\nDirection: {2}\nHeight level: {3}",
             hexMesh.name, hexMesh.structureType, CurrentDirection, HeightLevel);
+    }
+
+    public void StartMultiSelection(Vector2Int cell)
+    {
+        if (MultiSelectionActive)
+            return;
+
+        if (cell != multiSelectionStartCell && multiSelectionStartCell.x >= 0)
+        {
+            MultiSelectionActive = true;
+            line.enabled = true;
+            UpdateMultiSelection(cell);
+        }
+        else
+        {
+            multiSelectionStartCell = cell;
+        }
+    }
+
+    public void UpdateMultiSelection(Vector2Int mouseCoordinates)
+    {
+        line.SetPositions(GetMultiSelectionCornerPoints(mouseCoordinates));
+    }
+
+    public void FinishMultiSelection(Vector2Int endCell, EditMode function)
+    {
+        if (!MultiSelectionActive)
+            return;
+
+        int width = Mathf.Abs(endCell.x - multiSelectionStartCell.x) + 1;
+        int height = Mathf.Abs(endCell.y - multiSelectionStartCell.y) + 1;
+
+        int smallerX = Mathf.Min(multiSelectionStartCell.x, endCell.x);
+        int smallerY = Mathf.Min(multiSelectionStartCell.y, endCell.y);
+
+        BuildInstruction instruction = BuildInstruction.Default();
+        HexMeshScriptableObject hexMesh = CurrentHexMesh;
+
+        for (int y = smallerY; y < smallerY + height; y++)
+        {
+            for (int x = smallerX; x < smallerX + width; x++)
+            {
+                switch (function)
+                {
+                    case EditMode.Add:
+                        if (instruction != null)
+                        {
+                            instruction.HexMesh = hexMesh;
+                            instruction.Cell = new Vector2Int(x, y);
+                            instruction.Direction = CurrentDirection;
+                            instruction.HeightLevel = HeightLevel;
+                            AddObject(instruction);
+                        }
+                        break;
+                    case EditMode.Remove:
+                        AddOrRemoveObject(new Vector2Int(x, y), fullHeight: true, removeObj: true);
+                        break;
+                    case EditMode.Hide:
+                        grid.HideObjectsInCell(new Vector2Int(x, y), true);
+                        break;
+                }
+            }
+        }
+
+        ResetMultiSelection();
+    }
+
+    public void ResetMultiSelection()
+    {
+        MultiSelectionActive = false;
+        line.enabled = false;
+
+        if (multiSelectionStartCell.x >= 0)
+            multiSelectionStartCell = new Vector2Int(-1, -1);
     }
 
     public void ResetPlacer()
@@ -584,9 +673,26 @@ public class ObjectPlacer : MonoBehaviour
         }
     }
 
+    private Vector3[] GetMultiSelectionCornerPoints(Vector2Int mouseCoordinates)
+    {
+        Vector3[] points = new Vector3[4];
+        Vector3 start = grid.GetCellCenterWorld(multiSelectionStartCell, true);
+        start.y = 0.1f;
+        Vector3 end = grid.GetCellCenterWorld(mouseCoordinates, true);
+        end.y = 0.1f;
+        points[0] = start;
+        points[1] = new Vector3(end.x, start.y, start.z);
+        points[2] = end;
+        points[3] = new Vector3(start.x, start.y, end.z);
+        return points;
+    }
+
     //private void OnDrawGizmos()
     //{
-    //    Gizmos.color = Color.green;
-    //    Gizmos.DrawLine(Vector3.zero, new Vector3(Mathf.Cos(defaultDirectionRotationOffset), 0, Mathf.Sin(defaultDirectionRotationOffset)));
+    //    if (MultiSelectionActive)
+    //    {
+    //        Gizmos.color = Color.blue;
+            
+    //    }
     //}
 }

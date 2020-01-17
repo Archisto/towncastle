@@ -63,7 +63,7 @@ public class ToolsMenu : ScriptableObject
             int randX = UnityEngine.Random.Range(0, GameManager.Instance.Grid.GridSizeX);
             int randY = UnityEngine.Random.Range(0, GameManager.Instance.Grid.GridSizeY);
             instruction.Cell = new Vector2Int(randX, randY);
-            FindObjectOfType<ObjectPlacer>().TryPlaceObject(instruction);
+            FindObjectOfType<ObjectPlacer>().AddObject(instruction);
         }
         else
             Debug.LogError("Couldn't get a BuildInstruction");

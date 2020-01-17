@@ -321,17 +321,18 @@ public class HexGrid : MonoBehaviour
         {
             cells[coordinates.y][coordinates.x].RemoveAllObjects();
             hexBase.ObjectsHidden = false;
-            Debug.Log("Cell " + coordinates + " is now empty");
+            //Debug.Log("Cell " + coordinates + " is now empty");
         }
         // Selected height
         else
         {
-            bool success = cells[coordinates.y][coordinates.x].RemoveObjects(heightLevelRounded);
+            //bool success = 
+            cells[coordinates.y][coordinates.x].RemoveObjects(heightLevelRounded);
 
-            if (success)
-                Debug.Log(string.Format("Cell {0} (heightLevel: {1}) is now empty", coordinates, heightLevelRounded));
-            else
-                Debug.LogWarning(string.Format("There are no objects in cell {0} (heightLevel: {1})", coordinates, heightLevelRounded));
+            //if (success)
+            //    Debug.Log(string.Format("Cell {0} (heightLevel: {1}) is now empty", coordinates, heightLevelRounded));
+            //else
+            //    Debug.LogWarning(string.Format("There are no objects in cell {0} (heightLevel: {1})", coordinates, heightLevelRounded));
         }
     }
 
