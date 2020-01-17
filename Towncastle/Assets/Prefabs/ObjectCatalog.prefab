@@ -45,6 +45,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hexMeshes:
   - {fileID: 11400000, guid: a9c35b96da646b247acd52a3f52d1f60, type: 2}
+  - {fileID: 11400000, guid: a09abd697fe0ed94ab7bcc8f4990cb40, type: 2}
+  - {fileID: 11400000, guid: dd6c88b3096fe2a4fa81430b1b8b6e8b, type: 2}
+  - {fileID: 11400000, guid: b2d9b5d4bb9b56d4097c21c9864a7b06, type: 2}
   - {fileID: 11400000, guid: a8a922151b0d81145b4ab900bc59ffac, type: 2}
   - {fileID: 11400000, guid: f350d68c057fecf41a7ad17d4cdeb033, type: 2}
   - {fileID: 11400000, guid: f086d8b43ee07994880fc546ed43f43a, type: 2}
