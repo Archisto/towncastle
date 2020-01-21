@@ -143,8 +143,9 @@ public class HexGrid : MonoBehaviour
                 newHexBase.HexGrid = this;
                 Vector3 newPosition = GetCellCenterWorld(x, y, defaultYAxis: true);
 
-                // Rises until hits something (use a terrain shaper)
-                newPosition.y = GetYWhereHitAbove(newPosition);
+                // Rises until hits something (use a terrain shaper).
+                // The Y value is then rounded up.
+                newPosition.y = (int)(GetYWhereHitAbove(newPosition) + 0.5f);
 
                 newHexBase.transform.position = newPosition;
                 newHexBase.Coordinates = new Vector2Int(x, y);
@@ -324,10 +325,12 @@ public class HexGrid : MonoBehaviour
     {
         HexBase hexBase = GetHexBaseInCell(coordinates.x, coordinates.y);
 
+        // TODO: Remove if not hidden
         // Won't remove if any object in the cell (all height levels) is hidden
         if (!removeHidden && hexBase.ObjectsHidden)
             return false;
 
+        // TODO: Remove all not hidden in cell
         // Full height
         if (heightLevelRounded == 0)
         {
