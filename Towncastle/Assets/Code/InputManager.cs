@@ -13,7 +13,6 @@ public class InputManager : MonoBehaviour
     private MouseController mouse;
     private HexGrid grid;
     private ObjectPlacer objPlacer;
-    private PlayerController player;
 
     private SingleInputHandler horizontalInput;
     private SingleInputHandler verticalInput;
@@ -29,7 +28,7 @@ public class InputManager : MonoBehaviour
     private SingleInputHandler hideModeInput;
     private SingleInputHandler saveFavoriteInput;
     private SingleInputHandler showAllInput;
-    private SingleInputHandler resetInput;
+    private SingleInputHandler resetCamInput;
     private SingleInputHandler pauseInput;
     private SingleInputHandler helpInput;
 
@@ -56,7 +55,6 @@ public class InputManager : MonoBehaviour
         mouse = GameManager.Instance.Mouse;
         grid = GameManager.Instance.Grid;
         objPlacer = GameManager.Instance.ObjectPlacer;
-        player = GameManager.Instance.Player;
 
         InitIndicators();
 
@@ -77,7 +75,7 @@ public class InputManager : MonoBehaviour
         hideModeInput = new SingleInputHandler("Hide Mode");
         saveFavoriteInput = new SingleInputHandler("Save Favorite");
         showAllInput = new SingleInputHandler("Show All");
-        resetInput = new SingleInputHandler("Reset");
+        resetCamInput = new SingleInputHandler("Reset Camera");
         pauseInput = new SingleInputHandler("Pause");
         helpInput = new SingleInputHandler("Help");
 
@@ -129,10 +127,6 @@ public class InputManager : MonoBehaviour
         if (!GameManager.Instance.GamePaused)
         {
             HandleGameInput();
-
-            if (player != null)
-                HandlePlayerMovement();
-
             HandlePauseInput();
         }
         else
@@ -176,12 +170,6 @@ public class InputManager : MonoBehaviour
             grid.HideAllObjects(false);
         }
 
-        resetInput.Update();
-        if (resetInput.JustPressedDown)
-        {
-            GameManager.Instance.ResetGame();
-        }
-
         if (!objPlacer.MultiSelectionActive)
         {
             HandleScrollWheelInput();
@@ -201,6 +189,7 @@ public class InputManager : MonoBehaviour
     {
         horizontalInput.Update();
         verticalInput.Update();
+        resetCamInput.Update();
 
         if (mouseCameraMoveActive &&
             MouseCursorNearScreenEdgePercentage(Utils.Direction.Left, 0.05f))
@@ -219,11 +208,17 @@ public class InputManager : MonoBehaviour
             cam.Move(direction, 1);
         }
 
+        // The camera can zoom in and out regardless of whether it moves horizontally or not
         if (verticalInput.PressedDown)
         {
             Utils.Direction direction =
                 verticalInput.PositiveAxis ? Utils.Direction.Up : Utils.Direction.Down;
             cam.Move(direction, 1);
+        }
+
+        if (resetCamInput.JustPressedDown)
+        {
+            cam.ResetCamera();
         }
     }
 
@@ -394,36 +389,6 @@ public class InputManager : MonoBehaviour
 
             if (!mouse.LeftButtonDown)
                 multiSelectionWasActive = true;
-        }
-    }
-
-    /// <summary>
-    /// Handles player movement user input.
-    /// </summary>
-    private void HandlePlayerMovement()
-    {
-        Vector3 direction = Vector3.zero;
-
-        if (Input.GetKey(KeyCode.W))
-        {
-            direction.z += 1;
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            direction.z -= 1;
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            direction.x -= 1;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            direction.x += 1;
-        }
-
-        if (direction != Vector3.zero)
-        {
-            player.Move(direction);
         }
     }
 

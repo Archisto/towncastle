@@ -16,10 +16,19 @@ public class CameraController : MonoBehaviour, IPublicFloat
     private float rotationSpeed = 1f;
 
     [SerializeField]
+    private float initialZoomRatio = 1f;
+
+    [SerializeField]
     private float minRadius = 10f;
 
     [SerializeField]
+    private float maxRadius;
+
+    [SerializeField]
     private float minY = 10f;
+
+    [SerializeField]
+    private float maxY;
 
     [SerializeField]
     private float orbitAngle = Mathf.PI; // radians
@@ -30,10 +39,10 @@ public class CameraController : MonoBehaviour, IPublicFloat
     private Quaternion startRotation;
 
     private Vector3 leveledOrbitPoint;
-    private float zoomRatio = 1;
+    private float zoomRatio;
     private float orbitRadius;
-    private float maxRadius;
-    private float maxY;
+
+    private float startOrbitAngle;
 
     /// <summary>
     /// The orbit angle (in radians).
@@ -49,26 +58,34 @@ public class CameraController : MonoBehaviour, IPublicFloat
     /// </summary>
     private void Start()
     {
-        if (orbitPoint != null)
-        {
-            leveledOrbitPoint = orbitPoint.position;
-            leveledOrbitPoint.y = transform.position.y;
-            orbitRadius = Vector3.Distance(transform.position, leveledOrbitPoint);
-            maxY = leveledOrbitPoint.y;
+        if (orbitPoint == null)
+            throw new MissingReferenceException("Orbit point");
 
+        leveledOrbitPoint = orbitPoint.position;
+        leveledOrbitPoint.y = transform.position.y;
+        orbitRadius = Vector3.Distance(transform.position, leveledOrbitPoint);
+
+        if (minY < 0 || minY < orbitPoint.position.y)
+            minY = orbitPoint.position.y + 1;
+
+        if (maxY <= minY)
+            maxY = transform.position.y;
+
+        if (minRadius < 0)
+            minRadius = orbitRadius - 1;
+
+        if (maxRadius <= minRadius)
             maxRadius = orbitRadius;
 
-            if (minRadius < 0 || minRadius >= maxRadius)
-                minRadius = maxRadius - 1;
-
-            if (minY < 0 || minY < orbitPoint.position.y)
-                minY = orbitPoint.position.y + 1;
-
-            LookAt(orbitPoint.position);
-        }
+        zoomRatio = initialZoomRatio;
 
         startPosition = transform.position;
         startRotation = transform.rotation;
+        startOrbitAngle = orbitAngle;
+
+        UpdateZoom();
+        UpdatePosition();
+        LookAt(orbitPoint.position);
     }
 
     /// <summary>
@@ -109,8 +126,7 @@ public class CameraController : MonoBehaviour, IPublicFloat
     {
         zoomRatio += speedMultiplier * zoomSpeed * Time.deltaTime;
         zoomRatio = Mathf.Clamp01(zoomRatio);
-        orbitRadius = Utils.ValueFromRatio(zoomRatio, minRadius, maxRadius);
-        leveledOrbitPoint.y = minY + zoomRatio * (maxY - minY);
+        UpdateZoom();
         UpdatePosition();
     }
 
@@ -124,6 +140,12 @@ public class CameraController : MonoBehaviour, IPublicFloat
             orbitAngle += 2 * Mathf.PI;
 
         UpdatePosition();
+    }
+
+    private void UpdateZoom()
+    {
+        orbitRadius = Utils.ValueFromRatio(zoomRatio, minRadius, maxRadius);
+        leveledOrbitPoint.y = Utils.ValueFromRatio(zoomRatio, minY, maxY);
     }
 
     private void UpdatePosition()
@@ -177,5 +199,14 @@ public class CameraController : MonoBehaviour, IPublicFloat
             transform.rotation.eulerAngles.x * -1,
             transform.rotation.eulerAngles.y + 180,
             transform.rotation.eulerAngles.z * -1);
+    }
+
+    public void ResetCamera()
+    {
+        orbitAngle = startOrbitAngle;
+        zoomRatio = initialZoomRatio;
+        UpdateZoom();
+        UpdatePosition();
+        LookAt(orbitPoint.position);
     }
 }

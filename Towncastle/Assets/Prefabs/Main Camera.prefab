@@ -99,6 +99,9 @@ MonoBehaviour:
   orbitPoint: {fileID: 0}
   zoomSpeed: 0.75
   rotationSpeed: 1
-  minRadius: 5
-  minY: 10
+  initialZoomRatio: 0.65
+  minRadius: 10
+  maxRadius: 40
+  minY: 12
+  maxY: 30
   orbitAngle: 3.1415927
