@@ -66,6 +66,7 @@ public class ObjectPlacer : MonoBehaviour
 
     private HexGrid grid;
     private ObjectCatalog catalog;
+    private Settings settings;
     private LineRenderer line;
 
     private Pool<HexObject> hexObjPool;
@@ -116,6 +117,7 @@ public class ObjectPlacer : MonoBehaviour
     {
         grid = GameManager.Instance.Grid;
         catalog = FindObjectOfType<ObjectCatalog>();
+        settings = GameManager.Instance.Settings;
         InitLine();
         
         CurrentDirection = initialHexDirection;
@@ -371,7 +373,9 @@ public class ObjectPlacer : MonoBehaviour
         if (grid.CellExists(cell))
         {
             // Add
-            if (!removeObj)
+            if (!removeObj
+                && (settings.AddingToOccupiedCellActive
+                    || grid.CellIsEmpty(cell, HeightLevelRoundedDown)))
             {
                 // Adds an object according to the build instruction
                 if (buildInstruction != null)
@@ -392,25 +396,31 @@ public class ObjectPlacer : MonoBehaviour
             // Remove
             else if (removeObj)
             {
+                bool success = false;
+
                 // Removes all objects in cell from all height levels
                 if (fullHeight)
                 {
-                    grid.EditCell(cell, null, 0);
+                    success = grid.EditCell(cell, null, 0);
                 }
                 // Removes all objects in cell from the selected rounded height level
                 else
                 {
-                    grid.EditCell(cell, null, HeightLevelRoundedDown);
+                    success = grid.EditCell(cell, null, HeightLevelRoundedDown);
                 }
 
-                RepositionPreviewObject(cell);
-                return true;
+                if (success)
+                    RepositionPreviewObject(cell);
+                else
+                    Debug.LogWarning(
+                        string.Format("Cannot remove from cell {0} (heightLevel: {1})", cell, HeightLevel));
+
+                return success;
             }
             else
             {
-                // TODO: Make it possible to remove [heightLevel > 1] objects
-
-                Debug.LogWarning("Cannot perform action to cell: " + cell);
+                Debug.LogWarning(
+                        string.Format("Cannot add to cell {0} (heightLevel: {1})", cell, HeightLevel));
             }
         }
 

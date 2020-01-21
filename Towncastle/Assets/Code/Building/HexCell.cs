@@ -18,8 +18,6 @@ public class HexCell : IGridObject
         get => totalObjectCount == 0;
     }
 
-    //public HexObject[] HexObjects { get; private set; }
-
     public int MaxHeightLevel { get; private set; }
 
     public HexCell(int x, int y, int maxHeightLevel)
@@ -52,6 +50,11 @@ public class HexCell : IGridObject
         {
             throw new ArgumentOutOfRangeException();
         }
+    }
+
+    public bool HasSomethingOnHeightLevel(int heightLevel)
+    {
+        return objectList[heightLevel - 1].Count > 0;
     }
 
     public bool Has(HexObject hexObject)

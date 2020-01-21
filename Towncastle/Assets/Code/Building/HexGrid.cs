@@ -273,17 +273,25 @@ public class HexGrid : MonoBehaviour
         return CellExists(coordinates.x, coordinates.y);
     }
 
-    public bool CellIsEmpty(int x, int y)
+    public bool CellIsEmpty(int x, int y, int heightLevel)
     {
         if (!CellExists(x, y))
             return false;
 
-        return cells[y][x].IsEmpty;
+        if (heightLevel >= 1)
+            return !cells[y][x].HasSomethingOnHeightLevel(heightLevel);
+        else
+            return cells[y][x].IsEmpty;
     }
 
     public bool CellIsEmpty(Vector2Int coordinates)
     {
-        return CellIsEmpty(coordinates.x, coordinates.y);
+        return CellIsEmpty(coordinates.x, coordinates.y, 0);
+    }
+
+    public bool CellIsEmpty(Vector2Int coordinates, int heightLevel)
+    {
+        return CellIsEmpty(coordinates.x, coordinates.y, heightLevel);
     }
 
     /// <summary>
@@ -295,26 +303,30 @@ public class HexGrid : MonoBehaviour
     /// <param name="hexObject">The object to add or null to remove</param>
     /// <param name="heightLevelRounded">The rounded height level.
     /// Can be 0 only when removing (removes all height levels).</param>
-    public void EditCell(Vector2Int coordinates, HexObject hexObject, int heightLevelRounded)
+    /// <returns>Was editing the cell successful</returns>
+    public bool EditCell(Vector2Int coordinates, HexObject hexObject, int heightLevelRounded)
     {
         // Add
         if (hexObject != null)
         {
-            cells[coordinates.y][coordinates.x].PlaceObject(hexObject, heightLevelRounded);
+            return cells[coordinates.y][coordinates.x].PlaceObject(hexObject, heightLevelRounded);
         }
         // Remove if not hidden
         else if (hexObject == null && !cells[coordinates.y][coordinates.x].IsEmpty)
         {
-            RemoveObjects(coordinates, false, heightLevelRounded);
+            return RemoveObjects(coordinates, false, heightLevelRounded);
         }
+
+        return false;
     }
 
-    private void RemoveObjects(Vector2Int coordinates, bool removeHidden, int heightLevelRounded = 0)
+    private bool RemoveObjects(Vector2Int coordinates, bool removeHidden, int heightLevelRounded = 0)
     {
         HexBase hexBase = GetHexBaseInCell(coordinates.x, coordinates.y);
 
-        if (hexBase.ObjectsHidden && !removeHidden)
-            return;
+        // Won't remove if any object in the cell (all height levels) is hidden
+        if (!removeHidden && hexBase.ObjectsHidden)
+            return false;
 
         // Full height
         if (heightLevelRounded == 0)
@@ -322,12 +334,13 @@ public class HexGrid : MonoBehaviour
             cells[coordinates.y][coordinates.x].RemoveAllObjects();
             hexBase.ObjectsHidden = false;
             //Debug.Log("Cell " + coordinates + " is now empty");
+            return true;
         }
         // Selected height
         else
         {
             //bool success = 
-            cells[coordinates.y][coordinates.x].RemoveObjects(heightLevelRounded);
+            return cells[coordinates.y][coordinates.x].RemoveObjects(heightLevelRounded);
 
             //if (success)
             //    Debug.Log(string.Format("Cell {0} (heightLevel: {1}) is now empty", coordinates, heightLevelRounded));

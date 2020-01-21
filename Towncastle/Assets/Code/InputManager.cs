@@ -13,20 +13,29 @@ public class InputManager : MonoBehaviour
     private MouseController mouse;
     private HexGrid grid;
     private ObjectPlacer objPlacer;
+    private Settings settings;
 
     private SingleInputHandler horizontalInput;
     private SingleInputHandler verticalInput;
     private SingleInputHandler scrollWheelInput;
+    private SingleInputHandler saveFavoriteInput;
+
     private SingleInputHandler changeObjInput;
     private SingleInputHandler turnObjInput;
+
     private SingleInputHandler pickObjInput;
     private SingleInputHandler hideObjInput;
     private SingleInputHandler alt3Input;
+
     private SingleInputHandler matchHeightLevelInput;
+
     private SingleInputHandler addModeInput;
     private SingleInputHandler removeModeInput;
     private SingleInputHandler hideModeInput;
-    private SingleInputHandler saveFavoriteInput;
+
+    private SingleInputHandler toggleGridObjSnap;
+    private SingleInputHandler toggleAddingToOccupiedCell;
+
     private SingleInputHandler showAllInput;
     private SingleInputHandler resetCamInput;
     private SingleInputHandler pauseInput;
@@ -35,15 +44,11 @@ public class InputManager : MonoBehaviour
     private SingleInputHandler[] numberKeys;
 
     private Vector2 screenDimensions;
-    private bool mouseCameraMoveActive; // Enabled by default if we get the screen dimensions
     private bool multiSelectionWasActive; // TODO: Releasing Ctrl and then safely releasing LMB
-    private bool savingFavorite;
 
     private Indicator addModeIndicator;
     private Indicator removeModeIndicator;
     private Indicator hideModeIndicator;
-
-    public ObjectPlacer.EditMode EditMode { get; private set; }
 
     /// <summary>
     /// Start is called before the first frame update.
@@ -55,11 +60,11 @@ public class InputManager : MonoBehaviour
         mouse = GameManager.Instance.Mouse;
         grid = GameManager.Instance.Grid;
         objPlacer = GameManager.Instance.ObjectPlacer;
+        settings = GameManager.Instance.Settings;
+        settings.ResetSettings();
 
         InitIndicators();
-
-        EditMode = ObjectPlacer.EditMode.Add;
-        SetIndicatorStates(EditMode);
+        SetIndicatorStates(settings.EditMode);
 
         horizontalInput = new SingleInputHandler("Horizontal");
         verticalInput = new SingleInputHandler("Vertical");
@@ -73,6 +78,8 @@ public class InputManager : MonoBehaviour
         addModeInput = new SingleInputHandler("Add Mode");
         removeModeInput = new SingleInputHandler("Remove Mode");
         hideModeInput = new SingleInputHandler("Hide Mode");
+        toggleGridObjSnap = new SingleInputHandler("Toggle Grid Object Snap");
+        toggleAddingToOccupiedCell = new SingleInputHandler("Toggle Adding to Occupied Cell");
         saveFavoriteInput = new SingleInputHandler("Save Favorite");
         showAllInput = new SingleInputHandler("Show All");
         resetCamInput = new SingleInputHandler("Reset Camera");
@@ -95,7 +102,7 @@ public class InputManager : MonoBehaviour
         if (GameManager.Instance.UI != null)
         {
             screenDimensions = GameManager.Instance.UI.CanvasSize;
-            mouseCameraMoveActive = true;
+            settings.MouseCameraMoveActive = true;
         }
     }
 
@@ -175,7 +182,7 @@ public class InputManager : MonoBehaviour
             HandleScrollWheelInput();
 
             HandleObjPlacingInput();
-            HandleModeSelectionInput();
+            HandleQuickSettingsInput();
             HandleMultiSelectionInput();
             HandleFavoritesInput();
         }
@@ -191,12 +198,12 @@ public class InputManager : MonoBehaviour
         verticalInput.Update();
         resetCamInput.Update();
 
-        if (mouseCameraMoveActive &&
+        if (settings.MouseCameraMoveActive &&
             MouseCursorNearScreenEdgePercentage(Utils.Direction.Left, 0.05f))
         {
             cam.Move(Utils.Direction.Left, 1);
         }
-        else if (mouseCameraMoveActive &&
+        else if (settings.MouseCameraMoveActive &&
                  MouseCursorNearScreenEdgePercentage(Utils.Direction.Right, 0.05f))
         {
             cam.Move(Utils.Direction.Right, 1);
@@ -294,29 +301,43 @@ public class InputManager : MonoBehaviour
         //    multiSelectionWasActive = false;
     }
 
-    private void HandleModeSelectionInput()
+    private void HandleQuickSettingsInput()
     {
         addModeInput.Update();
         removeModeInput.Update();
         hideModeInput.Update();
+        toggleGridObjSnap.Update();
+        toggleAddingToOccupiedCell.Update();
 
         // Add mode
         if (addModeInput.JustPressedDown)
         {
-            EditMode = ObjectPlacer.EditMode.Add;
-            SetIndicatorStates(EditMode);
+            settings.EditMode = ObjectPlacer.EditMode.Add;
+            SetIndicatorStates(settings.EditMode);
         }
         // Remove mode
         else if (removeModeInput.JustPressedDown)
         {
-            EditMode = ObjectPlacer.EditMode.Remove;
-            SetIndicatorStates(EditMode);
+            settings.EditMode = ObjectPlacer.EditMode.Remove;
+            SetIndicatorStates(settings.EditMode);
         }
         // Hide mode
         else if (hideModeInput.JustPressedDown)
         {
-            EditMode = ObjectPlacer.EditMode.Hide;
-            SetIndicatorStates(EditMode);
+            settings.EditMode = ObjectPlacer.EditMode.Hide;
+            SetIndicatorStates(settings.EditMode);
+        }
+        // Grid object snap toggle
+        else if (toggleGridObjSnap.JustPressedDown)
+        {
+            settings.GridObjSnapActive = !settings.GridObjSnapActive;
+            Debug.Log("GridObjSnapActive: " + settings.GridObjSnapActive);
+        }
+        // Adding to occupied cell toggle
+        else if (toggleAddingToOccupiedCell.JustPressedDown)
+        {
+            settings.AddingToOccupiedCellActive = !settings.AddingToOccupiedCellActive;
+            Debug.Log("AddingToOccupiedCellActive: " + settings.AddingToOccupiedCellActive);
         }
     }
 
@@ -329,9 +350,9 @@ public class InputManager : MonoBehaviour
             if (numberKeys[i].JustPressedDown)
             {
                 // Saving a favorite to the selected number key
-                if (savingFavorite)
+                if (settings.SavingFavoriteActive)
                 {
-                    savingFavorite = false;
+                    settings.SavingFavoriteActive = false;
                     objPlacer.SaveCurrentHexMeshToFavorites(i);
                     Debug.Log("Favorite saved to num " + i);
                 }
@@ -347,9 +368,9 @@ public class InputManager : MonoBehaviour
         saveFavoriteInput.Update();
         if (saveFavoriteInput.JustPressedDown)
         {
-            savingFavorite = !savingFavorite;
+            settings.SavingFavoriteActive = !settings.SavingFavoriteActive;
 
-            if (savingFavorite)
+            if (settings.SavingFavoriteActive)
                 Debug.Log("Saving favorite...");
             else
                 Debug.Log("Saving favorite cancelled");
@@ -379,7 +400,7 @@ public class InputManager : MonoBehaviour
         // Finish
         else if (!mouse.LeftButtonDown && objPlacer.MultiSelectionActive)
         {
-            objPlacer.FinishMultiSelection(mouse.Coordinates, EditMode);
+            objPlacer.FinishMultiSelection(mouse.Coordinates, settings.EditMode);
         }
         // Cancel
         else if (objPlacer.MultiSelectionActive && (!hideObjInput.PressedDown ||
@@ -410,9 +431,9 @@ public class InputManager : MonoBehaviour
         if (pauseInput.JustPressedDown)
         {
             // Cancels saving a favorite hex mesh
-            if (savingFavorite)
+            if (settings.SavingFavoriteActive)
             {
-                savingFavorite = false;
+                settings.SavingFavoriteActive = false;
                 Debug.Log("Saving favorite cancelled");
             }
             // Closes the help screen
@@ -520,11 +541,11 @@ public class InputManager : MonoBehaviour
 
     public void SetMouseCameraMoveActive(bool active)
     {
-        mouseCameraMoveActive = active;
+        settings.MouseCameraMoveActive = active;
     }
 
     public void ResetInput()
     {
-        savingFavorite = false;
+        settings.SavingFavoriteActive = false;
     }
 }

@@ -71,7 +71,7 @@ public class SingleInputHandler
             wasPressedDown = false;
             Released = true;
         }
-        else
+        else if (Released)
         {
             Released = false;
         }

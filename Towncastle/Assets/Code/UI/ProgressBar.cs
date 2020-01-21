@@ -18,14 +18,12 @@ public class ProgressBar : MonoBehaviour
 
 #pragma warning restore 0649
 
-    PlayerController player;
 
     /// <summary>
     /// Start is called before the first frame update
     /// </summary>
     private void Start()
     {
-        player = GameManager.Instance.Player;
     }
 
     /// <summary>
@@ -35,18 +33,18 @@ public class ProgressBar : MonoBehaviour
     {
         // TODO: Abstract parent class
 
-        if (player == null || player.MaxHitpoints <= 0)
-            return;
+        return;
 
-        float hpRatio = (float) player.Hitpoints / player.MaxHitpoints;
+        float ratio = 0;
+        //float ratio = (float) player.Hitpoints / player.MaxHitpoints;
 
         if (fillImg != null)
         {
-            if (hpRatio == 0f && fillImg.enabled)
+            if (ratio == 0f && fillImg.enabled)
             {
                 fillImg.enabled = false;
             }
-            else if (hpRatio > 0f && !fillImg.enabled)
+            else if (ratio > 0f && !fillImg.enabled)
             {
                 fillImg.enabled = true;
             }
@@ -54,19 +52,19 @@ public class ProgressBar : MonoBehaviour
             switch (barDirection)
             {
                 case Utils.Direction.Up:
-                    fillImg.rectTransform.offsetMax = new Vector2(fillImg.rectTransform.offsetMax.x, -1 * hpRatio * maxFillSize);
+                    fillImg.rectTransform.offsetMax = new Vector2(fillImg.rectTransform.offsetMax.x, -1 * ratio * maxFillSize);
                     break;
 
                 case Utils.Direction.Down:
-                    fillImg.rectTransform.offsetMin = new Vector2(fillImg.rectTransform.offsetMin.x, hpRatio * maxFillSize);
+                    fillImg.rectTransform.offsetMin = new Vector2(fillImg.rectTransform.offsetMin.x, ratio * maxFillSize);
                     break;
 
                 case Utils.Direction.Left:
-                    fillImg.rectTransform.offsetMin = new Vector2(hpRatio * maxFillSize, fillImg.rectTransform.offsetMin.y);
+                    fillImg.rectTransform.offsetMin = new Vector2(ratio * maxFillSize, fillImg.rectTransform.offsetMin.y);
                     break;
 
                 case Utils.Direction.Right:
-                    fillImg.rectTransform.offsetMax = new Vector2(-1 * hpRatio * maxFillSize, fillImg.rectTransform.offsetMax.y);
+                    fillImg.rectTransform.offsetMax = new Vector2(-1 * ratio * maxFillSize, fillImg.rectTransform.offsetMax.y);
                     break;
             }
         }

@@ -45,14 +45,4 @@ public class PositionText : MonoBehaviour
             text.text = objPlacer.GetPlacementInfo();
         }
     }
-
-    public void StopCounter()
-    {
-        Debug.Log("Time: " + Value + " s");
-    }
-
-    public void ResetCounter()
-    {
-        text.text = "0,00 s";
-    }
 }

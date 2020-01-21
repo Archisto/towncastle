@@ -30,8 +30,6 @@ public class GameManager : MonoBehaviour
 
     #endregion Singleton
 
-    private Shooter shooter;
-    private TimeCounter counter;
     private List<LevelObject> levelObjects;
 
     private Vector3 playerStartPos;
@@ -48,9 +46,7 @@ public class GameManager : MonoBehaviour
 
     public ObjectPlacer ObjectPlacer { get; private set; }
 
-    public PlayerController Player { get; private set; }
-
-    public float ElapsedTime { get; private set; }
+    public Settings Settings { get; private set; }
 
     public bool PlayReady { get => !GamePaused && !GameOver; }
 
@@ -86,16 +82,9 @@ public class GameManager : MonoBehaviour
         Camera = FindObjectOfType<CameraController>();
         Grid = FindObjectOfType<HexGrid>();
         ObjectPlacer = FindObjectOfType<ObjectPlacer>();
-
-        // TODO: Remove
-        Player = FindObjectOfType<PlayerController>();
-        shooter = FindObjectOfType<Shooter>();
-        counter = FindObjectOfType<TimeCounter>();
+        Settings = new Settings(Mouse, Camera);
 
         InitLevelObjects();
-
-        if (Player != null)
-            playerStartPos = Player.transform.position;
 
         Debug.Log("GameManager initialized.");
     }
@@ -128,21 +117,16 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Update is called once per frame.
     /// </summary>
-    private void Update()
-    {
-        if (!GamePaused)
-        {
-            if (!GameOver)
-            {
-                UpdateTime();
-            }
-        }
-    }
-
-    private void UpdateTime()
-    {
-        ElapsedTime += Time.deltaTime;
-    }
+    //private void Update()
+    //{
+    //    if (!GamePaused)
+    //    {
+    //        if (!GameOver)
+    //        {
+    //            // TODO?
+    //        }
+    //    }
+    //}
 
     public void PauseGame(bool pause)
     {
@@ -161,9 +145,6 @@ public class GameManager : MonoBehaviour
     public void EndGame()
     {
         GameOver = true;
-
-        if (counter != null)
-            counter.StopCounter();
     }
 
     public void QuitGame()
@@ -176,7 +157,6 @@ public class GameManager : MonoBehaviour
         Debug.Log("Resetting game.");
 
         GameOver = false;
-        ElapsedTime = 0f;
 
         if (levelObjects != null)
         {
@@ -191,17 +171,5 @@ public class GameManager : MonoBehaviour
             Grid.ResetGrid();
             ObjectPlacer.ResetPlacer();
         }
-
-        if (Player != null)
-        {
-            Player.transform.position = playerStartPos;
-            Player.ResetPlayer();
-        }
-
-        if (shooter != null)
-            shooter.ResetShooter();
-
-        if (counter != null)
-            counter.ResetCounter();
     }
 }

@@ -70,7 +70,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mouseWorldY: 0
-  mask:
+  initialMask:
     serializedVersion: 2
     m_Bits: 768
   cursorFollowerObj: {fileID: 0}

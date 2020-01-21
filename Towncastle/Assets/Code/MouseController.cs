@@ -9,12 +9,14 @@ public class MouseController : MonoBehaviour
 #pragma warning disable 0649
 
     [SerializeField]
-    private LayerMask mask;
+    private LayerMask initialMask;
 
     [SerializeField]
     public GameObject cursorFollowerObj;
 
- #pragma warning restore 0649
+#pragma warning restore 0649
+
+    private LayerMask mask;
 
     /// <summary>
     /// The world coordinates of the mouse cursor.
@@ -38,6 +40,19 @@ public class MouseController : MonoBehaviour
     public bool RightButtonReleased { get; private set; }
 
     public bool Dragging { get; set; }
+
+    public void SetMask(LayerMask mask)
+    {
+        this.mask = mask;
+    }
+
+    /// <summary>
+    /// Start is called before the first frame update.
+    /// </summary>
+    private void Start()
+    {
+        mask = initialMask;
+    }
 
     /// <summary>
     /// Update is called once per frame.
@@ -151,5 +166,7 @@ public class MouseController : MonoBehaviour
 
         SelectingCoordinates = false;
         SelectedObject = null;
+
+        mask = initialMask;
     }
 }
