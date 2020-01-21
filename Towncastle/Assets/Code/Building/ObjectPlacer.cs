@@ -284,6 +284,18 @@ public class ObjectPlacer : MonoBehaviour
         }
     }
 
+    public void ChangeObject(int index)
+    {
+        if (catalog != null && catalog.HexMeshCount > 1)
+        {
+            if (index >= 0 && index < catalog.HexMeshCount)
+                currentHexMeshIndex = index;
+
+            catalog.CurrentIndex = currentHexMeshIndex;
+            UpdatePreviewObjectHexMesh();
+        }
+    }
+
     public void ChangeObject(bool next)
     {
         if (catalog != null && catalog.HexMeshCount > 1)
@@ -294,13 +306,38 @@ public class ObjectPlacer : MonoBehaviour
             else if (currentHexMeshIndex < 0)
                 currentHexMeshIndex = catalog.HexMeshCount - 1;
 
+            catalog.CurrentIndex = currentHexMeshIndex;
             UpdatePreviewObjectHexMesh();
         }
+    }
+
+    public void SelectFavoriteHexMesh(int favoriteIndex)
+    {
+        int newIndex = catalog.GetFavoriteHexMeshFullCatalogIndex(favoriteIndex);
+        if (newIndex >= 0)
+        {
+            if (currentHexMeshIndex != newIndex)
+            {
+                currentHexMeshIndex = newIndex;
+                catalog.CurrentIndex = currentHexMeshIndex;
+                UpdatePreviewObjectHexMesh();
+            }
+        }
+        else
+        {
+            Debug.LogError("Couldn't select favorite hex mesh " + favoriteIndex);
+        }
+    }
+
+    public bool SaveCurrentHexMeshToFavorites(int favoriteIndex)
+    {
+        return catalog.SaveCurrentHexMeshToFavorites(favoriteIndex);
     }
 
     public void PickObject(HexObject hexObject)
     {
         // TODO: Equal size hitboxes make picking the desired object difficult
+        // (half height is a start)
 
         if (hexObject == null)
         {

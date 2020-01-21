@@ -124,6 +124,11 @@ public static class Utils
         return AngleFromHexDirection(direction1) - AngleFromHexDirection(direction2);
     }
 
+    public static Vector3 GetHorizontalOrbitDirection(float angle)
+    {
+        return new Vector3(Mathf.Sin(angle), 0, Mathf.Cos(angle));
+    }
+
     public static Vector3 GetCurvePoint(Vector3 p0, Vector3 p1, Vector3 p2, float t)
     {
         // Bézier curve:

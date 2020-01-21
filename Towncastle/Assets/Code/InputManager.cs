@@ -27,6 +27,7 @@ public class InputManager : MonoBehaviour
     private SingleInputHandler addModeInput;
     private SingleInputHandler removeModeInput;
     private SingleInputHandler hideModeInput;
+    private SingleInputHandler saveFavoriteInput;
     private SingleInputHandler showAllInput;
     private SingleInputHandler resetInput;
     private SingleInputHandler pauseInput;
@@ -37,6 +38,7 @@ public class InputManager : MonoBehaviour
     private Vector2 screenDimensions;
     private bool mouseCameraMoveActive; // Enabled by default if we get the screen dimensions
     private bool multiSelectionWasActive; // TODO: Releasing Ctrl and then safely releasing LMB
+    private bool savingFavorite;
 
     private Indicator addModeIndicator;
     private Indicator removeModeIndicator;
@@ -73,6 +75,7 @@ public class InputManager : MonoBehaviour
         addModeInput = new SingleInputHandler("Add Mode");
         removeModeInput = new SingleInputHandler("Remove Mode");
         hideModeInput = new SingleInputHandler("Hide Mode");
+        saveFavoriteInput = new SingleInputHandler("Save Favorite");
         showAllInput = new SingleInputHandler("Show All");
         resetInput = new SingleInputHandler("Reset");
         pauseInput = new SingleInputHandler("Pause");
@@ -183,11 +186,10 @@ public class InputManager : MonoBehaviour
         {
             HandleScrollWheelInput();
 
-            if (mouse.SelectingCoordinates)
-                HandleObjPlacingInput();
-
+            HandleObjPlacingInput();
             HandleModeSelectionInput();
             HandleMultiSelectionInput();
+            HandleFavoritesInput();
         }
         else
         {
@@ -295,17 +297,6 @@ public class InputManager : MonoBehaviour
         // After releasing the mouse button after a multiselection adding objects is enabled again
         //if (add && multiSelectionWasActive)
         //    multiSelectionWasActive = false;
-
-        // NUMBER KEYS
-
-        //for (int i = 0; i < numberKeys.Length; i++)
-        //{
-        //    numberKeys[i].Update();
-        //    if (numberKeys[i].JustPressedDown)
-        //    {
-        //        objPlacer.SetCoord(i, removeKey.PressedDown);
-        //    }
-        //}
     }
 
     private void HandleModeSelectionInput()
@@ -331,6 +322,42 @@ public class InputManager : MonoBehaviour
         {
             EditMode = ObjectPlacer.EditMode.Hide;
             SetIndicatorStates(EditMode);
+        }
+    }
+
+    private void HandleFavoritesInput()
+    {
+        // Selecting a favorite
+        for (int i = 0; i < numberKeys.Length; i++)
+        {
+            numberKeys[i].Update();
+            if (numberKeys[i].JustPressedDown)
+            {
+                // Saving a favorite to the selected number key
+                if (savingFavorite)
+                {
+                    savingFavorite = false;
+                    objPlacer.SaveCurrentHexMeshToFavorites(i);
+                    Debug.Log("Favorite saved to num " + i);
+                }
+                // Changing to the favorited hex mesh
+                else
+                {
+                    objPlacer.SelectFavoriteHexMesh(i);
+                }
+            }
+        }
+
+        // De/activating the favorite saving mode
+        saveFavoriteInput.Update();
+        if (saveFavoriteInput.JustPressedDown)
+        {
+            savingFavorite = !savingFavorite;
+
+            if (savingFavorite)
+                Debug.Log("Saving favorite...");
+            else
+                Debug.Log("Saving favorite cancelled");
         }
     }
 
@@ -417,8 +444,14 @@ public class InputManager : MonoBehaviour
         pauseInput.Update();
         if (pauseInput.JustPressedDown)
         {
+            // Cancels saving a favorite hex mesh
+            if (savingFavorite)
+            {
+                savingFavorite = false;
+                Debug.Log("Saving favorite cancelled");
+            }
             // Closes the help screen
-            if (ui.HelpActive)
+            else if(ui.HelpActive)
             {
                 ui.ToggleHelp();
             }
@@ -523,5 +556,10 @@ public class InputManager : MonoBehaviour
     public void SetMouseCameraMoveActive(bool active)
     {
         mouseCameraMoveActive = active;
+    }
+
+    public void ResetInput()
+    {
+        savingFavorite = false;
     }
 }

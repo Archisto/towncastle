@@ -40,7 +40,7 @@ public class MouseController : MonoBehaviour
     public bool Dragging { get; set; }
 
     /// <summary>
-    /// Updates the object once per frame.
+    /// Update is called once per frame.
     /// </summary>
     private void Update()
     {

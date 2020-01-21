@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour
+public class CameraController : MonoBehaviour, IPublicFloat
 {
 #pragma warning disable 0649
 
@@ -36,6 +36,15 @@ public class CameraController : MonoBehaviour
     private float maxY;
 
     /// <summary>
+    /// The orbit angle (in radians).
+    /// </summary>
+    public float FloatValue
+    {
+        get => orbitAngle;
+        set => orbitAngle = value;
+    }
+
+    /// <summary>
     /// Start is called before the first frame update.
     /// </summary>
     private void Start()
@@ -60,22 +69,6 @@ public class CameraController : MonoBehaviour
 
         startPosition = transform.position;
         startRotation = transform.rotation;
-    }
-
-    /// <summary>
-    /// LateUpdate is called once per frame, after Update.
-    /// </summary>
-    private void LateUpdate()
-    {
-        if (GameManager.Instance.PlayReady)
-        {
-            // TODO
-        }
-    }
-
-    private Vector3 GetOrbitDirection()
-    {
-        return new Vector3(Mathf.Sin(orbitAngle), 0, Mathf.Cos(orbitAngle));
     }
 
     /// <summary>
@@ -118,8 +111,7 @@ public class CameraController : MonoBehaviour
         zoomRatio = Mathf.Clamp01(zoomRatio);
         orbitRadius = Utils.ValueFromRatio(zoomRatio, minRadius, maxRadius);
         leveledOrbitPoint.y = minY + zoomRatio * (maxY - minY);
-
-        transform.position = leveledOrbitPoint + GetOrbitDirection() * orbitRadius;
+        UpdatePosition();
     }
 
     private void Orbit(float speedMultiplier)
@@ -131,7 +123,14 @@ public class CameraController : MonoBehaviour
         else if (speedMultiplier < 0 && orbitAngle < 0)
             orbitAngle += 2 * Mathf.PI;
 
-        transform.position = leveledOrbitPoint + GetOrbitDirection() * orbitRadius;
+        UpdatePosition();
+    }
+
+    private void UpdatePosition()
+    {
+        transform.position =
+            leveledOrbitPoint
+            + Utils.GetHorizontalOrbitDirection(orbitAngle) * orbitRadius;
     }
 
     public void LookAt(Vector3 position)

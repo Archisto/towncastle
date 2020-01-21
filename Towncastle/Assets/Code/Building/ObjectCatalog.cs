@@ -8,12 +8,16 @@ using Random = UnityEngine.Random;
 
 public class ObjectCatalog : MonoBehaviour
 {
+    private const int FavoriteHexMeshCount = 10;
+
 #pragma warning disable 0649
 
     [SerializeField]
     private HexMeshScriptableObject[] hexMeshes;
 
 #pragma warning restore 0649
+
+    private HexMeshScriptableObject[] favoriteHexMeshes;
 
     public int HexMeshCount
     {
@@ -26,12 +30,68 @@ public class ObjectCatalog : MonoBehaviour
         }
     }
 
+    public int CurrentIndex { get; set; }
+
+    /// <summary>
+    /// Start is called before the first frame update.
+    /// </summary>
+    private void Start()
+    {
+        InitFavorites();
+    }
+
+    private void InitFavorites()
+    {
+        favoriteHexMeshes = new HexMeshScriptableObject[FavoriteHexMeshCount];
+        int favoriteIndex;
+        for (int i = 0; i < favoriteHexMeshes.Length; i++)
+        {
+            // Fav indices are organized like the alphanumeric num keys on the keyboard
+            favoriteIndex = (i < favoriteHexMeshes.Length - 1 ? i + 1 : 0);
+            favoriteHexMeshes[favoriteIndex] = hexMeshes[i];
+        }
+    }
+
     public HexMeshScriptableObject GetHexMesh(int index)
     {
         if (index >= 0 && index < HexMeshCount)
             return hexMeshes[index];
 
         return null;
+    }
+
+    public HexMeshScriptableObject GetFavoriteHexMesh(int index)
+    {
+        if (index >= 0 && index < FavoriteHexMeshCount)
+            return favoriteHexMeshes[index];
+
+        return null;
+    }
+
+    public int GetFavoriteHexMeshFullCatalogIndex(int favoriteIndex)
+    {
+        if (favoriteIndex < 0
+            || favoriteIndex >= FavoriteHexMeshCount
+            || favoriteHexMeshes[favoriteIndex] == null)
+            return -1;
+
+        for (int i = 0; i < hexMeshes.Length; i++)
+        {
+            if (favoriteHexMeshes[favoriteIndex] == hexMeshes[i])
+                return i;
+        }
+
+        return -1;
+    }
+
+    public bool SaveCurrentHexMeshToFavorites(int index)
+    {
+        if (index < 0 && index >= FavoriteHexMeshCount)
+            return false;
+
+        favoriteHexMeshes[index] = hexMeshes[CurrentIndex];
+
+        return true;
     }
 
     public HexMeshScriptableObject GetRandomHexMesh()
