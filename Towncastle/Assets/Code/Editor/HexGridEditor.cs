@@ -30,7 +30,7 @@ namespace Towncastle.Editor
             EditorGUI.EndDisabledGroup();
 
             PopulateHexBasesButton();
-            ReacquireHexBasesButton();
+            //ReacquireHexBasesButton();
             DestroyAllHexBasesButton();
 
             EditorGUI.EndDisabledGroup();

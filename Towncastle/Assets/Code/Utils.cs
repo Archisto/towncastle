@@ -119,6 +119,13 @@ public static class Utils
         }
     }
 
+    /// <summary>
+    /// Gets the angle between two hex directions.
+    /// Right is the world main direction so its angle is 0.
+    /// </summary>
+    /// <param name="direction1">A hex direction</param>
+    /// <param name="direction2">Another hex direction</param>
+    /// <returns>An angle in degrees</returns>
     public static float AngleFromHexDirectionToAnother(HexDirection direction1, HexDirection direction2)
     {
         return AngleFromHexDirection(direction1) - AngleFromHexDirection(direction2);

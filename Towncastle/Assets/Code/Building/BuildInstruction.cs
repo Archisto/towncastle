@@ -29,7 +29,7 @@ public class BuildInstruction
 
     public override string ToString()
     {
-        return string.Format("HexMesh {0} at {1} (heightLevel: {2}) looking {3}",
+        return string.Format("HexMesh {0} at {1} (height level: {2}) looking {3}",
             HexMesh.name, Cell, HeightLevel, Direction);
     }
 }

@@ -23,9 +23,7 @@ public class HexBase : MonoBehaviour, IGridObject
 
     public Vector2Int Coordinates { get => coordinates; set => coordinates = value; }
 
-    public float HeightLevel { get => 1; set { } }
-
-    public float Y { get => transform.position.y; }
+    public float HeightLevel { get; set; }
 
     public HexGrid HexGrid { get; set; }
 
@@ -56,7 +54,8 @@ public class HexBase : MonoBehaviour, IGridObject
             return;
 
         Vector3 newPosition = transform.position;
-        newPosition.y = HexGrid.GetYWhereHitAbove(newPosition);
+        newPosition.y = HexGrid.GetYWhereHitAboveRoundedUp(newPosition);
+        HeightLevel = FindObjectOfType<HexGrid>().GetHeightLevelFromPosY(newPosition.y);
         transform.position = newPosition;
     }
 }

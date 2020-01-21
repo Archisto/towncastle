@@ -143,12 +143,13 @@ public class HexGrid : MonoBehaviour
                 newHexBase.HexGrid = this;
                 Vector3 newPosition = GetCellCenterWorld(x, y, defaultYAxis: true);
 
-                // Rises until hits something (use a terrain shaper).
-                // The Y value is then rounded up.
-                newPosition.y = (int)(GetYWhereHitAbove(newPosition) + 0.5f);
+                // Rises until hits something (use a terrain shaper)
+                // and settles on a height level or its half
+                newPosition.y = GetYWhereHitAboveRoundedUp(newPosition);
 
                 newHexBase.transform.position = newPosition;
                 newHexBase.Coordinates = new Vector2Int(x, y);
+                newHexBase.HeightLevel = GetHeightLevelFromPosY(newPosition.y);
                 newHexBase.name = string.Format("HexBase ({0}, {1})", x, y);
                 SetHexBaseMaterial(newHexBase);
                 hexBases.Add(newHexBase);
@@ -210,22 +211,30 @@ public class HexGrid : MonoBehaviour
                 continue;
 
             newPosition = hexBase.transform.position;
-            newPosition.y = GetYWhereHitAbove(newPosition);
+            newPosition.y = GetYWhereHitAboveRoundedUp(newPosition);
             hexBase.transform.position = newPosition;
+            hexBase.HeightLevel = GetHeightLevelFromPosY(newPosition.y);
         }
     }
 
-    public float GetYWhereHitAbove(Vector3 origin)
+    public int GetYWhereHitAboveRoundedUp(Vector3 origin)
     {
         float maxDistance = 20f;
 
         RaycastHit hit;
         if (Physics.Raycast(origin, Vector3.up, out hit, maxDistance))
         {
-            return hit.point.y;
+            return (int)(hit.point.y + 0.5f);
         }
 
-        return origin.y;
+        return (int)(origin.y + 0.5f);
+    }
+
+    public float GetHeightLevelFromPosY(float posY)
+    {
+        float rawHeightLevel = posY / CellHeight;
+        bool halfHeight = (int)rawHeightLevel < (int)(rawHeightLevel + 0.5f);
+        return 1 + (int)rawHeightLevel + (halfHeight ? 0.5f : 0);
     }
 
     /// <summary>
@@ -355,25 +364,16 @@ public class HexGrid : MonoBehaviour
     public Vector3 GetCellCenterWorld(int x, int y, bool defaultYAxis)
     {
         if (cellSize <= 0 || !CellExists(x, y))
-        {
             return new Vector3(-1, -1, -1);
-        }
 
         float yAxis = 0;
         if (!defaultYAxis && hexBases != null && hexBases.Count > 0)
-        {
-            HexBase hexBase = GetHexBaseInCell(x, y);
-
-            if (hexBase != null)
-                yAxis = hexBase.Y;
-        }
+            yAxis = GetCellY(x, y);
 
         Vector3 result = transform.position + new Vector3(x * cellSize, yAxis, y * CellGapZ);
 
         if (y % 2 != 0)
-        {
             result.x += 0.5f * cellSize;
-        }
 
         return result;
     }
@@ -424,6 +424,20 @@ public class HexGrid : MonoBehaviour
             //Debug.Log("Cell: " + result);
             return result;
         }
+    }
+
+    public float GetCellY(int x, int y)
+    {
+        HexBase hexBase = GetHexBaseInCell(x, y);
+        if (hexBase != null)
+            return hexBase.transform.position.y;
+        else
+            return 0;
+    }
+
+    public float GetCellY(Vector2Int coordinates)
+    {
+        return GetCellY(coordinates.x, coordinates.y);
     }
 
     public HexObject GetObjectInCell(Vector2Int cell, bool acceptHidden)

@@ -17,7 +17,14 @@ namespace Towncastle.Editor
         {
             base.OnInspectorGUI();
 
+            DisplayHexBaseInfo();
             ShapeTerrainButton();
+        }
+
+        private void DisplayHexBaseInfo()
+        {
+            GUILayout.Label(string.Format("Position Y: {0}\nHeight level: {1}",
+                targetHexBase.transform.position.y, targetHexBase.HeightLevel));
         }
 
         private void ShapeTerrainButton()

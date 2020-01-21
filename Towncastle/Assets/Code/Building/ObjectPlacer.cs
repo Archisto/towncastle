@@ -213,7 +213,7 @@ public class ObjectPlacer : MonoBehaviour
 
     private void RepositionPreviewObject(Vector2Int previewCell)
     {
-        PlaceObject(PreviewObj, previewCell, HeightLevel, false);
+        PlacePreviewObject(previewCell, HeightLevel);
 
         if (placerObjMain != null)
         {
@@ -413,14 +413,14 @@ public class ObjectPlacer : MonoBehaviour
                     RepositionPreviewObject(cell);
                 else
                     Debug.LogWarning(
-                        string.Format("Cannot remove from cell {0} (heightLevel: {1})", cell, HeightLevel));
+                        string.Format("Cannot remove from cell {0} (height level: {1})", cell, HeightLevel));
 
                 return success;
             }
             else
             {
                 Debug.LogWarning(
-                        string.Format("Cannot add to cell {0} (heightLevel: {1})", cell, HeightLevel));
+                        string.Format("Cannot add to cell {0} (height level: {1})", cell, HeightLevel));
             }
         }
 
@@ -471,7 +471,7 @@ public class ObjectPlacer : MonoBehaviour
         if (newObj != null)
         {
             newObj.SetHexMesh(CurrentHexMesh);
-            PlaceObject(newObj, cell, heightLevel, true);
+            PlaceObject(newObj, cell, heightLevel);
             return true;
         }
         else
@@ -502,18 +502,41 @@ public class ObjectPlacer : MonoBehaviour
                              Vector2Int cell,
                              float rotationY,
                              float heightLevel,
-                             bool build)
+                             bool preview)
     {
         hexObj.Coordinates = cell;
         hexObj.HeightLevel = heightLevel;
 
-        Vector3 newPosition = grid.GetCellCenterWorld(cell, defaultYAxis: false);
-        newPosition.y +=
-            hexObj.HexMesh.defaultPositionY + (heightLevel - 1) * grid.CellHeight;
-        hexObj.transform.position = newPosition;
+        Vector3 newPosition = hexObj.transform.position;
 
-        if (build)
+        if (preview)
         {
+            newPosition = grid.GetCellCenterWorld(cell, defaultYAxis: false);
+            float cellYAxis = newPosition.y;
+            float hexBaseHeightLevel = grid.GetHexBaseInCell(cell.x, cell.y).HeightLevel;
+
+            // TODO: Settings affect this
+
+            //if (cellYAxis > PreviewObj.transform.position.y)
+            if (hexBaseHeightLevel > HeightLevel)
+            {
+                HeightLevel = hexBaseHeightLevel;
+                heightLevel = HeightLevel;
+            }
+            else if (HeightLevel > hexBaseHeightLevel)
+            {
+                HeightLevel -= hexBaseHeightLevel;
+                heightLevel = HeightLevel;
+            }
+
+            newPosition.y +=
+                hexObj.HexMesh.defaultPositionY + (heightLevel - 1) * grid.CellHeight;
+
+            hexObj.transform.position = newPosition;
+        }
+        else
+        {
+            hexObj.transform.position = PreviewObj.transform.position;
             hexObj.Direction = CurrentDirection;
             SetRotationForObject(hexObj, rotationY);
             hexObj.gameObject.SetActive(true);
@@ -522,9 +545,14 @@ public class ObjectPlacer : MonoBehaviour
         }
     }
 
-    private void PlaceObject(HexObject hexObj, Vector2Int cell, float heightLevel, bool build)
+    private void PlaceObject(HexObject hexObj, Vector2Int cell, float heightLevel)
     {
-        PlaceObject(hexObj, cell, objRotation, heightLevel, build);
+        PlaceObject(hexObj, cell, objRotation, heightLevel, false);
+    }
+
+    private void PlacePreviewObject(Vector2Int cell, float heightLevel)
+    {
+        PlaceObject(PreviewObj, cell, objRotation, heightLevel, true);
     }
 
     private void PlaceObjectUsingBuildInstruction(HexObject hexObj, BuildInstruction buildInstruction)
@@ -533,7 +561,7 @@ public class ObjectPlacer : MonoBehaviour
                     buildInstruction.Cell,
                     Utils.AngleFromHexDirection(buildInstruction.Direction),
                     buildInstruction.HeightLevel,
-                    true);
+                    false);
     }
 
     public void ChangeRotationForNextObject(Utils.Direction direction)
