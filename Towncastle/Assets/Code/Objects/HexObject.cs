@@ -178,8 +178,8 @@ public class HexObject : LevelObject, IGridObject
 
     public void SetHexMesh(HexMeshScriptableObject hexMesh)
     {
-        // TODO: Change hitbox also (half height is a start) (cube & cylinder broken)
-        // TODO: Weird rotations, with child object especially. Test different main directions.
+        // TODO: Change hitbox also (half height is a start)
+        // (cube & cylinder broken because they have >0 defaultY; hitbox doesn't follow)
 
         HexMesh = hexMesh;
 

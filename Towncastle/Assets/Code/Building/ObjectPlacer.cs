@@ -95,13 +95,7 @@ public class ObjectPlacer : MonoBehaviour
         }
         set
         {
-            if (value < 1)
-                heightLevel = 1;
-            else if (value > grid.MaxHeightLevel)
-                heightLevel = grid.MaxHeightLevel;
-            else
-                heightLevel = value;
-
+            SetHeightLevel(value);
             RepositionPreviewObject(PreviewObj.Coordinates);
         }
     }
@@ -156,6 +150,18 @@ public class ObjectPlacer : MonoBehaviour
         line.enabled = false;
 
         Debug.Log("Line initialized");
+    }
+
+    private void SetHeightLevel(float heightLevel)
+    {
+        if (heightLevel < 1)
+            this.heightLevel = 1;
+        else if (heightLevel > grid.MaxHeightLevel)
+            this.heightLevel = grid.MaxHeightLevel;
+        else
+            this.heightLevel = heightLevel;
+
+        Debug.Log("Height level: " + this.heightLevel);
     }
 
     /// <summary>
@@ -504,6 +510,7 @@ public class ObjectPlacer : MonoBehaviour
                              float heightLevel,
                              bool preview)
     {
+        Vector2Int oldCoordinates = hexObj.Coordinates;
         hexObj.Coordinates = cell;
         hexObj.HeightLevel = heightLevel;
 
@@ -518,14 +525,20 @@ public class ObjectPlacer : MonoBehaviour
             // TODO: Settings affect this
 
             //if (cellYAxis > PreviewObj.transform.position.y)
+
+            // Rises to the same height level
             if (hexBaseHeightLevel > HeightLevel)
             {
-                HeightLevel = hexBaseHeightLevel;
+                SetHeightLevel(hexBaseHeightLevel);
                 heightLevel = HeightLevel;
             }
+            // Lowers to match the difference in height level
+            // with the old coordinates' hex base
             else if (HeightLevel > hexBaseHeightLevel)
             {
-                HeightLevel -= hexBaseHeightLevel;
+                SetHeightLevel(hexBaseHeightLevel
+                               + HeightLevel
+                               - grid.GetHexBaseInCell(oldCoordinates.x, oldCoordinates.y).HeightLevel);
                 heightLevel = HeightLevel;
             }
 

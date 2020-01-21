@@ -29,6 +29,7 @@ public class Settings
         }
     }
     public bool AddingToOccupiedCellActive { get; set; }
+    public bool SelectAboveHighestOccupiedCellActive { get; set; }
 
     #endregion Input Settings
 
