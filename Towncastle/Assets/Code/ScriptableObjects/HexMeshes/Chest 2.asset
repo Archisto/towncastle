@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c2c12c3f29d7d34a86252a7392a9ecd, type: 3}
-  m_Name: CylinderHorizontal
+  m_Name: Chest 2
   m_EditorClassIdentifier: 
-  mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+  mesh: {fileID: 7466080252263096514, guid: f9bd9673626be7f438bb0d2214985c25, type: 3}
   imported: 1
   structureType: 6
   mainDirection: 1
-  halfHeight: 1
-  defaultRotationY: 90
-  defaultPositionY: 0.5
+  halfHeight: 0
+  defaultRotationY: 0
+  defaultPositionY: 0
   flipX: 0
   flipZ: 0

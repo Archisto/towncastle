@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c2c12c3f29d7d34a86252a7392a9ecd, type: 3}
-  m_Name: ColumnsSquare 1
+  m_Name: RingVerticalSmall
   m_EditorClassIdentifier: 
-  mesh: {fileID: -4053646290255332751, guid: 2c7e1cd4f2b3342409dd152b8b1795ce, type: 3}
+  mesh: {fileID: -4990155074535268009, guid: 35addc38242b1804eaec0d9a830fa6ce, type: 3}
   imported: 1
-  structureType: 4
+  structureType: 6
   mainDirection: 1
   halfHeight: 0
   defaultRotationY: 0

@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c2c12c3f29d7d34a86252a7392a9ecd, type: 3}
-  m_Name: ColumnsSquare 1
+  m_Name: ColumnHexHorizontal 1 Half
   m_EditorClassIdentifier: 
-  mesh: {fileID: -4053646290255332751, guid: 2c7e1cd4f2b3342409dd152b8b1795ce, type: 3}
+  mesh: {fileID: -8407648258028990087, guid: b8e82a2d4eee108458d174e60887719f, type: 3}
   imported: 1
   structureType: 4
   mainDirection: 1
