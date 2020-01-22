@@ -42,6 +42,9 @@ public class ObjectPlacer : MonoBehaviour
     private PlacerObject placerObjMain;
 
     [SerializeField]
+    private PlacerObject placerObjGround;
+
+    [SerializeField]
     private PlacerObject placerObjAltPrefab;
 
     [SerializeField]
@@ -76,6 +79,8 @@ public class ObjectPlacer : MonoBehaviour
 
     private int currentHexMeshIndex = 0;
     private float objRotation = 0;
+    private float heightLevel = 1;
+    private float preferredHeightLevel = 1;
     private Vector2Int multiSelectionStartCell;
 
     public Utils.HexDirection CurrentDirection { get; private set; }
@@ -86,7 +91,6 @@ public class ObjectPlacer : MonoBehaviour
 
     private HexMeshScriptableObject CurrentHexMesh { get => catalog.GetHexMesh(currentHexMeshIndex); }
 
-    private float heightLevel = 1;
     public float HeightLevel
     {
         get
@@ -99,6 +103,8 @@ public class ObjectPlacer : MonoBehaviour
             RepositionPreviewObject(PreviewObj.Coordinates);
         }
     }
+
+    private float HexBaseHeightLevel { get; set; }
 
     public int HeightLevelRoundedUp { get => (int)(HeightLevel + 0.5f); }
 
@@ -139,6 +145,7 @@ public class ObjectPlacer : MonoBehaviour
 
         if (placerObjMain != null)
         {
+            placerObjGround.gameObject.SetActive(false);
             placerObjAltPool = new Pool<PlacerObject>(placerObjAltPrefab, grid.MaxHeightLevel, false);
             activeAltPlacerObjs = new PlacerObject[grid.MaxHeightLevel - 1];
         }
@@ -160,8 +167,17 @@ public class ObjectPlacer : MonoBehaviour
             this.heightLevel = grid.MaxHeightLevel;
         else
             this.heightLevel = heightLevel;
+    }
 
-        Debug.Log("Height level: " + this.heightLevel);
+    public void ChangeHeightLevel(float change)
+    {
+        HeightLevel += change;
+        UpdatePreferredHeight();
+    }
+
+    public void UpdatePreferredHeight()
+    {
+        preferredHeightLevel = HeightLevel;
     }
 
     /// <summary>
@@ -230,6 +246,8 @@ public class ObjectPlacer : MonoBehaviour
                 // Top to bottom
                 bool topLevel = (i == 0);
 
+                int altPlacerHeightLevel = HeightLevelRoundedUp - i;
+
                 if (topLevel)
                 {
                     Material material;
@@ -249,28 +267,51 @@ public class ObjectPlacer : MonoBehaviour
                     SetupPlacerObject(placerObjMain, i, false);
                     placerObjMain.SetMaterial(material);
                 }
-                else
+                else if (altPlacerHeightLevel > HexBaseHeightLevel)
                 {
                     activeAltPlacerObjs[i - 1] = placerObjAltPool.GetPooledObject(true);
                     if (activeAltPlacerObjs[i - 1] != null)
                         SetupPlacerObject(activeAltPlacerObjs[i - 1], i, true);
                 }
             }
+
+            // Ground placer object setup
+            if (HexBaseHeightLevel < HeightLevel)
+            {
+                placerObjGround.gameObject.SetActive(true);
+                SetupPlacerObjectOnGround(placerObjGround);
+            }
         }
     }
 
-    private void SetupPlacerObject(PlacerObject placerObject, int distFromGround, bool snapToFullHeight)
+    private void SetupPlacerObject(PlacerObject placerObject, float posY)
     {
-        // Top to bottom
         Vector3 newPosition = PreviewObj.transform.position;
-        newPosition.y = ((snapToFullHeight ?  HeightLevelRoundedUp : HeightLevel) - (distFromGround + 1)) * grid.CellHeight;
+        newPosition.y = posY;
         placerObject.transform.position = newPosition;
 
         SetSimpleRotationForObject(placerObject.gameObject);
     }
 
+    private void SetupPlacerObject(PlacerObject placerObject, int distFromTop, bool snapToFullHeight)
+    {
+        // Top to bottom because when distFromTop increases, the position gets lower
+
+        float posY = ((snapToFullHeight ?  HeightLevelRoundedUp : HeightLevel) - 1 - distFromTop)
+            * grid.CellHeight;
+        SetupPlacerObject(placerObject, posY);
+    }
+
+    private void SetupPlacerObjectOnGround(PlacerObject placerObject)
+    {
+        float posY = (HexBaseHeightLevel - 1) * grid.CellHeight;
+        SetupPlacerObject(placerObject, posY);
+    }
+
     private void DisableAllAltPlacerObjects()
     {
+        placerObjGround.gameObject.SetActive(false);
+
         for (int i = activeAltPlacerObjs.Length - 1; i >= 0; i--)
         {
             if (activeAltPlacerObjs[i] != null)
@@ -511,6 +552,7 @@ public class ObjectPlacer : MonoBehaviour
                              bool preview)
     {
         Vector2Int oldCoordinates = hexObj.Coordinates;
+        bool changedHeightLevel = heightLevel != hexObj.HeightLevel;
         hexObj.Coordinates = cell;
         hexObj.HeightLevel = heightLevel;
 
@@ -520,29 +562,40 @@ public class ObjectPlacer : MonoBehaviour
         {
             newPosition = grid.GetCellCenterWorld(cell, defaultYAxis: false);
             float cellYAxis = newPosition.y;
-            float hexBaseHeightLevel = grid.GetHexBaseInCell(cell.x, cell.y).HeightLevel;
+            HexBaseHeightLevel = grid.GetHexBaseInCell(cell.x, cell.y).HeightLevel;
 
-            // TODO: Settings affect this
+            bool seekPreferredHeightLevel = settings.KeepSameHeightLevelOnUnevenTerrainActive;
 
             //if (cellYAxis > PreviewObj.transform.position.y)
 
             // Rises to the same height level
-            if (hexBaseHeightLevel > HeightLevel)
+            if (HexBaseHeightLevel > HeightLevel)
             {
-                SetHeightLevel(hexBaseHeightLevel);
+                SetHeightLevel(HexBaseHeightLevel);
                 heightLevel = HeightLevel;
             }
-            // Lowers to match the difference in height level
-            // with the old coordinates' hex base
-            else if (HeightLevel > hexBaseHeightLevel)
+            else if (HeightLevel > HexBaseHeightLevel)
             {
-                SetHeightLevel(hexBaseHeightLevel
-                               + HeightLevel
-                               - grid.GetHexBaseInCell(oldCoordinates.x, oldCoordinates.y).HeightLevel);
-                heightLevel = HeightLevel;
+                // Seeks the preferred height level
+                if (!changedHeightLevel && seekPreferredHeightLevel
+                    && preferredHeightLevel >= HexBaseHeightLevel)
+                {
+                    SetHeightLevel(preferredHeightLevel);
+                    heightLevel = preferredHeightLevel;
+                }
+                // Lowers to match the difference in height level
+                // with the old coordinates' hex base
+                else
+                {
+                    SetHeightLevel(HexBaseHeightLevel
+                                   + HeightLevel
+                                   - grid.GetHexBaseInCell(oldCoordinates.x, oldCoordinates.y).HeightLevel);
+                    heightLevel = HeightLevel;
+                }
             }
 
-            newPosition.y +=
+            // The default Y position for hex bases is 0 so newPosition.y starts there
+            newPosition.y =
                 hexObj.HexMesh.defaultPositionY + (heightLevel - 1) * grid.CellHeight;
 
             hexObj.transform.position = newPosition;
@@ -667,17 +720,6 @@ public class ObjectPlacer : MonoBehaviour
         UpdatePreviewRotation();
     }
 
-    public string GetPlacementInfo()
-    {
-        if (catalog == null || catalog.HexMeshCount == 0)
-            return "Can't access object catalog or it is empty.";
-
-        HexMeshScriptableObject hexMesh = CurrentHexMesh;
-
-        return string.Format("Selected item: {0} ({1})\nDirection: {2}\nHeight level: {3}",
-            hexMesh.name, hexMesh.structureType, CurrentDirection, HeightLevel);
-    }
-
     public void StartMultiSelection(Vector2Int cell)
     {
         if (MultiSelectionActive)
@@ -743,6 +785,20 @@ public class ObjectPlacer : MonoBehaviour
         ResetMultiSelection();
     }
 
+    private Vector3[] GetMultiSelectionCornerPoints(Vector2Int mouseCoordinates)
+    {
+        Vector3[] points = new Vector3[4];
+        Vector3 start = grid.GetCellCenterWorld(multiSelectionStartCell, true);
+        start.y = 0.1f;
+        Vector3 end = grid.GetCellCenterWorld(mouseCoordinates, true);
+        end.y = 0.1f;
+        points[0] = start;
+        points[1] = new Vector3(end.x, start.y, start.z);
+        points[2] = end;
+        points[3] = new Vector3(start.x, start.y, end.z);
+        return points;
+    }
+
     public void ResetMultiSelection()
     {
         MultiSelectionActive = false;
@@ -759,20 +815,29 @@ public class ObjectPlacer : MonoBehaviour
             PreviewObj.gameObject.SetActive(true);
             RepositionPreviewObject(PreviewObj.Coordinates);
         }
+
+        // How big of a reset are we talking about?
+        //HeightLevel = 1;
+        //preferredHeightLevel = 1;
     }
 
-    private Vector3[] GetMultiSelectionCornerPoints(Vector2Int mouseCoordinates)
+    public string GetPlacementInfo()
     {
-        Vector3[] points = new Vector3[4];
-        Vector3 start = grid.GetCellCenterWorld(multiSelectionStartCell, true);
-        start.y = 0.1f;
-        Vector3 end = grid.GetCellCenterWorld(mouseCoordinates, true);
-        end.y = 0.1f;
-        points[0] = start;
-        points[1] = new Vector3(end.x, start.y, start.z);
-        points[2] = end;
-        points[3] = new Vector3(start.x, start.y, end.z);
-        return points;
+        if (catalog == null || catalog.HexMeshCount == 0)
+            return "Can't access object catalog or it is empty.";
+
+        HexMeshScriptableObject hexMesh = CurrentHexMesh;
+
+        return string.Format(
+            "Selected item: {0} ({1})\n" +
+            "Direction: {2}\n" +
+            "Height level: {3}\n" +
+            "Distance to ground: {4}",
+            hexMesh.name,
+            hexMesh.structureType,
+            CurrentDirection,
+            HeightLevel,
+            HeightLevel - HexBaseHeightLevel);
     }
 
     //private void OnDrawGizmos()
@@ -780,7 +845,7 @@ public class ObjectPlacer : MonoBehaviour
     //    if (MultiSelectionActive)
     //    {
     //        Gizmos.color = Color.blue;
-            
+
     //    }
     //}
 }

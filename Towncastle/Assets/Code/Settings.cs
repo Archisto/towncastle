@@ -30,6 +30,7 @@ public class Settings
     }
     public bool AddingToOccupiedCellActive { get; set; }
     public bool SelectAboveHighestOccupiedCellActive { get; set; }
+    public bool KeepSameHeightLevelOnUnevenTerrainActive { get; set; }
 
     #endregion Input Settings
 

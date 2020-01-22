@@ -77,6 +77,11 @@ public static class Utils
             return -1;
     }
 
+    public static bool CanBeRoundedUp(float f)
+    {
+        return (int)f < (int)(f + 0.5f);
+    }
+
     public static Vector3 VectorFromDirection(Direction direction)
     {
         switch (direction)

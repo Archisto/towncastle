@@ -140,7 +140,7 @@ public class HexGrid : MonoBehaviour
                 else
                     newHexBase = Instantiate(hexBasePrefab);
 
-                newHexBase.HexGrid = this;
+                newHexBase.SetHexGrid(this);
                 Vector3 newPosition = GetCellCenterWorld(x, y, defaultYAxis: true);
 
                 // Rises until hits something (use a terrain shaper)
@@ -233,7 +233,7 @@ public class HexGrid : MonoBehaviour
     public float GetHeightLevelFromPosY(float posY)
     {
         float rawHeightLevel = posY / CellHeight;
-        bool halfHeight = (int)rawHeightLevel < (int)(rawHeightLevel + 0.5f);
+        bool halfHeight = Utils.CanBeRoundedUp(rawHeightLevel);
         return 1 + (int)rawHeightLevel + (halfHeight ? 0.5f : 0);
     }
 

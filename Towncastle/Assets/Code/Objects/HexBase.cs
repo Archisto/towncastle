@@ -11,9 +11,14 @@ public class HexBase : MonoBehaviour, IGridObject
     private Vector2Int coordinates;
 
     [SerializeField]
+    private float heightLevel;
+
+    [SerializeField]
     public bool frozen;
 
 #pragma warning restore 0649
+
+    private HexGrid grid;
 
     public Material mainMaterial;
     public Material containsHiddenObjsMaterial;
@@ -23,9 +28,7 @@ public class HexBase : MonoBehaviour, IGridObject
 
     public Vector2Int Coordinates { get => coordinates; set => coordinates = value; }
 
-    public float HeightLevel { get; set; }
-
-    public HexGrid HexGrid { get; set; }
+    public float HeightLevel { get => heightLevel; set => heightLevel = value; }
 
     public bool ObjectsHidden
     {
@@ -43,6 +46,11 @@ public class HexBase : MonoBehaviour, IGridObject
         }
     }
 
+    public void SetHexGrid(HexGrid hexGrid)
+    {
+        grid = hexGrid;
+    }
+
     private void Start()
     {
         meshRend = GetComponentInChildren<MeshRenderer>();
@@ -54,7 +62,7 @@ public class HexBase : MonoBehaviour, IGridObject
             return;
 
         Vector3 newPosition = transform.position;
-        newPosition.y = HexGrid.GetYWhereHitAboveRoundedUp(newPosition);
+        newPosition.y = grid.GetYWhereHitAboveRoundedUp(newPosition);
         HeightLevel = FindObjectOfType<HexGrid>().GetHeightLevelFromPosY(newPosition.y);
         transform.position = newPosition;
     }

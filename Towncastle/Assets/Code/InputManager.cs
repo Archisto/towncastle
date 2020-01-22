@@ -33,6 +33,7 @@ public class InputManager : MonoBehaviour
     private SingleInputHandler removeModeInput;
     private SingleInputHandler hideModeInput;
 
+    private SingleInputHandler toggleKeepSameHeightLevel;
     private SingleInputHandler toggleGridObjSnap;
     private SingleInputHandler toggleAddingToOccupiedCell;
 
@@ -78,6 +79,7 @@ public class InputManager : MonoBehaviour
         addModeInput = new SingleInputHandler("Add Mode");
         removeModeInput = new SingleInputHandler("Remove Mode");
         hideModeInput = new SingleInputHandler("Hide Mode");
+        toggleKeepSameHeightLevel = new SingleInputHandler("Toggle Keep Same Height Level On Uneven Terrain");
         toggleGridObjSnap = new SingleInputHandler("Toggle Grid Object Snap");
         toggleAddingToOccupiedCell = new SingleInputHandler("Toggle Adding to Occupied Cell");
         saveFavoriteInput = new SingleInputHandler("Save Favorite");
@@ -250,7 +252,8 @@ public class InputManager : MonoBehaviour
             else
             {
                 float heightLevelChange = pickObjInput.PressedDown ? 0.5f : 1f;
-                objPlacer.HeightLevel += (scrollWheelInput.PositiveAxis ? 1 : -1) * heightLevelChange;
+                heightLevelChange = (scrollWheelInput.PositiveAxis ? 1 : -1) * heightLevelChange;
+                objPlacer.ChangeHeightLevel(heightLevelChange);
             }
         }
     }
@@ -293,7 +296,10 @@ public class InputManager : MonoBehaviour
             // TODO: Annoyingly preview movement and height change happen in different frames
 
             if (mouse.SelectedObject is HexObject)
+            {
                 objPlacer.HeightLevel = mouse.SelectedObject.HeightLevel;
+                objPlacer.UpdatePreferredHeight();
+            }
         }
 
         // After releasing the mouse button after a multiselection adding objects is enabled again
@@ -306,6 +312,7 @@ public class InputManager : MonoBehaviour
         addModeInput.Update();
         removeModeInput.Update();
         hideModeInput.Update();
+        toggleKeepSameHeightLevel.Update();
         toggleGridObjSnap.Update();
         toggleAddingToOccupiedCell.Update();
 
@@ -326,6 +333,18 @@ public class InputManager : MonoBehaviour
         {
             settings.EditMode = ObjectPlacer.EditMode.Hide;
             SetIndicatorStates(settings.EditMode);
+        }
+        // Keep same height level toggle
+        else if (toggleKeepSameHeightLevel.JustPressedDown)
+        {
+            settings.KeepSameHeightLevelOnUnevenTerrainActive =
+                !settings.KeepSameHeightLevelOnUnevenTerrainActive;
+
+            if (settings.KeepSameHeightLevelOnUnevenTerrainActive)
+                objPlacer.UpdatePreferredHeight();
+
+            Debug.Log("KeepSameHeightLevelOnUnevenTerrainActive: "
+                + settings.KeepSameHeightLevelOnUnevenTerrainActive);
         }
         // Grid object snap toggle
         else if (toggleGridObjSnap.JustPressedDown)
