@@ -143,12 +143,15 @@ public class ObjectPlacer : MonoBehaviour
         PreviewObj.SetHexMesh(CurrentHexMesh);
         SetRotationForObject(PreviewObj);
 
-        if (placerObjMain != null)
-        {
-            placerObjGround.gameObject.SetActive(false);
-            placerObjAltPool = new Pool<PlacerObject>(placerObjAltPrefab, grid.MaxHeightLevel, false);
-            activeAltPlacerObjs = new PlacerObject[grid.MaxHeightLevel - 1];
-        }
+        if (placerObjMain == null)
+            throw new MissingReferenceException("Main placer object");
+
+        if (placerObjGround == null)
+            throw new MissingReferenceException("Ground placer object");
+
+        placerObjGround.gameObject.SetActive(false);
+        placerObjAltPool = new Pool<PlacerObject>(placerObjAltPrefab, grid.MaxHeightLevel, false);
+        activeAltPlacerObjs = new PlacerObject[grid.MaxHeightLevel - 1];
     }
 
     private void InitLine()
@@ -556,12 +559,15 @@ public class ObjectPlacer : MonoBehaviour
         hexObj.Coordinates = cell;
         hexObj.HeightLevel = heightLevel;
 
-        Vector3 newPosition = hexObj.transform.position;
+        Vector3 newPosition = grid.GetCellCenterWorld(cell, defaultYAxis: false);
+
+        // The default Y position for hex bases is 0 so newPosition.y starts there
+        newPosition.y =
+            hexObj.HexMesh.defaultPositionY + (heightLevel - 1) * grid.CellHeight;
+        hexObj.transform.position = newPosition;
 
         if (preview)
         {
-            newPosition = grid.GetCellCenterWorld(cell, defaultYAxis: false);
-            float cellYAxis = newPosition.y;
             HexBaseHeightLevel = grid.GetHexBaseInCell(cell.x, cell.y).HeightLevel;
 
             bool seekPreferredHeightLevel = settings.KeepSameHeightLevelOnUnevenTerrainActive;
@@ -593,16 +599,9 @@ public class ObjectPlacer : MonoBehaviour
                     heightLevel = HeightLevel;
                 }
             }
-
-            // The default Y position for hex bases is 0 so newPosition.y starts there
-            newPosition.y =
-                hexObj.HexMesh.defaultPositionY + (heightLevel - 1) * grid.CellHeight;
-
-            hexObj.transform.position = newPosition;
         }
         else
         {
-            hexObj.transform.position = PreviewObj.transform.position;
             hexObj.Direction = CurrentDirection;
             SetRotationForObject(hexObj, rotationY);
             hexObj.gameObject.SetActive(true);
@@ -753,8 +752,11 @@ public class ObjectPlacer : MonoBehaviour
         int smallerX = Mathf.Min(multiSelectionStartCell.x, endCell.x);
         int smallerY = Mathf.Min(multiSelectionStartCell.y, endCell.y);
 
-        BuildInstruction instruction = BuildInstruction.Default();
         HexMeshScriptableObject hexMesh = CurrentHexMesh;
+
+        BuildInstruction instruction = null;
+        if (function == EditMode.Add)
+            instruction = BuildInstruction.Default();
 
         for (int y = smallerY; y < smallerY + height; y++)
         {

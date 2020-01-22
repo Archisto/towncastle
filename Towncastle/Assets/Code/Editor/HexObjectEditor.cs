@@ -24,7 +24,8 @@ namespace Towncastle.Editor
         private void DisplayHexMeshInfo()
         {
             if (targetHexObject.HexMesh != null)
-                GUILayout.Label(string.Format("Hex Mesh: {0} ({1})", targetHexObject.HexMesh.name, targetHexObject.Type));
+                GUILayout.Label(string.Format("Hex Mesh: {0} ({1}) at {2}",
+                    targetHexObject.HexMesh.name, targetHexObject.Type, targetHexObject.Coordinates));
             else
                 GUILayout.Label("Hex Mesh: " + HexObject.StructureType.Undefined);
         }
