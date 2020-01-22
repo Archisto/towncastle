@@ -496,8 +496,10 @@ public class HexGrid : MonoBehaviour
         {
             for (int x = 0; x < GridSizeX; x++)
             {
-                cells[y][x].ActionToAllObjects<HexObject>(hexObj => hexObj.Hide(hide));
-                GetHexBaseInCell(x, y).ObjectsHidden = hide;
+                bool hideSuccess = cells[y][x].ActionToAllObjects<HexObject>(hexObj => hexObj.Hide(hide));
+
+                if (hideSuccess)
+                    GetHexBaseInCell(x, y).ObjectsHidden = hide;
             }
         }
     }

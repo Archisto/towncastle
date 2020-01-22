@@ -13,6 +13,9 @@ namespace Towncastle.UI
         private PauseMenu pauseMenu;
 
         [SerializeField]
+        private EditMenu editMenu;
+
+        [SerializeField]
         private GameObject helpMenu;
 
 #pragma warning restore 0649
@@ -25,6 +28,7 @@ namespace Towncastle.UI
 
         public Vector2 CanvasSize { get => canvasSize; }
 
+        public bool EditMenuActive { get; private set; }
         public bool HelpActive { get; private set; }
 
         /// <summary>
@@ -35,6 +39,7 @@ namespace Towncastle.UI
             canvas = GetComponent<Canvas>();
             UpdateCanvasSize();
             cam = FindObjectOfType<CameraController>().GetComponent<Camera>();
+            editMenu.Init();
         }
 
         public void UpdateCanvasSize()
@@ -63,6 +68,18 @@ namespace Towncastle.UI
         public void ActivatePauseMenu(bool activate)
         {
             pauseMenu.gameObject.SetActive(activate);
+
+            if (activate && HelpActive)
+                ToggleHelp();
+        }
+
+        public void ActivateEditMenu(bool activate)
+        {
+            if (activate)
+                editMenu.UpdateName();
+
+            editMenu.gameObject.SetActive(activate);
+            EditMenuActive = activate;
 
             if (activate && HelpActive)
                 ToggleHelp();

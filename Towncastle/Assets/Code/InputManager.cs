@@ -33,9 +33,9 @@ public class InputManager : MonoBehaviour
     private SingleInputHandler removeModeInput;
     private SingleInputHandler hideModeInput;
 
-    private SingleInputHandler toggleKeepSameHeightLevel;
     private SingleInputHandler toggleGridObjSnap;
     private SingleInputHandler toggleAddingToOccupiedCell;
+    private SingleInputHandler toggleKeepSameHeightLevel;
 
     private SingleInputHandler showAllInput;
     private SingleInputHandler resetCamInput;
@@ -46,6 +46,8 @@ public class InputManager : MonoBehaviour
 
     private Vector2 screenDimensions;
     private bool multiSelectionWasActive; // TODO: Releasing Ctrl and then safely releasing LMB
+
+    private ObjectPlacer.EditMode heldMode = ObjectPlacer.EditMode.None;
 
     private Indicator addModeIndicator;
     private Indicator removeModeIndicator;
@@ -179,14 +181,27 @@ public class InputManager : MonoBehaviour
             grid.HideAllObjects(false);
         }
 
-        if (!objPlacer.MultiSelectionActive)
+        if (ui.EditMenuActive)
+        {
+            HandleRightClickInput();
+        }
+        else if (!objPlacer.MultiSelectionActive)
         {
             HandleScrollWheelInput();
 
             HandleObjPlacingInput();
             HandleQuickSettingsInput();
-            HandleMultiSelectionInput();
-            HandleFavoritesInput();
+
+            if (ModeButtonHeldDown())
+            {
+                UpdateModeHold(settings.EditMode);
+            }
+            else
+            {
+                ResetModeHold();
+                HandleMultiSelectionInput();
+                HandleFavoritesInput();
+            }
         }
         else
         {
@@ -228,6 +243,15 @@ public class InputManager : MonoBehaviour
         if (resetCamInput.JustPressedDown)
         {
             cam.ResetCamera();
+        }
+    }
+
+    private void HandleRightClickInput()
+    {
+        if (mouse.RightButtonDown)
+        {
+            if (ui.EditMenuActive)
+                ui.ActivateEditMenu(false);
         }
     }
 
@@ -321,30 +345,21 @@ public class InputManager : MonoBehaviour
         {
             settings.EditMode = ObjectPlacer.EditMode.Add;
             SetIndicatorStates(settings.EditMode);
+            UpdateModeHold(settings.EditMode);
         }
         // Remove mode
         else if (removeModeInput.JustPressedDown)
         {
             settings.EditMode = ObjectPlacer.EditMode.Remove;
+            UpdateModeHold(settings.EditMode);
             SetIndicatorStates(settings.EditMode);
         }
         // Hide mode
         else if (hideModeInput.JustPressedDown)
         {
             settings.EditMode = ObjectPlacer.EditMode.Hide;
+            UpdateModeHold(settings.EditMode);
             SetIndicatorStates(settings.EditMode);
-        }
-        // Keep same height level toggle
-        else if (toggleKeepSameHeightLevel.JustPressedDown)
-        {
-            settings.KeepSameHeightLevelOnUnevenTerrainActive =
-                !settings.KeepSameHeightLevelOnUnevenTerrainActive;
-
-            if (settings.KeepSameHeightLevelOnUnevenTerrainActive)
-                objPlacer.UpdatePreferredHeight();
-
-            Debug.Log("KeepSameHeightLevelOnUnevenTerrainActive: "
-                + settings.KeepSameHeightLevelOnUnevenTerrainActive);
         }
         // Grid object snap toggle
         else if (toggleGridObjSnap.JustPressedDown)
@@ -358,6 +373,72 @@ public class InputManager : MonoBehaviour
             settings.AddingToOccupiedCellActive = !settings.AddingToOccupiedCellActive;
             Debug.Log("AddingToOccupiedCellActive: " + settings.AddingToOccupiedCellActive);
         }
+        // Keep same height level toggle
+        else if (toggleKeepSameHeightLevel.JustPressedDown)
+        {
+            settings.KeepSameHeightLevelOnUnevenTerrainActive =
+                !settings.KeepSameHeightLevelOnUnevenTerrainActive;
+
+            if (settings.KeepSameHeightLevelOnUnevenTerrainActive)
+                objPlacer.UpdatePreferredHeight();
+
+            Debug.Log("KeepSameHeightLevelOnUnevenTerrainActive: "
+                + settings.KeepSameHeightLevelOnUnevenTerrainActive);
+        }
+    }
+
+    private bool ModeButtonHeldDown()
+    {
+        switch (settings.EditMode)
+        {
+            case ObjectPlacer.EditMode.Add:
+                return addModeInput.PressedDown;
+            case ObjectPlacer.EditMode.Remove:
+                return removeModeInput.PressedDown;
+            case ObjectPlacer.EditMode.Hide:
+                return hideModeInput.PressedDown;
+        }
+
+        return false;
+    }
+
+    private void UpdateModeHold(ObjectPlacer.EditMode mode)
+    {
+        if (mode != heldMode)
+        {
+            ResetModeHold();
+            heldMode = mode;
+        }
+        else
+        {
+            settings.EditMenuOpeningElapsedTime += Time.deltaTime;
+            float progress = Utils.Ratio
+                (settings.EditMenuOpeningElapsedTime, 0, settings.EditMenuOpeningHoldTime);
+
+            if (progress >= 1)
+            {
+                ResetModeHold();
+                ui.ActivateEditMenu(true);
+            }
+            else
+            {
+                SetIndicatorProgress(heldMode, progress);
+            }
+        }
+    }
+
+    private void SetIndicatorStates(ObjectPlacer.EditMode mode)
+    {
+        addModeIndicator.SetActive(mode == ObjectPlacer.EditMode.Add);
+        removeModeIndicator.SetActive(mode == ObjectPlacer.EditMode.Remove);
+        hideModeIndicator.SetActive(mode == ObjectPlacer.EditMode.Hide);
+    }
+
+    private void SetIndicatorProgress(ObjectPlacer.EditMode mode, float progress)
+    {
+        addModeIndicator.UpdateProgress(mode == ObjectPlacer.EditMode.Add ? progress : 0);
+        removeModeIndicator.UpdateProgress(mode == ObjectPlacer.EditMode.Remove ? progress : 0);
+        hideModeIndicator.UpdateProgress(mode == ObjectPlacer.EditMode.Hide ? progress : 0);
     }
 
     private void HandleFavoritesInput()
@@ -394,13 +475,6 @@ public class InputManager : MonoBehaviour
             else
                 Debug.Log("Saving favorite cancelled");
         }
-    }
-
-    private void SetIndicatorStates(ObjectPlacer.EditMode mode)
-    {
-        addModeIndicator.SetActive(mode == ObjectPlacer.EditMode.Add);
-        removeModeIndicator.SetActive(mode == ObjectPlacer.EditMode.Remove);
-        hideModeIndicator.SetActive(mode == ObjectPlacer.EditMode.Hide);
     }
 
     private void HandleMultiSelectionInput()
@@ -455,8 +529,13 @@ public class InputManager : MonoBehaviour
                 settings.SavingFavoriteActive = false;
                 Debug.Log("Saving favorite cancelled");
             }
+            // Closes the editing menu
+            else if (ui.EditMenuActive)
+            {
+                ui.ActivateEditMenu(false);
+            }
             // Closes the help screen
-            else if(ui.HelpActive)
+            else if (ui.HelpActive)
             {
                 ui.ToggleHelp();
             }
@@ -469,7 +548,7 @@ public class InputManager : MonoBehaviour
         }
 
         helpInput.Update();
-        if (helpInput.JustPressedDown)
+        if (helpInput.JustPressedDown && !ui.EditMenuActive)
         {
             ui.ToggleHelp();
         }
@@ -563,8 +642,19 @@ public class InputManager : MonoBehaviour
         settings.MouseCameraMoveActive = active;
     }
 
+    private void ResetModeHold()
+    {
+        if (heldMode != ObjectPlacer.EditMode.None)
+        {
+            settings.ResetModeHold();
+            SetIndicatorProgress(ObjectPlacer.EditMode.None, 0);
+            heldMode = ObjectPlacer.EditMode.None;
+        }
+    }
+
     public void ResetInput()
     {
+        ResetModeHold();
         settings.SavingFavoriteActive = false;
     }
 }

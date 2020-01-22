@@ -34,10 +34,22 @@ public class Settings
 
     #endregion Input Settings
 
+    #region Time
+
+    public float EditMenuOpeningHoldTime { get => 0.6f; }
+    public float EditMenuOpeningElapsedTime { get; set; }
+
+    #endregion Time
+
     public Settings(MouseController mouse, CameraController camera)
     {
         this.mouse = mouse;
         this.camera = camera;
+    }
+
+    public void ResetModeHold()
+    {
+        EditMenuOpeningElapsedTime = 0;
     }
 
     public void ResetSettings()

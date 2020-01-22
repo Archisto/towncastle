@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Towncastle.UI;
 
 public class ObjectPlacer : MonoBehaviour
 {
@@ -67,9 +68,10 @@ public class ObjectPlacer : MonoBehaviour
 
 #pragma warning restore 0649
 
+    private UIManager ui;
+    private Settings settings;
     private HexGrid grid;
     private ObjectCatalog catalog;
-    private Settings settings;
     private LineRenderer line;
 
     private Pool<HexObject> hexObjPool;
@@ -115,9 +117,10 @@ public class ObjectPlacer : MonoBehaviour
     /// </summary>
     private void Start()
     {
+        ui = GameManager.Instance.UI;
+        settings = GameManager.Instance.Settings;
         grid = GameManager.Instance.Grid;
         catalog = FindObjectOfType<ObjectCatalog>();
-        settings = GameManager.Instance.Settings;
         InitLine();
         
         CurrentDirection = initialHexDirection;
@@ -188,7 +191,8 @@ public class ObjectPlacer : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        UpdatePreviewObjectPosition();
+        if (!ui.EditMenuActive)
+            UpdatePreviewObjectPosition();
 
         // TODO: Smarter way to count active objects
         if (objectsRemainingText)

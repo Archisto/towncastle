@@ -18,6 +18,9 @@ namespace Towncastle.UI
         [SerializeField]
         private ObjectPlacer.EditMode editMode;
 
+        [SerializeField]
+        private Image timeBar;
+
 #pragma warning restore 0649
 
         private Image image;
@@ -30,6 +33,9 @@ namespace Towncastle.UI
         private void Start()
         {
             image = GetComponentInChildren<Image>();
+
+            if (timeBar != null)
+                timeBar.fillAmount = 0;
         }
 
         public void SetActive(bool activate)
@@ -38,6 +44,15 @@ namespace Towncastle.UI
                 image = GetComponentInChildren<Image>();
 
             image.color = activate ? onColor : offColor;
+        }
+
+        public bool UpdateProgress(float progress)
+        {
+            if (timeBar == null)
+                return false;
+
+            timeBar.fillAmount = progress;
+            return progress >= 1;
         }
     }
 }

@@ -116,19 +116,26 @@ public class HexCell : IGridObject
         return true;
     }
 
-    public void ActionToAllObjects<T>(Action<HexObject> action)
+    public bool ActionToAllObjects<T>(Action<HexObject> action)
     {
         if (IsEmpty)
-            return;
+            return false;
+
+        bool success = false;
 
         foreach (List<HexObject> list in objectList)
         {
             foreach (HexObject obj in list)
             {
                 if (obj != null)
+                {
                     action(obj);
+                    success = true;
+                }
             }
         }
+
+        return success;
     }
 
     public bool RemoveObject(HexObject hexObject)
