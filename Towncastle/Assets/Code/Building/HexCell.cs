@@ -116,6 +116,25 @@ public class HexCell : IGridObject
         return true;
     }
 
+    public bool ActionToObjectsInHeightLevel<T>(Action<HexObject> action, int heightLevelRounded)
+    {
+        if (IsEmpty)
+            return false;
+
+        bool success = false;
+
+        foreach (HexObject obj in objectList[heightLevelRounded - 1])
+        {
+            if (obj != null)
+            {
+                action(obj);
+                success = true;
+            }
+        }
+
+        return success;
+    }
+
     public bool ActionToAllObjects<T>(Action<HexObject> action)
     {
         if (IsEmpty)

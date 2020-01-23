@@ -69,6 +69,7 @@ public class ObjectPlacer : MonoBehaviour
 #pragma warning restore 0649
 
     private UIManager ui;
+    private MouseController mouse;
     private Settings settings;
     private HexGrid grid;
     private ObjectCatalog catalog;
@@ -93,6 +94,8 @@ public class ObjectPlacer : MonoBehaviour
 
     private HexMeshScriptableObject CurrentHexMesh { get => catalog.GetHexMesh(currentHexMeshIndex); }
 
+    public Vector2Int Coordinates { get => PreviewObj.Coordinates; }
+
     public float HeightLevel
     {
         get
@@ -102,7 +105,7 @@ public class ObjectPlacer : MonoBehaviour
         set
         {
             SetHeightLevel(value);
-            RepositionPreviewObject(PreviewObj.Coordinates);
+            RepositionPreviewObject(Coordinates);
         }
     }
 
@@ -118,6 +121,7 @@ public class ObjectPlacer : MonoBehaviour
     private void Start()
     {
         ui = GameManager.Instance.UI;
+        mouse = GameManager.Instance.Mouse;
         settings = GameManager.Instance.Settings;
         grid = GameManager.Instance.Grid;
         catalog = FindObjectOfType<ObjectCatalog>();
@@ -220,12 +224,12 @@ public class ObjectPlacer : MonoBehaviour
     /// </summary>
     private void UpdatePreviewObjectPosition()
     {
-        Vector2Int previewCell = GameManager.Instance.Mouse.Coordinates;
+        Vector2Int previewCell = mouse.Coordinates;
 
         if (PreviewObj == null || !grid.CellExists(previewCell))
             return;
 
-        if (PreviewObj.Coordinates != previewCell)
+        if (Coordinates != previewCell)
         {
             //Debug.Log("Previewing: " + previewCell);
             RepositionPreviewObject(previewCell);
@@ -240,7 +244,7 @@ public class ObjectPlacer : MonoBehaviour
         if (PreviewObj != null)
         {
             PreviewObj.SetHexMesh(CurrentHexMesh);
-            RepositionPreviewObject(PreviewObj.Coordinates);
+            RepositionPreviewObject(Coordinates);
             SetRotationForObject(PreviewObj);
         }
     }
@@ -469,10 +473,10 @@ public class ObjectPlacer : MonoBehaviour
                 }
 
                 if (success)
-                    RepositionPreviewObject(cell);
-                else
-                    Debug.LogWarning(
-                        string.Format("Cannot remove from cell {0} (height level: {1})", cell, HeightLevel));
+                    RepositionPreviewObject(Coordinates);
+                //else
+                //    Debug.LogWarning(
+                //        string.Format("Cannot remove from cell {0} (height level: {1})", cell, HeightLevel));
 
                 return success;
             }
@@ -490,6 +494,11 @@ public class ObjectPlacer : MonoBehaviour
     {
         Vector2Int cell = grid.GetCellFromWorldPos(position);
         AddOrRemoveObject(cell, fullHeight: false, removeObj);
+    }
+
+    public void AddOrRemoveObjectInSelectedCell(bool fullHeight, bool removeObj)
+    {
+        AddOrRemoveObject(Coordinates, fullHeight, removeObj);
     }
 
     public void AddObject(BuildInstruction buildInstruction)
@@ -824,7 +833,7 @@ public class ObjectPlacer : MonoBehaviour
         if (PreviewObj != null)
         {
             PreviewObj.gameObject.SetActive(true);
-            RepositionPreviewObject(PreviewObj.Coordinates);
+            RepositionPreviewObject(Coordinates);
         }
 
         // How big of a reset are we talking about?

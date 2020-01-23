@@ -481,12 +481,18 @@ public class HexGrid : MonoBehaviour
         }
     }
 
-    public void HideObjectsInCell(Vector2Int cell, bool hide)
+    public void HideObjectsInCell(Vector2Int cell, bool hide, int heightLevelRounded = 0)
     {
         if (CellIsEmpty(cell))
             return;
 
-        cells[cell.y][cell.x].ActionToAllObjects<HexObject>(hexObj => hexObj.Hide(hide));
+        // Height level 0 means full height
+        if (heightLevelRounded < 1)
+            cells[cell.y][cell.x].ActionToAllObjects<HexObject>(hexObj => hexObj.Hide(hide));
+        else
+            cells[cell.y][cell.x].ActionToObjectsInHeightLevel<HexObject>
+                (hexObj => hexObj.Hide(hide), heightLevelRounded);
+
         GetHexBaseInCell(cell.x, cell.y).ObjectsHidden = hide;
     }
 

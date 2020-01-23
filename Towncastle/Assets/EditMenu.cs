@@ -14,6 +14,7 @@ namespace Towncastle.UI
         //private UIManager ui;
         private Settings settings;
         private HexGrid grid;
+        private ObjectPlacer objPlacer;
         private Text title;
 
         /// <summary>
@@ -24,6 +25,7 @@ namespace Towncastle.UI
             //ui = GameManager.Instance.UI;
             settings = GameManager.Instance.Settings;
             grid = GameManager.Instance.Grid;
+            objPlacer = GameManager.Instance.ObjectPlacer;
             title = GetComponentInChildren<Text>();
         }
 
@@ -43,7 +45,7 @@ namespace Towncastle.UI
             }
         }
 
-        public void AffectCellFullHeight()
+        public void AffectObjectGroup()
         {
             switch (settings.EditMode)
             {
@@ -56,16 +58,44 @@ namespace Towncastle.UI
             }
         }
 
-        public void AffectHeightLevel()
+        public void AffectCellFullHeight()
         {
             switch (settings.EditMode)
             {
                 case ObjectPlacer.EditMode.Add:
+                    objPlacer.HeightLevel = 1;
+                    objPlacer.AddOrRemoveObjectInSelectedCell(true, false);
                     break;
                 case ObjectPlacer.EditMode.Remove:
+                    objPlacer.AddOrRemoveObjectInSelectedCell(true, true);
                     break;
                 case ObjectPlacer.EditMode.Hide:
+                    grid.HideObjectsInCell(objPlacer.Coordinates, true, 0);
                     break;
+            }
+        }
+
+        public void AffectHeightLevel()
+        {
+            int heightLevelRounded = objPlacer.HeightLevelRoundedDown;
+
+            for (int y = 0; y < grid.GridSizeY; y++)
+            {
+                for (int x = 0; x < grid.GridSizeX; x++)
+                {
+                    switch (settings.EditMode)
+                    {
+                        case ObjectPlacer.EditMode.Add:
+                            objPlacer.AddOrRemoveObject(new Vector2Int(x, y), false, false);
+                            break;
+                        case ObjectPlacer.EditMode.Remove:
+                            objPlacer.AddOrRemoveObject(new Vector2Int(x, y), false, true);
+                            break;
+                        case ObjectPlacer.EditMode.Hide:
+                            grid.HideObjectsInCell(new Vector2Int(x, y), true, heightLevelRounded);
+                            break;
+                    }
+                }
             }
         }
 

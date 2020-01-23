@@ -322,18 +322,18 @@ public class InputManager : MonoBehaviour
             }
             else if (leftCtrlInput.PressedDown)
             {
-                grid.HideObjectsInCell(mouse.Coordinates, true);
+                grid.HideObjectsInCell(objPlacer.Coordinates, true, objPlacer.HeightLevelRoundedDown);
             }
             else if (leftAltInput.PressedDown)
             {
                 if (add)
-                    objPlacer.AddOrRemoveObject(mouse.Coordinates, true, false);
+                    objPlacer.AddOrRemoveObjectInSelectedCell(true, false);
                 else if (remove)
-                    objPlacer.AddOrRemoveObject(mouse.Coordinates, true, true);
+                    objPlacer.AddOrRemoveObjectInSelectedCell(true, true);
             }
             else
             {
-                objPlacer.AddOrRemoveObject(mouse.Coordinates, false, remove);
+                objPlacer.AddOrRemoveObjectInSelectedCell(false, remove);
             }
         }
         // Match height level
