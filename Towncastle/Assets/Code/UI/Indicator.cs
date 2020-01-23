@@ -46,6 +46,11 @@ namespace Towncastle.UI
             image.color = activate ? onColor : offColor;
         }
 
+        public void SetActiveIfModeMatches(ObjectPlacer.EditMode mode)
+        {
+            SetActive(mode == EditMode);
+        }
+
         public bool UpdateProgress(float progress)
         {
             if (timeBar == null)

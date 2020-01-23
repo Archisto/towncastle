@@ -23,9 +23,9 @@ public class InputManager : MonoBehaviour
     private SingleInputHandler changeObjInput;
     private SingleInputHandler turnObjInput;
 
-    private SingleInputHandler pickObjInput;
-    private SingleInputHandler hideObjInput;
-    private SingleInputHandler alt3Input;
+    private SingleInputHandler leftShiftInput;
+    private SingleInputHandler leftCtrlInput;
+    private SingleInputHandler leftAltInput;
 
     private SingleInputHandler matchHeightLevelInput;
 
@@ -45,7 +45,7 @@ public class InputManager : MonoBehaviour
     private SingleInputHandler[] numberKeys;
 
     private Vector2 screenDimensions;
-    private bool multiSelectionWasActive; // TODO: Releasing Ctrl and then safely releasing LMB
+    private bool cancelNextMouseClick;
 
     private ObjectPlacer.EditMode heldMode = ObjectPlacer.EditMode.None;
 
@@ -74,9 +74,9 @@ public class InputManager : MonoBehaviour
         scrollWheelInput = new SingleInputHandler("Mouse ScrollWheel");
         changeObjInput = new SingleInputHandler("Change Object");
         turnObjInput = new SingleInputHandler("Turn Object");
-        pickObjInput = new SingleInputHandler("Alt Action 1");
-        hideObjInput = new SingleInputHandler("Alt Action 2");
-        alt3Input = new SingleInputHandler("Alt Action 3");
+        leftShiftInput = new SingleInputHandler("Alt Action 1");
+        leftCtrlInput = new SingleInputHandler("Alt Action 2");
+        leftAltInput = new SingleInputHandler("Alt Action 3");
         matchHeightLevelInput = new SingleInputHandler("Match Height Level");
         addModeInput = new SingleInputHandler("Add Mode");
         removeModeInput = new SingleInputHandler("Remove Mode");
@@ -135,6 +135,14 @@ public class InputManager : MonoBehaviour
     /// </summary>
     private void Update()
     {
+        if (!Application.isFocused)
+        {
+            if (!cancelNextMouseClick)
+                cancelNextMouseClick = true;
+
+            return;
+        }
+
         if (!GameManager.Instance.GamePaused)
         {
             HandleGameInput();
@@ -155,9 +163,9 @@ public class InputManager : MonoBehaviour
     {
         HandleCameraInput();
 
-        pickObjInput.Update();
-        hideObjInput.Update();
-        alt3Input.Update();
+        leftShiftInput.Update();
+        leftCtrlInput.Update();
+        leftAltInput.Update();
 
         // Changing the object
         changeObjInput.Update();
@@ -183,18 +191,17 @@ public class InputManager : MonoBehaviour
 
         if (ui.EditMenuActive)
         {
-            HandleRightClickInput();
+            HandleRightClickCancelInput();
         }
         else if (!objPlacer.MultiSelectionActive)
         {
             HandleScrollWheelInput();
-
-            HandleObjPlacingInput();
+            HandleMouseAndModifierInput();
             HandleQuickSettingsInput();
 
             if (ModeButtonHeldDown())
             {
-                UpdateModeHold(settings.EditMode);
+                UpdateModeHold(settings.EditMode, instant: false);
             }
             else
             {
@@ -207,6 +214,14 @@ public class InputManager : MonoBehaviour
         {
             HandleMultiSelectionInput();
         }
+    }
+
+    private void HandleMouseAndModifierInput()
+    {
+        if (!cancelNextMouseClick)
+            HandleObjPlacingInput();
+        else if (mouse.LeftButtonReleased || mouse.RightButtonReleased)
+            cancelNextMouseClick = false;
     }
 
     private void HandleCameraInput()
@@ -246,12 +261,19 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    private void HandleRightClickInput()
+    private void HandleRightClickCancelInput()
     {
         if (mouse.RightButtonDown)
         {
-            if (ui.EditMenuActive)
+            if (cancelNextMouseClick)
+            {
+                cancelNextMouseClick = false;
+            }
+            else if (ui.EditMenuActive)
+            {
                 ui.ActivateEditMenu(false);
+                cancelNextMouseClick = true; // Cancels removing
+            }
         }
     }
 
@@ -261,12 +283,12 @@ public class InputManager : MonoBehaviour
         if (scrollWheelInput.PressedDown)
         {
             // Changing the object
-            if (alt3Input.PressedDown)
+            if (leftAltInput.PressedDown)
             {
                 objPlacer.ChangeObject(!scrollWheelInput.PositiveAxis);
             }
             // Turning the object
-            else if (hideObjInput.PressedDown)
+            else if (leftCtrlInput.PressedDown)
             {
                 Utils.Direction direction =
                    scrollWheelInput.PositiveAxis ? Utils.Direction.Left : Utils.Direction.Right;
@@ -275,7 +297,7 @@ public class InputManager : MonoBehaviour
             // Changing the height level
             else
             {
-                float heightLevelChange = pickObjInput.PressedDown ? 0.5f : 1f;
+                float heightLevelChange = leftShiftInput.PressedDown ? 0.5f : 1f;
                 heightLevelChange = (scrollWheelInput.PositiveAxis ? 1 : -1) * heightLevelChange;
                 objPlacer.ChangeHeightLevel(heightLevelChange);
             }
@@ -291,18 +313,18 @@ public class InputManager : MonoBehaviour
 
         if (add || remove)
         {
-            if (pickObjInput.PressedDown)
+            if (leftShiftInput.PressedDown)
             {
                 if (add)
                     objPlacer.PickObject(mouse.SelectedObject as HexObject);
                 else if (remove)
                     objPlacer.MatchRotation(mouse.SelectedObject as HexObject);
             }
-            else if (hideObjInput.PressedDown)
+            else if (leftCtrlInput.PressedDown)
             {
                 grid.HideObjectsInCell(mouse.Coordinates, true);
             }
-            else if (alt3Input.PressedDown)
+            else if (leftAltInput.PressedDown)
             {
                 if (add)
                     objPlacer.AddOrRemoveObject(mouse.Coordinates, true, false);
@@ -325,10 +347,6 @@ public class InputManager : MonoBehaviour
                 objPlacer.UpdatePreferredHeight();
             }
         }
-
-        // After releasing the mouse button after a multiselection adding objects is enabled again
-        //if (add && multiSelectionWasActive)
-        //    multiSelectionWasActive = false;
     }
 
     private void HandleQuickSettingsInput()
@@ -344,21 +362,21 @@ public class InputManager : MonoBehaviour
         if (addModeInput.JustPressedDown)
         {
             settings.EditMode = ObjectPlacer.EditMode.Add;
+            UpdateModeHold(settings.EditMode, instant: leftShiftInput.PressedDown);
             SetIndicatorStates(settings.EditMode);
-            UpdateModeHold(settings.EditMode);
         }
         // Remove mode
         else if (removeModeInput.JustPressedDown)
         {
             settings.EditMode = ObjectPlacer.EditMode.Remove;
-            UpdateModeHold(settings.EditMode);
+            UpdateModeHold(settings.EditMode, instant: leftShiftInput.PressedDown);
             SetIndicatorStates(settings.EditMode);
         }
         // Hide mode
         else if (hideModeInput.JustPressedDown)
         {
             settings.EditMode = ObjectPlacer.EditMode.Hide;
-            UpdateModeHold(settings.EditMode);
+            UpdateModeHold(settings.EditMode, instant: leftShiftInput.PressedDown);
             SetIndicatorStates(settings.EditMode);
         }
         // Grid object snap toggle
@@ -402,12 +420,15 @@ public class InputManager : MonoBehaviour
         return false;
     }
 
-    private void UpdateModeHold(ObjectPlacer.EditMode mode)
+    private void UpdateModeHold(ObjectPlacer.EditMode mode, bool instant)
     {
         if (mode != heldMode)
         {
             ResetModeHold();
             heldMode = mode;
+
+            if (instant)
+                ActivateEditMenu();
         }
         else
         {
@@ -415,10 +436,9 @@ public class InputManager : MonoBehaviour
             float progress = Utils.Ratio
                 (settings.EditMenuOpeningElapsedTime, 0, settings.EditMenuOpeningHoldTime);
 
-            if (progress >= 1)
+            if (instant || progress >= 1)
             {
-                ResetModeHold();
-                ui.ActivateEditMenu(true);
+                ActivateEditMenu();
             }
             else
             {
@@ -427,11 +447,17 @@ public class InputManager : MonoBehaviour
         }
     }
 
+    private void ActivateEditMenu()
+    {
+        ResetModeHold();
+        ui.ActivateEditMenu(true);
+    }
+
     private void SetIndicatorStates(ObjectPlacer.EditMode mode)
     {
-        addModeIndicator.SetActive(mode == ObjectPlacer.EditMode.Add);
-        removeModeIndicator.SetActive(mode == ObjectPlacer.EditMode.Remove);
-        hideModeIndicator.SetActive(mode == ObjectPlacer.EditMode.Hide);
+        addModeIndicator.SetActiveIfModeMatches(mode);
+        removeModeIndicator.SetActiveIfModeMatches(mode);
+        hideModeIndicator.SetActiveIfModeMatches(mode);
     }
 
     private void SetIndicatorProgress(ObjectPlacer.EditMode mode, float progress)
@@ -480,13 +506,12 @@ public class InputManager : MonoBehaviour
     private void HandleMultiSelectionInput()
     {
         // Start
-        if (mouse.LeftButtonDown && hideObjInput.PressedDown && !objPlacer.MultiSelectionActive)
+        if (mouse.LeftButtonDown && leftCtrlInput.PressedDown && !objPlacer.MultiSelectionActive)
         {
             objPlacer.StartMultiSelection(mouse.Coordinates);
-            multiSelectionWasActive = true;
         }
         // Update
-        else if (mouse.LeftButtonDown && hideObjInput.PressedDown && objPlacer.MultiSelectionActive)
+        else if (mouse.LeftButtonDown && leftCtrlInput.PressedDown && objPlacer.MultiSelectionActive)
         {
             objPlacer.UpdateMultiSelection(mouse.Coordinates);
         }
@@ -496,13 +521,12 @@ public class InputManager : MonoBehaviour
             objPlacer.FinishMultiSelection(mouse.Coordinates, settings.EditMode);
         }
         // Cancel
-        else if (objPlacer.MultiSelectionActive && (!hideObjInput.PressedDown ||
-                 (!mouse.LeftButtonDown && hideObjInput.PressedDown)))
+        //else if (objPlacer.MultiSelectionActive && (!hideObjInput.PressedDown ||
+        //         (!mouse.LeftButtonDown && hideObjInput.PressedDown)))
+        else if (objPlacer.MultiSelectionActive && !leftCtrlInput.PressedDown)
         {
             objPlacer.ResetMultiSelection();
-
-            if (!mouse.LeftButtonDown)
-                multiSelectionWasActive = true;
+            cancelNextMouseClick = true;
         }
     }
 
@@ -655,6 +679,7 @@ public class InputManager : MonoBehaviour
     public void ResetInput()
     {
         ResetModeHold();
+        cancelNextMouseClick = false;
         settings.SavingFavoriteActive = false;
     }
 }

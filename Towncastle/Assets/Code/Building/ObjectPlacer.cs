@@ -194,6 +194,11 @@ public class ObjectPlacer : MonoBehaviour
         if (!ui.EditMenuActive)
             UpdatePreviewObjectPosition();
 
+        UpdateActiveObjectsCountText();
+    }
+
+    private void UpdateActiveObjectsCountText()
+    {
         // TODO: Smarter way to count active objects
         if (objectsRemainingText)
         {
