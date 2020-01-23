@@ -505,28 +505,37 @@ public class InputManager : MonoBehaviour
 
     private void HandleMultiSelectionInput()
     {
-        // Start
-        if (mouse.LeftButtonDown && leftCtrlInput.PressedDown && !objPlacer.MultiSelectionActive)
+        if (mouse.LeftButtonDown)
         {
-            objPlacer.StartMultiSelection(mouse.Coordinates);
+            // Start
+            if (leftCtrlInput.PressedDown && !objPlacer.MultiSelectionActive)
+            {
+                objPlacer.StartMultiSelection(mouse.Coordinates);
+            }
+            // Update
+            else if (leftCtrlInput.PressedDown && objPlacer.MultiSelectionActive)
+            {
+                objPlacer.UpdateMultiSelection(mouse.Coordinates);
+            }
+            // Cancel
+            else if (objPlacer.MultiSelectionActive && !leftCtrlInput.PressedDown)
+            {
+                objPlacer.ResetMultiSelection();
+                cancelNextMouseClick = true;
+            }
         }
-        // Update
-        else if (mouse.LeftButtonDown && leftCtrlInput.PressedDown && objPlacer.MultiSelectionActive)
+        else
         {
-            objPlacer.UpdateMultiSelection(mouse.Coordinates);
-        }
-        // Finish
-        else if (!mouse.LeftButtonDown && objPlacer.MultiSelectionActive)
-        {
-            objPlacer.FinishMultiSelection(mouse.Coordinates, settings.EditMode);
-        }
-        // Cancel
-        //else if (objPlacer.MultiSelectionActive && (!hideObjInput.PressedDown ||
-        //         (!mouse.LeftButtonDown && hideObjInput.PressedDown)))
-        else if (objPlacer.MultiSelectionActive && !leftCtrlInput.PressedDown)
-        {
-            objPlacer.ResetMultiSelection();
-            cancelNextMouseClick = true;
+            // Finish
+            if (objPlacer.MultiSelectionActive)
+            {
+                objPlacer.FinishMultiSelection(mouse.Coordinates, settings.EditMode);
+            }
+            // Prevent from starting
+            else if (leftCtrlInput.PressedDown)
+            {
+                objPlacer.ResetMultiSelection();
+            }
         }
     }
 

@@ -778,11 +778,16 @@ public class ObjectPlacer : MonoBehaviour
         if (!MultiSelectionActive)
             return;
 
+        bool endXLarger = endCell.x > multiSelectionStartCell.x;
+        bool endYLarger = endCell.y > multiSelectionStartCell.y;
+
         int width = Mathf.Abs(endCell.x - multiSelectionStartCell.x) + 1;
         int height = Mathf.Abs(endCell.y - multiSelectionStartCell.y) + 1;
 
-        int smallerX = Mathf.Min(multiSelectionStartCell.x, endCell.x);
-        int smallerY = Mathf.Min(multiSelectionStartCell.y, endCell.y);
+        int targetValueX =
+            Mathf.Min(multiSelectionStartCell.x, endCell.x) + (endXLarger ? width : 0);
+        int targetValueY =
+            Mathf.Min(multiSelectionStartCell.y, endCell.y) + (endYLarger ? height : 0);
 
         HexMeshScriptableObject hexMesh = CurrentHexMesh;
 
@@ -790,9 +795,13 @@ public class ObjectPlacer : MonoBehaviour
         if (function == EditMode.Add)
             instruction = BuildInstruction.Default();
 
-        for (int y = smallerY; y < smallerY + height; y++)
+        for (int y = multiSelectionStartCell.y;
+             (endYLarger ? y < targetValueY : y >= targetValueY);
+             y += endYLarger ? 1 : -1)
         {
-            for (int x = smallerX; x < smallerX + width; x++)
+            for (int x = multiSelectionStartCell.x;
+                 (endXLarger ? x < targetValueX : x >= targetValueX);
+                 x += endXLarger ? 1 : -1)
             {
                 switch (function)
                 {
@@ -842,8 +851,11 @@ public class ObjectPlacer : MonoBehaviour
 
     public void ResetMultiSelection()
     {
-        MultiSelectionActive = false;
-        line.enabled = false;
+        if (MultiSelectionActive)
+        {
+            MultiSelectionActive = false;
+            line.enabled = false;
+        }
 
         if (multiSelectionStartCell.x >= 0)
             multiSelectionStartCell = new Vector2Int(-1, -1);
