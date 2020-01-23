@@ -86,7 +86,15 @@ namespace Towncastle.UI
                     switch (settings.EditMode)
                     {
                         case ObjectPlacer.EditMode.Add:
-                            objPlacer.AddOrRemoveObject(new Vector2Int(x, y), false, false);
+                            if (objPlacer.ObjectsLeft <= 0)
+                            {
+                                objPlacer.NotifyOutOfObjects();
+                                return;
+                            }
+                            else
+                            {
+                                objPlacer.AddOrRemoveObject(new Vector2Int(x, y), false, false);
+                            }
                             break;
                         case ObjectPlacer.EditMode.Remove:
                             objPlacer.AddOrRemoveObject(new Vector2Int(x, y), false, true);

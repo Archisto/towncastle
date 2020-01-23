@@ -52357,7 +52357,7 @@ MonoBehaviour:
     type: 3}
   previewObjMaterialMain: {fileID: 2100000, guid: 55c8c18d9ff0c0046ab88a31bd310a68,
     type: 2}
-  previewObjMaterialOccupied: {fileID: 2100000, guid: 4c829398dae5bd643a2c4b11fde10547,
+  previewObjMaterialOccupied: {fileID: 2100000, guid: 4655c2fa863bf7445b796bb2605e4758,
     type: 2}
   hexObjPoolSize: 800
   initialHexDirection: 1

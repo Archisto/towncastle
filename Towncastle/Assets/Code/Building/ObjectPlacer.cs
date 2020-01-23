@@ -115,6 +115,8 @@ public class ObjectPlacer : MonoBehaviour
 
     public int HeightLevelRoundedDown { get => (int)HeightLevel; }
 
+    public int ObjectsLeft { get; private set; }
+
     /// <summary>
     /// Start is called before the first frame update.
     /// </summary>
@@ -137,6 +139,11 @@ public class ObjectPlacer : MonoBehaviour
             hexObjPool = new Pool<HexObject>(hexObjPrefab, hexObjPoolSize, false);
             hexObjsInPool = hexObjPool.GetAllObjects();
             GameManager.Instance.AddLevelObjectsToList(hexObjsInPool);
+            ObjectsLeft = hexObjPoolSize;
+        }
+        else
+        {
+            ObjectsLeft = 0;
         }
 
         if (catalog != null && PreviewObj != null)
@@ -213,9 +220,11 @@ public class ObjectPlacer : MonoBehaviour
                     hexObjsInUse++;
             }
 
+            ObjectsLeft = hexObjPoolSize - hexObjsInUse;
+
             objectsRemainingText.text =
                 string.Format("Objects remaining\n{0}/{1}",
-                    hexObjPoolSize - hexObjsInUse, hexObjPoolSize);
+                    ObjectsLeft, hexObjPoolSize);
         }
     }
 
@@ -433,58 +442,62 @@ public class ObjectPlacer : MonoBehaviour
                                   bool removeObj,
                                   BuildInstruction buildInstruction = null)
     {
-        if (grid.CellExists(cell))
+        if (!grid.CellExists(cell))
+            return false;
+
+        // Add
+        if (!removeObj)
         {
-            // Add
-            if (!removeObj
-                && (settings.AddingToOccupiedCellActive
-                    || grid.CellIsEmpty(cell, HeightLevelRoundedDown)))
+            if (ObjectsLeft > 0)
             {
-                // Adds an object according to the build instruction
-                if (buildInstruction != null)
+                if (settings.AddingToOccupiedCellActive
+                    || grid.CellIsEmpty(cell, HeightLevelRoundedDown))
                 {
-                    AddObjectToGridCell(buildInstruction);
+                    // Adds an object according to the build instruction
+                    if (buildInstruction != null)
+                    {
+                        AddObjectToGridCell(buildInstruction);
+                    }
+                    // Adds objects to the cell in all height levels
+                    // if on the ground level or all the way down if not
+                    else if (fullHeight)
+                        BuildTower(cell);
+
+                    // Add a single object to the cell on the selected height level
+                    else
+                        AddObjectToGridCell(cell, HeightLevel);
+
+                    return true;
                 }
-                // Adds objects to the cell in all height levels
-                // if on the ground level or all the way down if not
-                else if (fullHeight)
-                    BuildTower(cell);
-
-                // Add a single object to the cell on the selected height level
-                else
-                    AddObjectToGridCell(cell, HeightLevel);
-
-                return true;
-            }
-            // Remove
-            else if (removeObj)
-            {
-                bool success = false;
-
-                // Removes all objects in cell from all height levels
-                if (fullHeight)
-                {
-                    success = grid.EditCell(cell, null, 0);
-                }
-                // Removes all objects in cell from the selected rounded height level
-                else
-                {
-                    success = grid.EditCell(cell, null, HeightLevelRoundedDown);
-                }
-
-                if (success)
-                    RepositionPreviewObject(Coordinates);
-                //else
-                //    Debug.LogWarning(
-                //        string.Format("Cannot remove from cell {0} (height level: {1})", cell, HeightLevel));
-
-                return success;
             }
             else
             {
-                Debug.LogWarning(
-                        string.Format("Cannot add to cell {0} (height level: {1})", cell, HeightLevel));
+                NotifyOutOfObjects();
             }
+        }
+        // Remove
+        else if (removeObj && ObjectsLeft < hexObjPoolSize)
+        {
+            bool success = false;
+
+            // Removes all objects in cell from all height levels
+            if (fullHeight)
+            {
+                success = grid.EditCell(cell, null, 0);
+            }
+            // Removes all objects in cell from the selected rounded height level
+            else
+            {
+                success = grid.EditCell(cell, null, HeightLevelRoundedDown);
+            }
+
+            if (success)
+                RepositionPreviewObject(Coordinates);
+            //else
+            //    Debug.LogWarning(
+            //        string.Format("Cannot remove from cell {0} (height level: {1})", cell, HeightLevel));
+
+            return success;
         }
 
         return false;
@@ -625,6 +638,7 @@ public class ObjectPlacer : MonoBehaviour
             hexObj.gameObject.SetActive(true);
             grid.EditCell(cell, hexObj, (int)heightLevel); // Height level is rounded down
             RepositionPreviewObject(cell);
+            ObjectsLeft--;
         }
     }
 
@@ -783,6 +797,12 @@ public class ObjectPlacer : MonoBehaviour
                 switch (function)
                 {
                     case EditMode.Add:
+                        if (ObjectsLeft <= 0)
+                        {
+                            NotifyOutOfObjects();
+                            goto End;
+                        }
+
                         if (instruction != null)
                         {
                             instruction.HexMesh = hexMesh;
@@ -802,6 +822,7 @@ public class ObjectPlacer : MonoBehaviour
             }
         }
 
+    End:
         ResetMultiSelection();
     }
 
@@ -839,6 +860,16 @@ public class ObjectPlacer : MonoBehaviour
         // How big of a reset are we talking about?
         //HeightLevel = 1;
         //preferredHeightLevel = 1;
+    }
+
+    public void NotifyOutOfObjects()
+    {
+        Debug.LogWarning("No more objects to add");
+    }
+
+    public void NotifyStageReset()
+    {
+        Debug.LogWarning("Stage reset (TODO: Undo)");
     }
 
     public string GetPlacementInfo()

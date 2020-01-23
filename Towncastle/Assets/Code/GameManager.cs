@@ -171,5 +171,7 @@ public class GameManager : MonoBehaviour
             Grid.ResetGrid();
             ObjectPlacer.ResetPlacer();
         }
+
+        ObjectPlacer.NotifyStageReset();
     }
 }
