@@ -164,8 +164,10 @@ public class ObjectPlacer : MonoBehaviour
             throw new MissingReferenceException("Ground placer object");
 
         placerObjGround.gameObject.SetActive(false);
-        placerObjAltPool = new Pool<PlacerObject>(placerObjAltPrefab, grid.MaxHeightLevel, false);
-        activeAltPlacerObjs = new PlacerObject[grid.MaxHeightLevel - 1];
+
+        int possibleMaxAltPlacerObjCount = grid.MaxHeightLevel - 2;
+        placerObjAltPool = new Pool<PlacerObject>(placerObjAltPrefab, possibleMaxAltPlacerObjCount, false);
+        activeAltPlacerObjs = new PlacerObject[possibleMaxAltPlacerObjCount];
     }
 
     private void InitLine()
