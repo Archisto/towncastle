@@ -52910,6 +52910,203 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.size
+      value: 59
+      objectReference: {fileID: 0}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[27]
+      value: 
+      objectReference: {fileID: 11400000, guid: cd1b5f7b3dea88b4583590b036c7cdf4,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[28]
+      value: 
+      objectReference: {fileID: 11400000, guid: 7e82f42facf5bd74ab1d24881e6e5764,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[29]
+      value: 
+      objectReference: {fileID: 11400000, guid: 2101a4eb7e77d1740a6450bf23de76c7,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[30]
+      value: 
+      objectReference: {fileID: 11400000, guid: 645c2434f3d212842918b1a90d2b561e,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[31]
+      value: 
+      objectReference: {fileID: 11400000, guid: a75a93ca97c986f4ba9bd1c31da5bec2,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[32]
+      value: 
+      objectReference: {fileID: 11400000, guid: 66924719719185d4392bafaaf41af684,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[33]
+      value: 
+      objectReference: {fileID: 11400000, guid: e987458c5c0e9134b9bcf34cb7f5d951,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[34]
+      value: 
+      objectReference: {fileID: 11400000, guid: 210afa9d05ecb364fbfab24668ba3d5d,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[35]
+      value: 
+      objectReference: {fileID: 11400000, guid: 2d1c67e66db3d494ba6f86b6d399a316,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[36]
+      value: 
+      objectReference: {fileID: 11400000, guid: d7ca524f39e81d84083dfdd32895fad9,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[37]
+      value: 
+      objectReference: {fileID: 11400000, guid: 5897a9afb728ee44b954b60984d596a9,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[38]
+      value: 
+      objectReference: {fileID: 11400000, guid: 628a1ff043494f54c90fbb0946333a3f,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[39]
+      value: 
+      objectReference: {fileID: 11400000, guid: 8caa3695356959b409cca3c0b2fb308e,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[40]
+      value: 
+      objectReference: {fileID: 11400000, guid: 6b85241c96094344cac082039f890bee,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[41]
+      value: 
+      objectReference: {fileID: 11400000, guid: ec9e105fae4610f47bb62311eb213001,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[42]
+      value: 
+      objectReference: {fileID: 11400000, guid: 745b0367875f92f4ea51f0638e845c55,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[43]
+      value: 
+      objectReference: {fileID: 11400000, guid: 3a899f25d47a940468c50ca7857b0cbb,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[44]
+      value: 
+      objectReference: {fileID: 11400000, guid: 79eec457d9f91144a81bbe3ffad033ff,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[45]
+      value: 
+      objectReference: {fileID: 11400000, guid: 45c43627ccf2fde4a91cf10ea662ce6b,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[46]
+      value: 
+      objectReference: {fileID: 11400000, guid: bf86a490b964c634e874560164f59615,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[47]
+      value: 
+      objectReference: {fileID: 11400000, guid: 09af6bd5eaeb3394b9d90d48900b4c68,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[48]
+      value: 
+      objectReference: {fileID: 11400000, guid: 6ec3cac035088914ea2741c570918ef9,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[49]
+      value: 
+      objectReference: {fileID: 11400000, guid: aff8710b3ee21a44981fcb56edc2e3a2,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[50]
+      value: 
+      objectReference: {fileID: 11400000, guid: ee1fc2aaebb7d364f8e3d2b3868c68f1,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[51]
+      value: 
+      objectReference: {fileID: 11400000, guid: 2c10fc2546b12ff469a68bf45e1fd4b4,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[52]
+      value: 
+      objectReference: {fileID: 11400000, guid: e202f3dd46aa8804a83f680fa9df1683,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[53]
+      value: 
+      objectReference: {fileID: 11400000, guid: 31d1135b6bc53d94aa8fdc66b5915d4b,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[54]
+      value: 
+      objectReference: {fileID: 11400000, guid: 1015ddf6e98590c43bc6c396afaf9efc,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[55]
+      value: 
+      objectReference: {fileID: 11400000, guid: d66db880292d5394da9ea87508009239,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[56]
+      value: 
+      objectReference: {fileID: 11400000, guid: f410aac400c8e7b4aa26ff8bcfaeb16d,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[57]
+      value: 
+      objectReference: {fileID: 11400000, guid: 9c5a7e905442df846bcf3cf9d3fc92ed,
+        type: 2}
+    - target: {fileID: 2112709945433131582, guid: b35b5920f5187e7468910f1fec128f47,
+        type: 3}
+      propertyPath: hexMeshes.Array.data[58]
+      value: 
+      objectReference: {fileID: 11400000, guid: 2cbf6872271a6934f9c044170e62c4b5,
+        type: 2}
     - target: {fileID: 2112709945433131583, guid: b35b5920f5187e7468910f1fec128f47,
         type: 3}
       propertyPath: m_Name

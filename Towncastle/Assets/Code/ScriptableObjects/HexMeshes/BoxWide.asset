@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c2c12c3f29d7d34a86252a7392a9ecd, type: 3}
-  m_Name: Box 2
+  m_Name: BoxWide
   m_EditorClassIdentifier: 
-  mesh: {fileID: -514420134313037959, guid: 3d3e8296f6f2d9743b72d8ecc94f8ef6, type: 3}
+  mesh: {fileID: 7506022949801504896, guid: bb753bbecb5978a4a82e96eaa67b5d06, type: 3}
   imported: 1
   structureType: 6
   mainDirection: 1

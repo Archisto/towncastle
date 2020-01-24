@@ -365,7 +365,6 @@ public class ObjectPlacer : MonoBehaviour
             if (index >= 0 && index < catalog.HexMeshCount)
                 currentHexMeshIndex = index;
 
-            catalog.CurrentIndex = currentHexMeshIndex;
             UpdatePreviewObjectHexMesh();
         }
     }
@@ -380,7 +379,6 @@ public class ObjectPlacer : MonoBehaviour
             else if (currentHexMeshIndex < 0)
                 currentHexMeshIndex = catalog.HexMeshCount - 1;
 
-            catalog.CurrentIndex = currentHexMeshIndex;
             UpdatePreviewObjectHexMesh();
         }
     }
@@ -393,7 +391,6 @@ public class ObjectPlacer : MonoBehaviour
             if (currentHexMeshIndex != newIndex)
             {
                 currentHexMeshIndex = newIndex;
-                catalog.CurrentIndex = currentHexMeshIndex;
                 UpdatePreviewObjectHexMesh();
             }
         }
@@ -405,7 +402,14 @@ public class ObjectPlacer : MonoBehaviour
 
     public bool SaveCurrentHexMeshToFavorites(int favoriteIndex)
     {
-        return catalog.SaveCurrentHexMeshToFavorites(favoriteIndex);
+        bool success = catalog.SaveCurrentHexMeshToFavorites(favoriteIndex, currentHexMeshIndex);
+
+        if (success)
+            NotifyFavoriteSaved(favoriteIndex, CurrentHexMesh.name);
+        else
+            Debug.LogError("Couldn't save favorite");
+
+        return success;
     }
 
     public void PickObject(HexObject hexObject)
@@ -872,6 +876,11 @@ public class ObjectPlacer : MonoBehaviour
         // How big of a reset are we talking about?
         //HeightLevel = 1;
         //preferredHeightLevel = 1;
+    }
+
+    public void NotifyFavoriteSaved(int favoriteSlot, string hexObjName)
+    {
+        Debug.Log(string.Format("Favorite {0} saved: {1}", favoriteSlot, hexObjName));
     }
 
     public void NotifyOutOfObjects()

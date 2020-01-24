@@ -480,7 +480,6 @@ public class InputManager : MonoBehaviour
                 {
                     settings.SavingFavoriteActive = false;
                     objPlacer.SaveCurrentHexMeshToFavorites(i);
-                    Debug.Log("Favorite saved to num " + i);
                 }
                 // Changing to the favorited hex mesh
                 else

@@ -17,7 +17,7 @@ public class ObjectCatalog : MonoBehaviour
 
 #pragma warning restore 0649
 
-    private HexMeshScriptableObject[] favoriteHexMeshes;
+    private int[] favoriteHexMeshIndices;
 
     public int HexMeshCount
     {
@@ -30,8 +30,6 @@ public class ObjectCatalog : MonoBehaviour
         }
     }
 
-    public int CurrentIndex { get; set; }
-
     /// <summary>
     /// Start is called before the first frame update.
     /// </summary>
@@ -40,15 +38,19 @@ public class ObjectCatalog : MonoBehaviour
         InitFavorites();
     }
 
+    /// <summary>
+    /// Initializes the favorite hex mesh indices array.
+    /// By default, the 10 favorites are the first 10 hex meshes.
+    /// </summary>
     private void InitFavorites()
     {
-        favoriteHexMeshes = new HexMeshScriptableObject[FavoriteHexMeshCount];
+        favoriteHexMeshIndices = new int[FavoriteHexMeshCount];
         int favoriteIndex;
-        for (int i = 0; i < favoriteHexMeshes.Length; i++)
+        for (int i = 0; i < favoriteHexMeshIndices.Length; i++)
         {
             // Fav indices are organized like the alphanumeric num keys on the keyboard
-            favoriteIndex = (i < favoriteHexMeshes.Length - 1 ? i + 1 : 0);
-            favoriteHexMeshes[favoriteIndex] = hexMeshes[i];
+            favoriteIndex = (i < favoriteHexMeshIndices.Length - 1 ? i + 1 : 0);
+            favoriteHexMeshIndices[favoriteIndex] = i;
         }
     }
 
@@ -60,36 +62,28 @@ public class ObjectCatalog : MonoBehaviour
         return null;
     }
 
-    public HexMeshScriptableObject GetFavoriteHexMesh(int index)
+    public HexMeshScriptableObject GetFavoriteHexMesh(int favoriteIndex)
     {
-        if (index >= 0 && index < FavoriteHexMeshCount)
-            return favoriteHexMeshes[index];
+        if (favoriteIndex >= 0 && favoriteIndex < FavoriteHexMeshCount)
+            return hexMeshes[favoriteHexMeshIndices[favoriteIndex]];
 
         return null;
     }
 
     public int GetFavoriteHexMeshFullCatalogIndex(int favoriteIndex)
     {
-        if (favoriteIndex < 0
-            || favoriteIndex >= FavoriteHexMeshCount
-            || favoriteHexMeshes[favoriteIndex] == null)
+        if (favoriteIndex < 0 || favoriteIndex >= FavoriteHexMeshCount)
             return -1;
 
-        for (int i = 0; i < hexMeshes.Length; i++)
-        {
-            if (favoriteHexMeshes[favoriteIndex] == hexMeshes[i])
-                return i;
-        }
-
-        return -1;
+        return favoriteHexMeshIndices[favoriteIndex];
     }
 
-    public bool SaveCurrentHexMeshToFavorites(int index)
+    public bool SaveCurrentHexMeshToFavorites(int favoriteIndex, int catalogIndex)
     {
-        if (index < 0 && index >= FavoriteHexMeshCount)
+        if (favoriteIndex < 0 && favoriteIndex >= FavoriteHexMeshCount)
             return false;
 
-        favoriteHexMeshes[index] = hexMeshes[CurrentIndex];
+        favoriteHexMeshIndices[favoriteIndex] = catalogIndex;
 
         return true;
     }
