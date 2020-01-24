@@ -10,11 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c2c12c3f29d7d34a86252a7392a9ecd, type: 3}
-  m_Name: FenceSixth 2
+  m_Name: FenceLeftOutRightIn 1
   m_EditorClassIdentifier: 
-  mesh: {fileID: 1536801582876157152, guid: 85eca71fc7518e44b86a168373968ee4, type: 3}
+  mesh: {fileID: 7576188671553890492, guid: 19660a2660c9edc4a922f88bf670d000, type: 3}
   imported: 1
   structureType: 1
   mainDirection: 1
+  halfHeight: 0
   defaultRotationY: 0
   defaultPositionY: 0
+  flipX: 0
+  flipZ: 0
