@@ -239,10 +239,7 @@ public class ObjectPlacer : MonoBehaviour
             return;
 
         if (Coordinates != previewCell)
-        {
-            //Debug.Log("Previewing: " + previewCell);
             RepositionPreviewObject(previewCell);
-        }
     }
 
     /// <summary>
@@ -258,7 +255,7 @@ public class ObjectPlacer : MonoBehaviour
         }
     }
 
-    private void RepositionPreviewObject(Vector2Int previewCell)
+    public void RepositionPreviewObject(Vector2Int previewCell)
     {
         PlacePreviewObject(previewCell, HeightLevel);
 
@@ -549,6 +546,31 @@ public class ObjectPlacer : MonoBehaviour
         }
     }
 
+    private bool BuildFromInstruction(BuildInstruction instruction,
+                                      int x, int y,
+                                      bool useCurrentDirection = false,
+                                      bool useCurrentHeightLevel = false)
+    {
+        if (ObjectsLeft <= 0)
+            NotifyOutOfObjects();
+
+        if (instruction != null)
+        {
+            instruction.Cell = new Vector2Int(x, y);
+
+            if (useCurrentDirection)
+                instruction.Direction = CurrentDirection;
+            if (useCurrentHeightLevel)
+                instruction.HeightLevel = HeightLevel;
+
+            AddObject(instruction);
+
+            return true;
+        }
+
+        return false;
+    }
+
     private bool AddObjectToGridCell(Vector2Int cell, float heightLevel)
     {
         HexObject newObj = hexObjPool.GetPooledObject(false);
@@ -641,7 +663,10 @@ public class ObjectPlacer : MonoBehaviour
             SetRotationForObject(hexObj, rotationY);
             hexObj.gameObject.SetActive(true);
             grid.EditCell(cell, hexObj, (int)heightLevel); // Height level is rounded down
-            RepositionPreviewObject(cell);
+
+            if (!MultiSelectionActive)
+                RepositionPreviewObject(cell);
+
             ObjectsLeft--;
         }
     }
@@ -653,6 +678,15 @@ public class ObjectPlacer : MonoBehaviour
 
     private void PlacePreviewObject(Vector2Int cell, float heightLevel)
     {
+        if (settings.AutoselectAboveHighestOccupiedCellActive)
+        {
+            heightLevel = grid.GetHighestOccupiedHeightLevel(cell);
+            if (heightLevel < grid.MaxHeightLevel)
+                heightLevel++;
+
+            SetHeightLevel(heightLevel);
+        }
+
         PlaceObject(PreviewObj, cell, objRotation, heightLevel, true);
     }
 
@@ -793,11 +827,12 @@ public class ObjectPlacer : MonoBehaviour
         int targetValueY =
             Mathf.Min(multiSelectionStartCell.y, endCell.y) + (endYLarger ? height : 0);
 
-        HexMeshScriptableObject hexMesh = CurrentHexMesh;
-
         BuildInstruction instruction = null;
         if (function == EditMode.Add)
+        {
             instruction = BuildInstruction.Default();
+            instruction.HexMesh = CurrentHexMesh;
+        }
 
         for (int y = multiSelectionStartCell.y;
              (endYLarger ? y < targetValueY : y >= targetValueY);
@@ -810,20 +845,8 @@ public class ObjectPlacer : MonoBehaviour
                 switch (function)
                 {
                     case EditMode.Add:
-                        if (ObjectsLeft <= 0)
-                        {
-                            NotifyOutOfObjects();
+                        if (!BuildFromInstruction(instruction, x, y, true, true))
                             goto End;
-                        }
-
-                        if (instruction != null)
-                        {
-                            instruction.HexMesh = hexMesh;
-                            instruction.Cell = new Vector2Int(x, y);
-                            instruction.Direction = CurrentDirection;
-                            instruction.HeightLevel = HeightLevel;
-                            AddObject(instruction);
-                        }
                         break;
                     case EditMode.Remove:
                         AddOrRemoveObject(new Vector2Int(x, y), fullHeight: true, removeObj: true);
@@ -837,6 +860,7 @@ public class ObjectPlacer : MonoBehaviour
 
     End:
         ResetMultiSelection();
+        //RepositionPreviewObject(endCell);
     }
 
     private Vector3[] GetMultiSelectionCornerPoints(Vector2Int mouseCoordinates)

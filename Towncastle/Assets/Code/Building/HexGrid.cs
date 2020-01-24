@@ -481,6 +481,17 @@ public class HexGrid : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Gets the highest occupied height level in the given cell.
+    /// Returns 0 if the cell is empty.
+    /// </summary>
+    /// <param name="cell">The cell's coordinates</param>
+    /// <returns>Highest occupied height level in the cell; 0 if empty</returns>
+    public float GetHighestOccupiedHeightLevel(Vector2Int cell)
+    {
+        return cells[cell.y][cell.x].GetHighestOccupiedHeightLevel();
+    }
+
     public void HideObjectsInCell(Vector2Int cell, bool hide, int heightLevelRounded = 0)
     {
         if (CellIsEmpty(cell))

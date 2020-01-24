@@ -104,6 +104,39 @@ public class HexCell : IGridObject
         return hexObjectList;
     }
 
+    /// <summary>
+    /// Gets the highest occupied height level.
+    /// Returns 0 if the cell is empty.
+    /// </summary>
+    /// <returns>Highest occupied height level; 0 if empty</returns>
+    public float GetHighestOccupiedHeightLevel()
+    {
+        if (IsEmpty)
+            return 0;
+
+        float result = 1;
+
+        // Iterates from the highest height level down
+        for (int i = objectList.Length - 1; i >= 0; i--)
+        {
+            for (int j = 0; j < objectList[i].Count; j++)
+            {
+                if (objectList[i][j].HeightLevel > result)
+                {
+                    result = objectList[i][j].HeightLevel;
+                }
+            }
+
+            // The next iteration would be a full height level lower
+            // so there's no need to continue if the result has been increased
+            // from the default
+            if (result > 1)
+                break;
+        }
+
+        return result;
+    }
+
     public bool PlaceObject(HexObject hexObject, int heightLevelRounded)
     {
         if (hexObject == null

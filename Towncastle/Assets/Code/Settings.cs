@@ -29,7 +29,7 @@ public class Settings
         }
     }
     public bool AddingToOccupiedCellActive { get; set; }
-    public bool SelectAboveHighestOccupiedCellActive { get; set; }
+    public bool AutoselectAboveHighestOccupiedCellActive { get; set; }
     public bool KeepSameHeightLevelOnUnevenTerrainActive { get; set; }
 
     #endregion Input Settings
@@ -58,5 +58,7 @@ public class Settings
         SavingFavoriteActive = false;
         GridObjSnapActive = true;
         AddingToOccupiedCellActive = true;
+        AutoselectAboveHighestOccupiedCellActive = false;
+        KeepSameHeightLevelOnUnevenTerrainActive = false;
     }
 }

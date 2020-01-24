@@ -35,6 +35,7 @@ public class InputManager : MonoBehaviour
 
     private SingleInputHandler toggleGridObjSnap;
     private SingleInputHandler toggleAddingToOccupiedCell;
+    private SingleInputHandler toggleAutoselectAboveHighestOccupied;
     private SingleInputHandler toggleKeepSameHeightLevel;
 
     private SingleInputHandler showAllInput;
@@ -81,9 +82,10 @@ public class InputManager : MonoBehaviour
         addModeInput = new SingleInputHandler("Add Mode");
         removeModeInput = new SingleInputHandler("Remove Mode");
         hideModeInput = new SingleInputHandler("Hide Mode");
-        toggleKeepSameHeightLevel = new SingleInputHandler("Toggle Keep Same Height Level On Uneven Terrain");
         toggleGridObjSnap = new SingleInputHandler("Toggle Grid Object Snap");
         toggleAddingToOccupiedCell = new SingleInputHandler("Toggle Adding to Occupied Cell");
+        toggleAutoselectAboveHighestOccupied = new SingleInputHandler("Toggle Autoselect Above Highest Occupied Cell");
+        toggleKeepSameHeightLevel = new SingleInputHandler("Toggle Keep Same Height Level On Uneven Terrain");
         saveFavoriteInput = new SingleInputHandler("Save Favorite");
         showAllInput = new SingleInputHandler("Show All");
         resetCamInput = new SingleInputHandler("Reset Camera");
@@ -354,9 +356,10 @@ public class InputManager : MonoBehaviour
         addModeInput.Update();
         removeModeInput.Update();
         hideModeInput.Update();
-        toggleKeepSameHeightLevel.Update();
         toggleGridObjSnap.Update();
         toggleAddingToOccupiedCell.Update();
+        toggleAutoselectAboveHighestOccupied.Update();
+        toggleKeepSameHeightLevel.Update();
 
         // Add mode
         if (addModeInput.JustPressedDown)
@@ -388,8 +391,22 @@ public class InputManager : MonoBehaviour
         // Adding to occupied cell toggle
         else if (toggleAddingToOccupiedCell.JustPressedDown)
         {
-            settings.AddingToOccupiedCellActive = !settings.AddingToOccupiedCellActive;
-            Debug.Log("AddingToOccupiedCellActive: " + settings.AddingToOccupiedCellActive);
+            settings.AddingToOccupiedCellActive =
+                !settings.AddingToOccupiedCellActive;
+            Debug.Log("AddingToOccupiedCellActive: " +
+                settings.AddingToOccupiedCellActive);
+        }
+        // Autoselecting above highest occupied cell toggle
+        else if (toggleAutoselectAboveHighestOccupied.JustPressedDown)
+        {
+            settings.AutoselectAboveHighestOccupiedCellActive =
+                !settings.AutoselectAboveHighestOccupiedCellActive;
+
+            if (settings.AutoselectAboveHighestOccupiedCellActive)
+                objPlacer.RepositionPreviewObject(mouse.Coordinates);
+
+            Debug.Log("AutoselectAboveHighestOccupiedCellActive: " +
+                settings.AutoselectAboveHighestOccupiedCellActive);
         }
         // Keep same height level toggle
         else if (toggleKeepSameHeightLevel.JustPressedDown)
